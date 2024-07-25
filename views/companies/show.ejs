@@ -1,0 +1,11 @@
+<div class="container my-4">
+  
+    <h1><%= company.id %>. <%= company.name %></h1>
+  
+
+  <form action="/companies/<%= company.id %>?_method=DELETE" method="post">
+    <input type="hidden" name="_csrf" value="<%- _csrf %>" />
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </form>
+</div>

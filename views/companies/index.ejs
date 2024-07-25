@@ -1,0 +1,45 @@
+<div class="container my-4">
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <h1>Companies</h1>
+    </div>
+    <div class="col-md-4 text-right">
+      <a href="/companies/new" class="btn btn-primary">Add company</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-hover table-bordered table-stripped">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Website</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let company of companies) { %>
+            <tr>
+              <td>
+                <a href="/companies/<%= company.id %>">
+                  <%= company.id %>
+                </a>
+              </td>
+              <td>
+                <a href="/companies/<%= company.id %>">
+                  <%= company.name %>
+                </a>
+              </td>
+              <td><%= company.website %></td>
+              <td>
+                <a href="/companies/<%= company.id %>/edit">Edit</a>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

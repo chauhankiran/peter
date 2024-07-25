@@ -9,6 +9,7 @@
     "@sailshq/lodash": "^3.10.6",
     "@sailshq/socket.io-redis": "^6.1.2",
     "dotenv": "^16.4.5",
+    "method-override": "3.0.0",
     "sails": "^1.5.11",
     "sails-hook-apianalytics": "^2.0.6",
     "sails-hook-organics": "^2.2.2",

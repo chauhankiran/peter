@@ -63,4 +63,12 @@ module.exports.routes = {
   'POST  /api/v1/deliver-contact-form-message':          { action: 'deliver-contact-form-message' },
   'POST  /api/v1/observe-my-session':                 { action: 'observe-my-session', hasSocketFeatures: true },
 
+  // Companies
+  'GET    /companies'         : 'CompaniesController.index',
+  'GET    /companies/new'     : 'CompaniesController.new',
+  'GET    /companies/:id'     : 'CompaniesController.show',
+  'POST   /companies'         : 'CompaniesController.create',
+  'GET    /companies/:id/edit': 'CompaniesController.edit',
+  'PUT    /companies/:id'     : 'CompaniesController.update',
+  'DELETE /companies/:id'     : 'CompaniesController.destroy',
 };

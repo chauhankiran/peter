@@ -1,0 +1,36 @@
+<div class="container my-4">
+  <h1 class="mb-4">Edit company</h1>
+
+  <form action="/companies/<%= company.id %>?_method=PUT" method="post">
+    <input type="hidden" name="_csrf" value="<%- _csrf %>" />
+
+    <div class="mb-3">
+      <label for="name">Name</label>
+      <input 
+        type="text"
+        name="name"
+        id="name"
+        placeholder="Google, Inc."
+        class="form-control"
+        value="<%= company.name %>"
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="website">Website</label>
+      <input 
+        type="text" 
+        name="website"
+        id="website"
+        placeholder="https://google.com"
+        class="form-control"
+        value="<%= company.website %>"
+      >
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary">Update</button>
+      <a href="/companies/<%= company.id %>" class="btn btn-default">Cancel</a>
+    </div>
+  </form>
+</div>
