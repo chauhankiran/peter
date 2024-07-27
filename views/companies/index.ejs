@@ -41,5 +41,27 @@
         </tbody>
       </table>
     </div>
+
+    <div class="col-md-12">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item <%= pagination.currentPage === pagination.firstPage ? 'disabled' : '' %>">
+            <a class="page-link" href="/companies">First</a>
+          </li>
+
+          <li class="page-item <%= pagination.currentPage === pagination.prevPage ? 'disabled' : '' %>">
+            <a class="page-link" href="/companies?page=<%=pagination.prevPage%>&limit=<%=pagination.perPage%>">Previous</a>
+          </li>
+          
+          <li class="page-item <%= pagination.currentPage === pagination.lastPage ? 'disabled' : '' %>">
+            <a class="page-link" href="/companies?page=<%=pagination.nextPage%>&limit=<%=pagination.perPage%>">Next</a>
+          </li>
+          
+          <li class="page-item <%= pagination.currentPage === pagination.lastPage ? 'disabled' : ''%>">
+            <a class="page-link" href="/companies?page=<%=pagination.lastPage%>&limit=<%=pagination.perPage%>">Last</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </div>
 </div>
