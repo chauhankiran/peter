@@ -161,5 +161,10 @@ without necessarily having a billing card.`,
       collection: 'company',
       via: 'updatedBy',
     },
+
+    companyStatuses: {
+      collection: 'companyStatus',
+      via: 'updatedBy'
+    }
   },
 };

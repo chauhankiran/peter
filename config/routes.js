@@ -71,4 +71,13 @@ module.exports.routes = {
   'GET    /companies/:id/edit': 'CompaniesController.edit',
   'PUT    /companies/:id'     : 'CompaniesController.update',
   'DELETE /companies/:id'     : 'CompaniesController.destroy',
+
+  // Admin / Company Statuses
+  'GET    /admin/company-statuses'         : 'CompanyStatusesController.index',
+  'GET    /admin/company-statuses/new'     : 'CompanyStatusesController.new',
+  'GET    /admin/company-statuses/:id'     : 'CompanyStatusesController.show',
+  'POST   /admin/company-statuses'         : 'CompanyStatusesController.create',
+  'GET    /admin/company-statuses/:id/edit': 'CompanyStatusesController.edit',
+  'PUT    /admin/company-statuses/:id'     : 'CompanyStatusesController.update',
+  'DELETE /admin/company-statuses/:id'     : 'CompanyStatusesController.destroy',
 };

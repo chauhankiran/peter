@@ -22,23 +22,7 @@
   <body>
     <div purpose="page-wrap">
       <!-- Nav -->
-      <nav class="d-flex p-4 border-bottom">
-        <div class="d-flex flex-fill justify-content-start">
-          <a href="/" class="pe-4 link-underline-light">Peter</a>
-          <% if (me) { %>
-            <a href="/companies" class="pe-4 link-underline-light">Companies</a>
-          <% } %>
-        </div>
-        <div class="d-flex flex-fill justify-content-end">
-          <% if (me) { %>
-            <a href="/account" class="pe-4 link-underline-light">Settings</a>
-            <a href="/logout" class="link-underline-light">Logout</a>
-          <% } else { %>
-            <a href="/login" class="pe-4 link-underline-light">Login</a>
-            <a href="/signup" class="link-underline-light">Register</a>
-          <% } %>
-        </div>
-      </nav>
+      <%- include('../shared/nav') %>
 
       <!-- Alert if email has not been confirmed -->
       <% if(me&&me.emailChangeCandidate) { %>

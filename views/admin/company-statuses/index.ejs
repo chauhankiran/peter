@@ -1,0 +1,55 @@
+<div class="container my-4">
+  <!-- Header -->
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <h1>Company statuses (<%= count %>)</h1>
+    </div>
+    <div class="col-md-4 text-end">
+      <a href="/admin/company-statuses/new" class="btn btn-primary">New company status</a>
+    </div>
+  </div>
+
+  <!-- Table content -->
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-hover table-bordered table-stripped">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Is active</th>
+            <th>Updated by</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (companyStatuses.length > 0) { %>
+            <% for (let companyStatus of companyStatuses) { %>
+              <tr>
+                <td>
+                  <a href="/admin/company-statuses/<%= companyStatus.id %>">
+                    <%= companyStatus.id %>
+                  </a>
+                </td>
+                <td>
+                  <a href="/admin/company-statuses/<%= companyStatus.id %>">
+                    <%= companyStatus.name %>
+                  </a>
+                </td>
+                <td><%= companyStatus.isActive ? "Yes" : "No" %></td>
+                <td><%= companyStatuses.updatedBy?.fullName || "-" %></td>
+                <td>
+                  <a href="/admin/company-statuses/<%= companyStatus.id %>/edit">Edit</a>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr class="text-center">
+              <td colspan="6">No company statues found. Create a <a href="/admin/company-statuses/new">new company status</a></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

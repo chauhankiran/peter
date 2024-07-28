@@ -1,22 +1,25 @@
 <div class="container my-4">
+  <!-- Header -->
   <div class="row align-items-center">
     <div class="col-md-8">
-      <h1>Companies</h1>
+      <h1>Companies (<%= pagination.total %>)</h1>
     </div>
     <div class="col-md-4 text-end">
-      <a href="/companies/new" class="btn btn-primary">Add company</a>
+      <a href="/companies/new" class="btn btn-primary">New company</a>
     </div>
   </div>
 
+  <!-- Search -->
   <div class="row">
     <div class="col-md-12">
       <form action="/companies">
-        <input type="text" name="search" id="search" class="form-control mb-2" placeholder="Search company by name and press 'Enter'" value="<%= req.search %>">
+        <input type="text" name="search" id="search" class="form-control mb-3" placeholder="Search company by name and press 'Enter'" value="<%= req.search %>">
         <input type="submit">
       </form>
     </div>
   </div>
 
+  <!-- Table content -->
   <div class="row">
     <div class="col-md-12">
       <table class="table table-hover table-bordered table-stripped">
@@ -31,30 +34,37 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let company of companies) { %>
-            <tr>
-              <td>
-                <a href="/companies/<%= company.id %>">
-                  <%= company.id %>
-                </a>
-              </td>
-              <td>
-                <a href="/companies/<%= company.id %>">
-                  <%= company.name %>
-                </a>
-              </td>
-              <td><%= company.website %></td>
-              <td><%= company.createdBy?.fullName || "-" %></td>
-              <td><%= company.updatedBy?.fullName || "-" %></td>
-              <td>
-                <a href="/companies/<%= company.id %>/edit">Edit</a>
-              </td>
+          <% if (companies.length > 0) { %>
+            <% for (let company of companies) { %>
+              <tr>
+                <td>
+                  <a href="/companies/<%= company.id %>">
+                    <%= company.id %>
+                  </a>
+                </td>
+                <td>
+                  <a href="/companies/<%= company.id %>">
+                    <%= company.name %>
+                  </a>
+                </td>
+                <td><%= company.website %></td>
+                <td><%= company.createdBy?.fullName || "-" %></td>
+                <td><%= company.updatedBy?.fullName || "-" %></td>
+                <td>
+                  <a href="/companies/<%= company.id %>/edit">Edit</a>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr class="text-center">
+              <td colspan="6">No companies found. Create a <a href="/companies/new">new company</a></td>
             </tr>
           <% } %>
         </tbody>
       </table>
     </div>
 
+    <!-- Pagination -->
     <div class="col-md-12">
       <nav>
         <ul class="pagination">

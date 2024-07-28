@@ -17,5 +17,9 @@ module.exports = {
     updatedBy: {
       model: 'user',
     },
+
+    companyStatusId: {
+      model: 'companyStatus'
+    },
   },
 };

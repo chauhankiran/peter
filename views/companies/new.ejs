@@ -15,6 +15,16 @@
     </div>
 
     <div class="mb-3">
+      <label for="companyStatusId">Company Status</label>
+      <select class="form-select" id="companyStatusId" name="companyStatusId">
+        <option>None</option>
+        <% for (const companyStatus of companyStatuses ) { %>
+          <option value="<%= companyStatus.id %>"><%= companyStatus.name %></option>
+        <% } %>
+      </select>
+    </div>
+
+    <div class="mb-3">
       <button type="submit" class="btn btn-primary">Create</button>
       <a href="/companies" class="btn btn-default">Cancel</a>
     </div>

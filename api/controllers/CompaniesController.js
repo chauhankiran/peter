@@ -87,22 +87,28 @@ module.exports = {
   show: async (req, res) => {
     const id = req.params.id;
 
-    const company = await Company.findOne({ id });
+    const company = await Company.findOne({ id }).populate('companyStatusId');
 
-    res.view('companies/show', { company });
+    console.log(company)
+
+    return res.view('companies/show', { company });
   },
 
   new: async (req, res) => {
-    res.view('companies/new');
+    // Fetch company status.
+    const companyStatuses = await CompanyStatus.find({ where: { isActive: true } })
+
+    return res.view('companies/new', { companyStatuses });
   },
 
   create: async (req, res) => {
-    const { name, website } = req.body;
+    const { name, website, companyStatusId } = req.body;
 
     const company = await Company.create({
       name,
       website,
       createdBy: req.me.id,
+      companyStatusId
     }).fetch();
 
     res.redirect(`/companies/${company.id}`);
@@ -111,19 +117,22 @@ module.exports = {
   edit: async (req, res) => {
     const id = req.params.id;
 
+    // Fetch company status.
+    const companyStatuses = await CompanyStatus.find({ where: { isActive: true } })
     const company = await Company.findOne({ id });
 
-    res.view('companies/edit', { company });
+    return res.view('companies/edit', { company, companyStatuses });
   },
 
   update: async (req, res) => {
     const id = req.params.id;
-    const { name, website } = req.body;
+    const { name, website, companyStatusId } = req.body;
 
     const company = await Company.updateOne({ id }).set({
       name,
       website,
       updatedBy: req.me.id,
+      companyStatusId
     });
 
     res.redirect(`/companies/${company.id}`);
