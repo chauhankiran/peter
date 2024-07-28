@@ -8,7 +8,10 @@ module.exports = {
 
     const skip = (page - 1) * PER_PAGE;
 
-    const companies = await Company.find({ limit, skip});
+    const companies = await Company.find({ limit, skip })
+      .populate('createdBy')
+      .populate('updatedBy')
+      .sort('id DESC');
     const count = await Company.count();
 
     // Pagination object.
@@ -16,15 +19,16 @@ module.exports = {
       perPage: limit,
       currentPage: +page,
       firstPage: 1,
-      isEmpty: count > 0 ? true: false,
+      isEmpty: count > 0 ? true : false,
       total: count,
       hasTotal: count ? true : false,
       lastPage: Math.ceil(count / limit),
       hasMorePages: true,
-      prevPage: page > 1 ? page - 1 : 1,
-      nextPage: page < Math.ceil(count / limit) ? page + 1 : Math.ceil(count / limit),
-      hasPages: count > PER_PAGE ? true: false,
-    }
+      prevPage: +page > 1 ? +page - 1 : 1,
+      nextPage:
+        +page < Math.ceil(count / limit) ? +page + 1 : Math.ceil(count / limit),
+      hasPages: count > PER_PAGE ? true : false,
+    };
 
     res.view('companies/index', { companies, pagination });
   },
@@ -46,9 +50,10 @@ module.exports = {
 
     const company = await Company.create({
       name,
-      website
+      website,
+      createdBy: req.me.id,
     }).fetch();
-    
+
     res.redirect(`/companies/${company.id}`);
   },
 
@@ -64,9 +69,11 @@ module.exports = {
     const id = req.params.id;
     const { name, website } = req.body;
 
-    const company = await Company
-      .updateOne({ id })
-      .set({ name, website });
+    const company = await Company.updateOne({ id }).set({
+      name,
+      website,
+      updatedBy: req.me.id,
+    });
 
     res.redirect(`/companies/${company.id}`);
   },
@@ -74,9 +81,8 @@ module.exports = {
   destroy: async (req, res) => {
     const id = req.params.id;
 
-    await Company
-      .destroyOne({ id })
+    await Company.destroyOne({ id });
 
-    res.redirect('/companies')
+    res.redirect('/companies');
   },
-}
+};

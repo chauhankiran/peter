@@ -7,15 +7,14 @@ module.exports = {
       required: true,
       unique: true,
       isEmail: true,
-      maxLength: 200,
-      example: 'mary.sue@example.com',
+      maxLength: 255,
     },
 
     emailStatus: {
       type: 'string',
       isIn: ['unconfirmed', 'change-requested', 'confirmed'],
       defaultsTo: 'confirmed',
-      description: 'The confirmation status of the user\'s email address.',
+      description: "The confirmation status of the user's email address.",
       extendedDescription: `Users might be created as "unconfirmed" (e.g. normal signup) or as "confirmed" (e.g. hard-coded
 admin users).  When the email verification feature is enabled, new users created via the
 signup form have \`emailStatus: 'unconfirmed'\` until they click the link in the confirmation email.
@@ -34,7 +33,7 @@ email status until they click the link in the confirmation email.`,
       type: 'string',
       required: true,
       description:
-        'Securely hashed representation of the user\'s login password.',
+        "Securely hashed representation of the user's login password.",
       protect: true,
       example: '2$28a8eabna301089103-13948134nad',
     },
@@ -42,7 +41,7 @@ email status until they click the link in the confirmation email.`,
     fullName: {
       type: 'string',
       required: true,
-      description: 'Full representation of the user\'s name.',
+      description: "Full representation of the user's name.",
       maxLength: 120,
       example: 'Mary Sue van der McHenst',
     },
@@ -68,13 +67,13 @@ So, while this \`isSuperAdmin\` demarcation might not be the right approach fore
     passwordResetToken: {
       type: 'string',
       description:
-        'A unique token used to verify the user\'s identity when recovering a password.  Expires after 1 use, or after a set amount of time has elapsed.',
+        "A unique token used to verify the user's identity when recovering a password.  Expires after 1 use, or after a set amount of time has elapsed.",
     },
 
     passwordResetTokenExpiresAt: {
       type: 'number',
       description:
-        'A JS timestamp (epoch ms) representing the moment when this user\'s `passwordResetToken` will expire (or 0 if the user currently has no such token).',
+        "A JS timestamp (epoch ms) representing the moment when this user's `passwordResetToken` will expire (or 0 if the user currently has no such token).",
       example: 1502844074211,
     },
 
@@ -87,7 +86,7 @@ So, while this \`isSuperAdmin\` demarcation might not be the right approach fore
     emailProofTokenExpiresAt: {
       type: 'number',
       description:
-        'A JS timestamp (epoch ms) representing the moment when this user\'s `emailProofToken` will expire (or 0 if the user currently has no such token).',
+        "A JS timestamp (epoch ms) representing the moment when this user's `emailProofToken` will expire (or 0 if the user currently has no such token).",
       example: 1502844074211,
     },
 
@@ -113,52 +112,54 @@ without necessarily having a billing card.`,
       type: 'string',
       example: 'Visa',
       description:
-        'The brand of this user\'s default billing card (or empty string if no billing card is set up).',
+        "The brand of this user's default billing card (or empty string if no billing card is set up).",
       extendedDescription:
-        'To ensure PCI compliance, this data comes from Stripe, where it reflects the user\'s default payment source.',
+        "To ensure PCI compliance, this data comes from Stripe, where it reflects the user's default payment source.",
     },
 
     billingCardLast4: {
       type: 'string',
       example: '4242',
       description:
-        'The last four digits of the card number for this user\'s default billing card (or empty string if no billing card is set up).',
+        "The last four digits of the card number for this user's default billing card (or empty string if no billing card is set up).",
       extendedDescription:
-        'To ensure PCI compliance, this data comes from Stripe, where it reflects the user\'s default payment source.',
+        "To ensure PCI compliance, this data comes from Stripe, where it reflects the user's default payment source.",
     },
 
     billingCardExpMonth: {
       type: 'string',
       example: '08',
       description:
-        'The two-digit expiration month from this user\'s default billing card, formatted as MM (or empty string if no billing card is set up).',
+        "The two-digit expiration month from this user's default billing card, formatted as MM (or empty string if no billing card is set up).",
       extendedDescription:
-        'To ensure PCI compliance, this data comes from Stripe, where it reflects the user\'s default payment source.',
+        "To ensure PCI compliance, this data comes from Stripe, where it reflects the user's default payment source.",
     },
 
     billingCardExpYear: {
       type: 'string',
       example: '2023',
       description:
-        'The four-digit expiration year from this user\'s default billing card, formatted as YYYY (or empty string if no credit card is set up).',
+        "The four-digit expiration year from this user's default billing card, formatted as YYYY (or empty string if no credit card is set up).",
       extendedDescription:
-        'To ensure PCI compliance, this data comes from Stripe, where it reflects the user\'s default payment source.',
+        "To ensure PCI compliance, this data comes from Stripe, where it reflects the user's default payment source.",
     },
 
     tosAcceptedByIp: {
       type: 'string',
-      description:
-        'The IP (ipv4) address of the request that accepted the terms of service.',
-      extendedDescription:
-        'Useful for certain types of businesses and regulatory requirements (KYC, etc.)',
-      moreInfoUrl: 'https://en.wikipedia.org/wiki/Know_your_customer',
     },
 
     lastSeenAt: {
       type: 'number',
-      description:
-        'A JS timestamp (epoch ms) representing the moment at which this user most recently interacted with the backend while logged in (or 0 if they have not interacted with the backend at all yet).',
-      example: 1502844074211,
+    },
+
+    companies: {
+      collection: 'company',
+      via: 'createdBy',
+    },
+
+    companies: {
+      collection: 'company',
+      via: 'updatedBy',
     },
   },
 };

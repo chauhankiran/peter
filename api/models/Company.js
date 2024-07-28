@@ -10,5 +10,12 @@ module.exports = {
       type: 'string',
       maxLength: 255,
     },
+
+    createdBy: {
+      model: 'user',
+    },
+    updatedBy: {
+      model: 'user',
+    },
   },
 };

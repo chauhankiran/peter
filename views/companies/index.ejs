@@ -16,6 +16,8 @@
             <th>Id</th>
             <th>Name</th>
             <th>Website</th>
+            <th>Created by</th>
+            <th>Updated by</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -33,6 +35,8 @@
                 </a>
               </td>
               <td><%= company.website %></td>
+              <td><%= company.createdBy?.fullName || "-" %></td>
+              <td><%= company.updatedBy?.fullName || "-" %></td>
               <td>
                 <a href="/companies/<%= company.id %>/edit">Edit</a>
               </td>
