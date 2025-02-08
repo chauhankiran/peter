@@ -235,6 +235,9 @@ a.nav-brand:hover,
 a.nav-item:hover {
   color: #fff;
 }
+.nav .active {
+  text-decoration: underline;
+}
 
 
 /*

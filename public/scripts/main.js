@@ -494,3 +494,16 @@ function deleteMultipleUsers() {
     return false;
   }
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+  const currentPath = window.location.pathname;
+  const menuLinks = document.querySelectorAll('.nav a');
+
+  menuLinks.forEach(menuLink => {
+    const href = menuLink.getAttribute('href');
+
+    if (href !== '/' && currentPath.includes(href)) {
+      menuLink.classList.add('active');
+    }
+  });
+});
