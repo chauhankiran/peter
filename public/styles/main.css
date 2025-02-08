@@ -50,9 +50,21 @@ h3 {
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
+
 a {
-  color: darkred;
+  color: #477dca;
+  text-decoration: none;
+  transition: color 0.1s linear;
 }
+a:active, 
+a:focus, 
+a:hover {
+  color: #2c5999;
+}
+a:hover {
+  text-decoration: underline;
+}
+
 hr {
   margin: 1rem 0;
   color: inherit;
@@ -221,6 +233,7 @@ hr {
   display: flex;
 }
 .nav {
+  background-color: #477dca;
   min-height: 4rem;
   border-bottom: 1px solid #ddd;
   padding-left: 1rem;
@@ -239,12 +252,15 @@ hr {
 }
 .nav-brand,
 .nav-item {
+  color: #fff;
   padding: 0.5rem;
   align-items: center;
 }
-.nav-brand {
-  color: darkred;
+a.nav-brand:hover,
+a.nav-item:hover {
+  color: #fff;
 }
+
 
 /*
  * Form.
