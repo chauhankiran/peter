@@ -263,7 +263,7 @@ select {
   display: block;
   width: 100%;
 
-  border: 2px solid #767676;
+  border: 1px solid #767676;
   padding: 8px 12px;
 }
 
@@ -280,7 +280,7 @@ select:hover,
 select:active,
 select:focus-visible {
   outline: unset;
-  border: 2px solid #000;
+  border: 1px solid #000;
 }
 
 /*
@@ -302,13 +302,15 @@ button {
   color: inherit;
   display: inline-block;
 
-  border: 2px solid #767676;
+  border: 1px solid #767676;
   background-color: #efefef;
 }
 input[type="submit"]:hover,
 input[type="button"]:hover,
 .btn:hover,
 button:hover {
+  text-decoration: none;
+  color: inherit;
   background-color: #dbdbdb;
 }
 input[type="submit"]:disabled,
@@ -350,7 +352,7 @@ tbody tr:hover {
 }
 th,
 td {
-  border: 2px solid #767676;
+  border: 1px solid #767676;
   padding: 8px;
 }
 th {
@@ -451,7 +453,7 @@ td {
 }
 .dropdown-content {
   background-color: #efefef;
-  border: 2px solid #767676;
+  border: 1px solid #767676;
 }
 .dropdown-item {
   display: block;
