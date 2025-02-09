@@ -100,6 +100,7 @@ module.exports = {
       name,
       description,
       taskTypeId,
+      isCompleted,
       companyId,
       contactId,
       dealId,
@@ -113,6 +114,7 @@ module.exports = {
         name,
         description,
         "taskTypeId",
+        "isCompleted",
         "companyId",
         "contactId",
         "dealId",
@@ -123,6 +125,7 @@ module.exports = {
         ${name},
         ${description},
         ${taskTypeId},
+        ${isCompleted},
         ${companyId},
         ${contactId},
         ${dealId},
@@ -141,6 +144,7 @@ module.exports = {
         t.description,
         t."isActive",
         t."taskTypeId",
+        t."isCompleted",
         tt."name" AS "taskType",
         t."createdAt",
         t."updatedAt",
@@ -162,7 +166,7 @@ module.exports = {
   },
 
   update: async (taskObj) => {
-    const { id, name, description, taskTypeId, updatedBy } = taskObj;
+    const { id, name, description, isCompleted, taskTypeId, updatedBy } = taskObj;
 
     return await sql`
       UPDATE
@@ -170,6 +174,7 @@ module.exports = {
       SET
         name = ${name},
         description = ${description},
+        "isCompleted" = ${isCompleted},
         "taskTypeId" = ${taskTypeId},
         "updatedBy" = ${updatedBy},
         "updatedAt" = ${sql`now()`}

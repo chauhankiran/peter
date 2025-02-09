@@ -283,6 +283,13 @@ select:focus-visible {
   border: 1px solid #000;
 }
 
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-left: 0;
+  margin-right: 6px;
+}
+
 /*
  * Buttons.
  * ============================================================================

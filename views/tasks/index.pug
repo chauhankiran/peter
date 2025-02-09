@@ -75,6 +75,8 @@ block content
                     a(href=`/tasks/${task.id}`) #{task.name}
                     if (!task.isActive)
                       span.archive-status (archived)
+                    if (task.isCompleted)
+                      span.archive-status (completed)
                 
                 if labels.task.taskTypeId
                   td #{task.taskType || "-" }

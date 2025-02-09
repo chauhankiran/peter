@@ -11,6 +11,8 @@ CREATE TABLE tasks (
   "quoteId" INT,
   "ticketId" INT,
 
+  "isCompleted" BOOLEAN,
+
   "isActive" BOOLEAN NOT NULL DEFAULT true,
   "createdBy" INT,
   "updatedBy" INT,

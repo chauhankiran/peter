@@ -28,7 +28,7 @@ module.exports = {
     try {
       const taskViews = await taskViewsService.pluck(["name"]);
 
-      let columns = 't."isActive",';
+      let columns = 't."isActive",t."isCompleted",';
       let headers = [];
       for (const taskView of taskViews) {
         const column = columnsObj[taskView.name];
@@ -109,6 +109,7 @@ module.exports = {
       dealId,
       quoteId,
       ticketId,
+      isCompleted
     } = req.body;
 
     if (!name) {
@@ -126,6 +127,7 @@ module.exports = {
         dealId: dealId || null,
         quoteId: quoteId || null,
         ticketId: ticketId || null,
+        isCompleted: isCompleted == 'on' ? true : false,
         createdBy: req.session.currentUser.id,
       };
       await tasksService.create(taskObj);
@@ -184,7 +186,7 @@ module.exports = {
 
   update: async (req, res, next) => {
     const id = req.params.id;
-    const { name, description, taskTypeId } = req.body;
+    const { name, description, isCompleted, taskTypeId } = req.body;
 
     if (!name) {
       return next(notFound());
@@ -202,6 +204,7 @@ module.exports = {
         id,
         name,
         description,
+        isCompleted: isCompleted == 'on' ? true : false,
         taskTypeId,
         updatedBy: req.session.currentUser.id,
       };

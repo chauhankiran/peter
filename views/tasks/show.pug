@@ -26,6 +26,8 @@ block content
             span.field-value #{task.name}
               if !task.isActive 
                 span.archive-status (archived)
+              if task.isCompleted
+                span.archive-status (completed)
 
         if labels.task.taskTypeId
           .col-12.mb-4

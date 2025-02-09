@@ -97,6 +97,17 @@ const taskLabels = async (sql) => {
       'Updated at'
     ) returning "displayName"`.then(([x]) => x);
   console.log("updatedAt:", result9);
+
+  // isCompleted
+  const result10 = await sql`
+    INSERT INTO "taskLabels" (
+      name, 
+      "displayName"
+    ) VALUES (
+      'isCompleted', 
+      'Is completed'
+    ) returning "displayName"`.then(([x]) => x);
+  console.log("isCompleted:", result10);
 };
 
 module.exports = taskLabels;

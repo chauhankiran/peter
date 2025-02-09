@@ -17,3 +17,10 @@ if labels.task.description
   .form-group 
     label(for="description") #{labels.task.description}
     textarea(name="description", id="description" cols="30", rows="10", placeholder="Add informative optional description") #{task ? task.description : ""}
+
+//- isCompleted
+if labels.task.isCompleted
+  .form-group 
+    input(type='checkbox' name='isCompleted' id='isCompleted' value=task && task.isCompleted ? true : false 
+    checked=task && task.isCompleted ? 'checked' : false)
+    label(for="isCompleted") #{labels.task.isCompleted}
