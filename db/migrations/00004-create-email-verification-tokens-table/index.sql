@@ -1,0 +1,10 @@
+CREATE TABLE "emailVerificationTokens" (
+  id BIGSERIAL PRIMARY KEY,
+
+  "userId" BIGINT NOT NULL,
+  "token" TEXT NOT NULL UNIQUE,
+  "expiresAt" TIMESTAMPTZ NOT NULL,
+  "usedAt" TIMESTAMPTZ,
+  
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);

@@ -1,0 +1,36 @@
+extend ../layout
+
+block content 
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-3.mt-4 
+                h1.mb-4 Register 
+
+                include ../includes/flash
+                
+                form(action="/register", method="post") 
+                    .mb-4
+                        label(for="firstName") First name
+                            span.red *
+                        input(type="text", name="firstName", id="firstName", placeholder="Kai", value=firstName, autofocus=true)
+                    .mb-4
+                        label(for="lastName") Last name
+                            span.red *
+                        input(type="text", name="lastName", id="lastName", placeholder="Doe", value=lastName)
+                    .mb-4
+                        label(for="email") Email
+                            span.red *
+                        input(type="email", name="email", id="email", placeholder="kai@doe.com", value=email)
+                    .mb-4
+                        label(for="password") Password
+                            span.red *
+                        input(type="password", name="password", id="password" placeholder="******")
+                    .mb-4
+                        label(for="confirmPassword") Confirm password
+                            span.red *
+                        input(type="password", name="confirmPassword", id="confirmPassword" placeholder="******")
+        
+                    .mb-4.pt-2
+                        button(type="submit") Register
+            .col-8.mt-4

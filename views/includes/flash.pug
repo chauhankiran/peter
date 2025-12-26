@@ -1,0 +1,7 @@
+if info.length > 0
+    each message in info 
+        p.flash-info= message 
+
+if errors.length > 0
+    each error in errors
+        p.mb-2.flash-error= error
