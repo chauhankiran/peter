@@ -1,8 +1,9 @@
+const { views } = require("../../constants/app");
 const sql = require("../../db/sql");
 
 module.exports = {
     onboarding: async (req, res, next) => {
-        return res.render("accounts/onboarding");
+        return res.render(views.onboardingPath);
     },
 
     setup: async (req, res, next) => {
@@ -18,7 +19,7 @@ module.exports = {
 
         if (validationFailed) {
             res.locals.errors = errors;
-            return res.render("accounts/onboarding");
+            return res.render(views.onboardingPath);
         }
 
         // Create an org first.

@@ -1,3 +1,4 @@
+const { views } = require("../constants/app");
 const sql = require("../db/sql");
 
 module.exports = {
@@ -95,7 +96,7 @@ module.exports = {
             req.session.email = user.email;
             req.session.name = user.firstName + " " + user.lastName;
 
-            return res.render("accounts/verify-email");
+            return res.render(views.verifyEmailPath);
         } catch (err) {
             next(err);
         }

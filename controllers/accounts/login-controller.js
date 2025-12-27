@@ -1,9 +1,10 @@
+const { views } = require("../../constants/app");
 const sql = require("../../db/sql");
 const cipher = require("../../helpers/cipher");
 
 module.exports = {
     login: (req, res, next) => {
-        return res.render("accounts/login");
+        return res.render(views.loginPath);
     },
 
     session: async (req, res, next) => {
@@ -24,7 +25,7 @@ module.exports = {
 
         if (validationFailed) {
             res.locals.errors = errors;
-            return res.render("accounts/login", {
+            return res.render(views.loginPath, {
                 email,
             });
         }
@@ -47,23 +48,23 @@ module.exports = {
 
             if (!user) {
                 res.locals.errors = ["Email or Password is incorrect."];
-                return res.render("accounts/login");
+                return res.render(views.loginPath);
             }
 
             if (user.status === "pending") {
                 res.locals.errors = ["User verification is pending."];
-                return res.render("accounts/login");
+                return res.render(views.loginPath);
             }
 
             if (user.status === "disabled") {
                 res.locals.errors = ["User account is disabled."];
-                return res.render("accounts/login");
+                return res.render(views.loginPath);
             }
 
             const ok = cipher.compare(password, user.passwordHash);
             if (!ok) {
                 errors.push("Email or Password is incorrect.");
-                return res.render("accounts/login");
+                return res.render(views.loginPath);
             }
 
             // All good.

@@ -86,7 +86,7 @@ module.exports = {
             const url = `${req.protocol}://${req.get("host")}/verify-email?token=${token}`;
             console.log(url);
 
-            return res.render("accounts/check-email");
+            return res.render(views.checkEmailPath);
         } catch (err) {
             next(err);
         }
