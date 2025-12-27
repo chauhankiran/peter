@@ -2,5 +2,8 @@ nav.nav
     .nav-start 
         a(href="/").nav-brand Peter
     .nav-end 
-        a(href="/login").nav-item Login 
-        a(href="/register").nav-item Register
+        if isLoggedIn
+            a(href="/logout").nav-item Logout
+        else 
+            a(href="/login").nav-item Login 
+            a(href="/register").nav-item Register

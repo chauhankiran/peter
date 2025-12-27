@@ -13,7 +13,7 @@ CREATE TABLE "organizationInvites" (
   "createdBy" BIGINT,
   "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
   "updatedBy" BIGINT,
-  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+  "updatedAt" TIMESTAMPTZ,
 
   -- Acceptance
   "acceptedAt" TIMESTAMPTZ,

@@ -9,7 +9,7 @@ CREATE TABLE "userOrgs" (
     "createdBy" BIGINT,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updatedBy" BIGINT,
-    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ,
 
     "isActive" BOOLEAN NOT NULL DEFAULT true,
   

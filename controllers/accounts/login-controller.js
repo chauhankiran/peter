@@ -68,13 +68,8 @@ module.exports = {
 
             // All good.
             req.session.userId = user.id;
-
-            req.session.user = {
-                email: user.email,
-                name: user.firstName + " " + user.lastName,
-            };
-
-            console.log(req.session);
+            req.session.email = user.email;
+            req.session.name = user.firstName + " " + user.lastName;
 
             // Check if user is part of org or not.
             // If not then we need to show onboarding flow.

@@ -76,6 +76,25 @@ module.exports = {
                 `.then(([x]) => x);
             }
 
+            // All good.
+            const user = await sql`
+                SELECT
+                    id,
+                    "firstName",
+                    "lastName",
+                    email,
+                    "passwordHash",
+                    "status"
+                FROM 
+                    "users"
+                WHERE
+                    "id" = ${verification.userId}
+            `.then(([x]) => x);
+
+            req.session.userId = user.id;
+            req.session.email = user.email;
+            req.session.name = user.firstName + " " + user.lastName;
+
             return res.render("accounts/verify-email");
         } catch (err) {
             next(err);

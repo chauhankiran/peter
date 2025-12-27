@@ -3,6 +3,7 @@ const accountsController = require("../controllers/accounts-controller");
 const registerController = require("../controllers/accounts/register-controller");
 const loginController = require("../controllers/accounts/login-controller");
 const onboardingController = require("../controllers/accounts/onboarding-controller");
+const logoutController = require("../controllers/accounts/logout-controller");
 const router = express.Router();
 
 // Register
@@ -19,5 +20,8 @@ router.get("/verify-email", accountsController.verify);
 // Onboarding
 router.get("/onboarding", onboardingController.onboarding);
 router.post("/onboarding", onboardingController.setup);
+
+// Logout
+router.get("/logout", logoutController.destroy);
 
 module.exports = router;

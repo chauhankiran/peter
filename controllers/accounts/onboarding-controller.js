@@ -21,8 +21,6 @@ module.exports = {
             return res.render("accounts/onboarding");
         }
 
-        console.log("userId: ", req.session);
-
         // Create an org first.
         const org = await sql`
             INSERT INTO "orgs" (

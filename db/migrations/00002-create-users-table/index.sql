@@ -13,7 +13,7 @@ CREATE TABLE "users" (
     "createdBy" BIGINT,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
     "updatedBy" BIGINT,
-    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
+    "updatedAt" TIMESTAMPTZ,
 
     "status" TEXT NOT NULL DEFAULT 'pending' -- pending | active | disabled
 );

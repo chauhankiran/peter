@@ -43,7 +43,16 @@ if (app.get("env") === "development") {
 app.use((req, res, next) => {
     res.locals.info = req.flash("info");
     res.locals.error = req.flash("error");
+
+    // global locals to make sure to don't cause error.
     res.locals.errors = [];
+
+    res.locals.userId = req.session.userId || null;
+    res.locals.email = req.session.email || null;
+    res.locals.name = req.session.name || null;
+    res.locals.orgId = req.session.orgId || null;
+
+    res.locals.isLoggedIn = Boolean(req.session.userId) || false;
 
     next();
 });
