@@ -1,9 +1,10 @@
 const express = require("express");
-const accountsController = require("../controllers/accounts-controller");
 const registerController = require("../controllers/accounts/register-controller");
 const loginController = require("../controllers/accounts/login-controller");
 const onboardingController = require("../controllers/accounts/onboarding-controller");
 const logoutController = require("../controllers/accounts/logout-controller");
+const verifyController = require("../controllers/accounts/verify-controller");
+
 const router = express.Router();
 
 // Register
@@ -15,7 +16,7 @@ router.get("/login", loginController.login);
 router.post("/login", loginController.session);
 
 // Verify email.
-router.get("/verify-email", accountsController.verify);
+router.get("/verify-email", verifyController.verify);
 
 // Onboarding
 router.get("/onboarding", onboardingController.onboarding);

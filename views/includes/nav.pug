@@ -1,9 +1,14 @@
 nav.nav 
-    .nav-start 
-        a(href="/").nav-brand Peter
-    .nav-end 
-        if isLoggedIn
+    if isLoggedIn
+        .nav-start 
+            a(href="/").nav-brand Peter
+            a(href="/dashboard").nav-item Dashboard
+            a(href="/projects").nav-item Projects
+        .nav-end 
             a(href="/logout").nav-item Logout
-        else 
+    else
+        .nav-start 
+            a(href="/").nav-brand Peter
+        .nav-end 
             a(href="/login").nav-item Login 
             a(href="/register").nav-item Register

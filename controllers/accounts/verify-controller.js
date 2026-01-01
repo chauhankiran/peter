@@ -1,5 +1,5 @@
-const { views } = require("../constants/app");
-const sql = require("../db/sql");
+const { views } = require("../../constants/app");
+const sql = require("../../db/sql");
 
 module.exports = {
     verify: async (req, res, next) => {
@@ -94,7 +94,7 @@ module.exports = {
 
             req.session.userId = user.id;
             req.session.email = user.email;
-            req.session.name = user.firstName + " " + user.lastName;
+            req.session.userName = user.firstName + " " + user.lastName;
 
             return res.render(views.verifyEmailPath);
         } catch (err) {

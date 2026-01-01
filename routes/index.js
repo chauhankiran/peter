@@ -4,5 +4,6 @@ const router = express.Router();
 router.use("/", require("./home-route"));
 router.use("/", require("./accounts-route"));
 router.use("/dashboard", require("./dashboard-route"));
+router.use("/projects", require("./projects-route"));
 
 module.exports = router;
