@@ -15,7 +15,7 @@ const sql = postgres({
             parse: (x) => {
                 if (x) {
                     const d = new Date(x);
-                    return d.toLocaleDateString("en-US");
+                    return d.toISOString().split("T")[0];
                 }
                 return x;
             },

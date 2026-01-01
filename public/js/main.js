@@ -1,19 +1,3 @@
-document.querySelectorAll(".date").forEach((input) => {
-    input.addEventListener("focus", function () {
-        this.type = "date";
-
-        if (typeof this.showPicker === "function") {
-            this.showPicker();
-        }
-    });
-
-    input.addEventListener("blur", function () {
-        if (!this.value) {
-            this.type = "text";
-        }
-    });
-});
-
 const nameInput = document.getElementById("name");
 const keyInput = document.getElementById("key");
 

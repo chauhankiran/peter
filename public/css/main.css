@@ -44,6 +44,13 @@ p {
     padding: 0;
 }
 
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 1rem 0;
+    padding: 0;
+}
+
 /*
  * Nav.
  * ============================================================================
@@ -273,6 +280,13 @@ td {
     text-align: right;
 }
 
+.italic {
+    font-style: italic;
+}
+.bold {
+    font-weight: bold;
+}
+
 .d-inline {
     display: inline !important;
 }
@@ -482,6 +496,7 @@ button:disabled {
     opacity: 0.5;
 }
 
+/* secondary button */
 input[type="submit"].is-muted,
 input[type="button"].is-muted,
 .btn.is-muted,
@@ -493,6 +508,20 @@ input[type="button"].is-muted:hover,
 .btn.is-muted:hover,
 button.is-muted:hover {
     background-color: #efefef;
+}
+
+/* danger button */
+input[type="submit"].is-danger,
+input[type="button"].is-danger,
+.btn.is-danger,
+button.is-danger {
+    background-color: #ffeaed;
+}
+input[type="submit"].is-danger:hover,
+input[type="button"].is-danger:hover,
+.btn.is-danger:hover,
+button.is-danger:hover {
+    background-color: #fcdce1;
 }
 
 .btn-link {
@@ -606,4 +635,12 @@ input[type="file"] {
 }
 .flash-error {
     color: red;
+}
+
+/*
+ * Modal.
+ * ============================================================================
+ */
+.modal {
+    display: none;
 }

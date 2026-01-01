@@ -26,61 +26,68 @@ module.exports = {
             i ? [sql`and`, x] : x,
         );
 
-        const projects = await sql`
-            SELECT
-                p.id, 
-                p.name, 
-                p.key, 
-                p."dueDate", 
-                p."createdAt",
-                u."firstName",
-                u."lastName"
-            FROM 
-                projects p
-            JOIN
-                "projectMembers" pm
-            ON 
-                pm."projectId" = p.id AND 
-                pm."userId" = ${userId}
-            LEFT JOIN
-                users u
-            ON
-                p."createdBy" = u.id
-            WHERE 
-                ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
-                p."orgId" = ${orgId} AND 
-                p."status" = 'active'
-            ORDER BY
-                ${sql(orderBy)}
-                ${orderDir === "ASC" ? sql`ASC` : sql`DESC`}
-            LIMIT
-                ${limit}
-            OFFSET
-                ${skip}
-        `;
+        try {
+            const projects = await sql`
+                SELECT
+                    p.id, 
+                    p.name, 
+                    p.key, 
+                    p."dueDate", 
+                    p."createdAt",
+                    u."firstName",
+                    u."lastName"
+                FROM 
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON 
+                    pm."projectId" = p.id AND 
+                    pm."userId" = ${userId}
+                LEFT JOIN
+                    users u
+                ON
+                    p."createdBy" = u.id
+                WHERE 
+                    ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
+                    p."orgId" = ${orgId} AND 
+                    p."status" = 'active'
+                ORDER BY
+                    ${sql(orderBy)}
+                    ${orderDir === "ASC" ? sql`ASC` : sql`DESC`}
+                LIMIT
+                    ${limit}
+                OFFSET
+                    ${skip}
+            `;
 
-        const count = 9;
-        const pages = Math.ceil(count / limit);
+            const count = 9;
+            const pages = Math.ceil(count / limit);
 
-        const paginationLinks = generatePaginationLinks({
-            link: "/projects",
-            page,
-            pages,
-            search,
-            limit,
-            orderBy,
-            orderDir,
-        });
+            const paginationLinks = generatePaginationLinks({
+                link: "/projects",
+                page,
+                pages,
+                search,
+                limit,
+                orderBy,
+                orderDir,
+            });
 
-        return res.render(views.allProjectsPath, {
-            projects,
-            search,
-            paginationLinks,
-        });
+            return res.render(views.allProjectsPath, {
+                projects,
+                search,
+                paginationLinks,
+                orderBy,
+                orderDir,
+            });
+        } catch (err) {
+            next(err);
+        }
     },
 
     new: (req, res) => {
-        res.render(views.newProjectPath);
+        const project = {};
+        return res.render(views.newProjectPath, { project });
     },
 
     create: async (req, res, next) => {
@@ -101,12 +108,14 @@ module.exports = {
 
         if (validationFailed) {
             res.locals.errors = errors;
-            return res.render(views.newProjectPath, {
+
+            const project = {
                 name,
                 key,
                 dueDate,
                 description,
-            });
+            };
+            return res.render(views.newProjectPath, { project });
         }
 
         try {
@@ -126,7 +135,7 @@ module.exports = {
                     ) VALUES (
                         ${name}, 
                         ${key}, 
-                        ${dueDate || null}, 
+                        ${dueDate}, 
                         ${description},
                         ${req.session.orgId}, 
                         ${req.session.userId}
@@ -153,22 +162,203 @@ module.exports = {
             if (err.code === "23505") {
                 // Unique violation.
                 res.locals.errors = ["Project key must be unique."];
-                return res.render(views.newProjectPath, {
-                    name,
-                    dueDate,
-                    description,
-                });
+
+                const project = { name, dueDate, description };
+                return res.render(views.newProjectPath, { project });
             }
             next(err);
         }
     },
 
-    show: (req, res) => {
-        res.render("projects/show");
+    show: async (req, res, next) => {
+        const id = req.params.id;
+
+        try {
+            const project = await sql`
+                SELECT
+                    p.id, 
+                    p.name, 
+                    p.key, 
+                    p."dueDate", 
+                    p.description,
+                    p."createdAt",
+                    u."firstName",
+                    u."lastName"
+                FROM 
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON 
+                    pm."projectId" = p.id AND 
+                    pm."userId" = ${req.session.userId}
+                LEFT JOIN
+                    users u
+                ON
+                    p."createdBy" = u.id
+                WHERE 
+                    p.id = ${id} AND 
+                    p."orgId" = ${req.session.orgId} AND 
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!project) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            return res.render(views.showProjectPath, { project });
+        } catch (err) {
+            next(err);
+        }
     },
-    edit: (req, res) => {
-        res.render("projects/edit");
+
+    edit: async (req, res, next) => {
+        const id = req.params.id;
+
+        try {
+            const project = await sql`
+                SELECT
+                    p.id, 
+                    p.name, 
+                    p.key, 
+                    p."dueDate", 
+                    p.description
+                FROM 
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON 
+                    pm."projectId" = p.id AND 
+                    pm."userId" = ${req.session.userId}
+                WHERE 
+                    p.id = ${id} AND 
+                    p."orgId" = ${req.session.orgId} AND 
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!project) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            return res.render(views.editProjectPath, { project });
+        } catch (err) {
+            next(err);
+        }
     },
-    update: (req, res) => {},
-    destroy: (req, res) => {},
+
+    update: async (req, res, next) => {
+        const id = req.params.id;
+        const { name, key, dueDate, description } = req.body;
+
+        let validationFailed = false;
+        let errors = [];
+
+        if (!name) {
+            errors.push("Name is required.");
+            validationFailed = true;
+        }
+
+        if (!key) {
+            errors.push("Key is required.");
+            validationFailed = true;
+        }
+
+        if (validationFailed) {
+            res.locals.errors = errors;
+
+            const project = {
+                name,
+                key,
+                dueDate,
+                description,
+            };
+            return res.render(views.editProjectPath, { project });
+        }
+
+        try {
+            // Check first that project is exists.
+            const exists = await sql`
+                SELECT
+                    1
+                FROM 
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON 
+                    pm."projectId" = p.id AND 
+                    pm."userId" = ${req.session.userId}
+                WHERE 
+                    p.id = ${id} AND 
+                    p."orgId" = ${req.session.orgId} AND 
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!exists) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            // Update the project.
+            const project = await sql`
+                UPDATE
+                    projects
+                SET
+                    name = ${name},
+                    key = ${key},
+                    "dueDate" = ${dueDate},
+                    description = ${description}
+                WHERE 
+                    id = ${id} AND 
+                    "orgId" = ${req.session.orgId} AND 
+                    "status" = 'active'
+                returning id
+            `.then(([x]) => x);
+
+            req.flash("info", "Project updated successfully.");
+            return res.redirect(`/projects/${project.id}`);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    destroy: async (req, res, next) => {
+        const id = req.params.id;
+
+        try {
+            const exists = await sql`
+                SELECT
+                    1
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${id} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!exists) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            await sql`
+                DELETE FROM
+                    projects
+                WHERE 
+                    id = ${id} AND 
+                    "orgId" = ${req.session.orgId}
+            `.then(([x]) => x);
+
+            req.flash("info", "Project deleted successfully.");
+            return res.redirect("/projects");
+        } catch (err) {
+            next(err);
+        }
+    },
 };

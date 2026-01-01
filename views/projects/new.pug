@@ -10,24 +10,9 @@ block content
                 include ../includes/flash
 
                 form(action="/projects", method="post") 
-                    .mb-4
-                        label(for="name") Name
-                            span.red *
-                        input(type="text", name="name", id="name", value=name, placeholder="House Cleanup", autofocus=true)
-
-                    .mb-4
-                        label(for="key") Key
-                            span.red *
-                        input(type="text", name="key", id="key", value=key, placeholder="HC")
-
-                    .mb-4
-                        label(for="dueDate") Due date
-                        input(type="text", name="dueDate", id="dueDate", class="date", value=dueDate, placeholder="dd/mm/yyyy")
-
-                    .mb-4 
-                        label(for="description") Description
-                        textarea(name="description", id="description", rows="4", value=description, placeholder="Optional details...")
+                    include ./form
 
                     .mb-4.pt-2
+                        a(href="/projects").btn.is-muted.mr-2 Cancel
                         button(type="submit") Create project
             .col-8.mt-4
