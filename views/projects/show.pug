@@ -42,4 +42,16 @@ block content
                 .mb-4.pt-2
                     a(href="/projects").btn.is-muted.mr-2 &larr; Back
                     a(href=`/projects/${project.id}/edit`).btn.mr-4  Edit project
+                    button.btn.is-danger.delete-project Delete project
             .col-8.mt-4
+
+    .modal.delete-project-modal 
+        .modal-content
+                h3.mb-4 Delete project 
+
+                form(action=`/projects/${project.id}?_method=delete`, method="post") 
+                    p.mb-4 Are you sure you want to delete this project?
+
+                    .text-end.pt-4
+                        button.delete-project-close.is-muted.mr-4(type="button") Cancel 
+                        button.is-danger(type="submit") Yes
