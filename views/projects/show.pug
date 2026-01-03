@@ -2,13 +2,15 @@ extend ../layout
 
 block content 
     .container-fluid 
+        .row 
+            .col-1.mt-4 
+            .col-11.mt-4 
+                h1 Project details
+
+                include ../includes/flash
         .row
             .col-1.mt-4  
             .col-3.mt-4 
-                h1.mb-4 Project details
-
-                include ../includes/flash
-
                 .mb-4
                     strong Name
                     p= project.name
@@ -43,8 +45,32 @@ block content
                     a(href="/projects").btn.is-muted.mr-2 &larr; Back
                     a(href=`/projects/${project.id}/edit`).btn.mr-4  Edit project
                     button.btn.is-danger.delete-project Delete project
-            .col-8.mt-4
+            .col-4.mt-4
+            .col-3.mt-4
+                .mb-4
+                    strong Members
 
+                    //- Invite form.
+                    form(action=`projects/${project.id}/invite`, method="post") 
+                    .mb-1.mt-4
+                        label(for="email") Email
+                            span.red *
+                        input(type="text", name="email", id="email", placeholder="kai@doe.com")
+
+                    .mb-4
+                        button(type="submit") Invite
+                    //- END: Invite form.
+
+                    if projectMembers.length > 0
+                        each member in projectMembers
+                            p= member.firstName + " " + member.lastName + " <" + member.email + "> " 
+                                span.gray= "(" + member.role + ")"
+                    else
+                        p No members yet.
+
+            .col-1.mt-4
+
+    //- Delete project modal.
     .modal.delete-project-modal 
         .modal-content
                 h3.mb-4 Delete project 

@@ -206,7 +206,35 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            return res.render(views.showProjectPath, { project });
+            // Get all project members.
+            const projectMembers = await sql`
+                SELECT
+                    pm."userId" as "userId",
+                    pm.role as role,
+                    u."firstName" as "firstName",
+                    u."lastName" as "lastName",
+                    u.email as email
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    projects p
+                ON
+                    p.id = pm."projectId"
+                JOIN
+                    users u
+                ON
+                    u.id = pm."userId"
+                WHERE
+                    pm."projectId" = ${id} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+                ORDER BY
+                    pm.role ASC,
+                    u."firstName" ASC,
+                    u."lastName" ASC
+            `;
+
+            return res.render(views.showProjectPath, { project, projectMembers });
         } catch (err) {
             next(err);
         }

@@ -1,9 +1,13 @@
-CREATE TABLE "organizationInvites" (
+CREATE TABLE "invites" (
   id BIGSERIAL PRIMARY KEY,
 
   "orgId" BIGINT NOT NULL,
+  "projectId" BIGINT,
+
   "email" TEXT NOT NULL,
+
   "token" TEXT NOT NULL UNIQUE,
+  "expiresAt" TIMESTAMPTZ NOT NULL,
 
   "status" TEXT NOT NULL DEFAULT 'invited', -- invited | accepted | revoked | expired
 
@@ -17,9 +21,5 @@ CREATE TABLE "organizationInvites" (
 
   -- Acceptance
   "acceptedAt" TIMESTAMPTZ,
-  "invitedUserId" BIGINT NOT NULL,
-
-  "expiresAt" TIMESTAMPTZ NOT NULL,
-
-  UNIQUE ("orgId", "email") 
+  "invitedUserId" BIGINT NOT NULL
 );
