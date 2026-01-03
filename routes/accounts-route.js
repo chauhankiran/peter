@@ -4,6 +4,8 @@ const loginController = require("../controllers/accounts/login-controller");
 const onboardingController = require("../controllers/accounts/onboarding-controller");
 const logoutController = require("../controllers/accounts/logout-controller");
 const verifyController = require("../controllers/accounts/verify-controller");
+const inviteController = require("../controllers/accounts/invite-controller");
+const orgSelectionController = require("../controllers/accounts/org-selection-controller");
 
 const router = express.Router();
 
@@ -24,5 +26,12 @@ router.post("/onboarding", onboardingController.setup);
 
 // Logout
 router.get("/logout", logoutController.destroy);
+
+// Invite
+router.get("/invite", inviteController.invite);
+
+// Select org
+router.get("/choose-org", orgSelectionController.choose);
+router.post("/choose-org", orgSelectionController.select);
 
 module.exports = router;

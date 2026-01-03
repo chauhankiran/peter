@@ -4,12 +4,16 @@ block content
     .container-fluid 
         .row
             .col-1.mt-4  
+                
             .col-3.mt-4 
                 h1.mb-4 Register 
 
                 include ../includes/flash
                 
                 form(action="/register", method="post") 
+                    input(type="hidden", name="inviteToken", value=inviteToken)
+                    input(type="hidden", name="email", value=inviteEmail)
+
                     .mb-4
                         label(for="firstName") First name
                             span.red *
@@ -21,7 +25,10 @@ block content
                     .mb-4
                         label(for="email") Email
                             span.red *
-                        input(type="email", name="email", id="email", placeholder="kai@doe.com", value=email)
+                        if inviteEmail
+                            input(type="email", name="email", id="email", placeholder="kai@doe.com", value=inviteEmail, disabled=true)
+                        else
+                            input(type="email", name="email", id="email", placeholder="kai@doe.com", value=email)
                     .mb-4
                         label(for="password") Password
                             span.red *

@@ -21,5 +21,5 @@ CREATE TABLE "invites" (
 
   -- Acceptance
   "acceptedAt" TIMESTAMPTZ,
-  "invitedUserId" BIGINT NOT NULL
+  "invitedUserId" BIGINT
 );

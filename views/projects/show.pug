@@ -51,14 +51,14 @@ block content
                     strong Members
 
                     //- Invite form.
-                    form(action=`projects/${project.id}/invite`, method="post") 
-                    .mb-1.mt-4
-                        label(for="email") Email
-                            span.red *
-                        input(type="text", name="email", id="email", placeholder="kai@doe.com")
+                    form(action=`/projects/${project.id}/invite`, method="post") 
+                        .mb-1.mt-4
+                            label(for="email") Email
+                                span.red *
+                            input(type="text", name="email", id="email", placeholder="kai@doe.com")
 
-                    .mb-4
-                        button(type="submit") Invite
+                        .mb-4
+                            button(type="submit") Invite
                     //- END: Invite form.
 
                     if projectMembers.length > 0

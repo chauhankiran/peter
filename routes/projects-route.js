@@ -9,5 +9,6 @@ router.get("/:id", projectsController.show);
 router.get("/:id/edit", projectsController.edit);
 router.put("/:id", projectsController.update);
 router.delete("/:id", projectsController.destroy);
+router.post("/:id/invite", projectsController.invite);
 
 module.exports = router;

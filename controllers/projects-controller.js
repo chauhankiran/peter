@@ -1,6 +1,7 @@
 const sql = require("../db/sql");
 const { PER_PAGE, views } = require("../constants/app");
 const generatePaginationLinks = require("../helpers/generate-pagination-links");
+const cipher = require("../helpers/cipher");
 
 module.exports = {
     index: async (req, res, next) => {
@@ -385,6 +386,125 @@ module.exports = {
 
             req.flash("info", "Project deleted successfully.");
             return res.redirect("/projects");
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    // invite user to project.
+    invite: async (req, res, next) => {
+        const id = req.params.id;
+        const { email } = req.body;
+
+        if (!email) {
+            req.flash("info", "Email is required.");
+            return res.redirect(`/projects/${id}`);
+        }
+
+        // Create an invite link first.
+        const token = cipher.token(32);
+        const url = `${req.protocol}://${req.get("host")}/invite?token=${token}`;
+
+        try {
+            // First check if project exist or not.
+            const project = await sql`
+                SELECT
+                    1
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${id} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!project) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            // Check if user is already a member of this project.
+            const invitedUser = await sql`
+                SELECT
+                    id,
+                    email
+                FROM
+                    users
+                WHERE
+                    email = ${email}
+            `.then(([x]) => x);
+
+            if (invitedUser) {
+                const existingMember = await sql`
+                    SELECT
+                        1
+                    FROM
+                        "projectMembers"
+                    WHERE
+                        "projectId" = ${id} AND
+                        "userId" = ${invitedUser.id}
+                `.then(([x]) => x);
+
+                if (existingMember) {
+                    req.flash("info", "User is already a member of this project.");
+                    return res.redirect(`/projects/${id}`);
+                }
+            }
+
+            // Check if user is already invited to this project.
+            const existingInvite = await sql`
+                SELECT
+                    id,
+                    "expiresAt",
+                    status
+                FROM
+                    "invites"
+                WHERE
+                    "orgId" = ${req.session.orgId} AND
+                    "projectId" = ${id} AND
+                    "email" = ${email} AND
+                    status = 'invited' AND
+                    "expiresAt" > ${sql`now()`}
+                ORDER BY
+                    id DESC
+                LIMIT
+                    1
+            `.then(([x]) => x);
+
+            if (existingInvite) {
+                req.flash("info", "User is already invited.");
+                return res.redirect(`/projects/${id}`);
+            }
+
+            await sql`
+                INSERT INTO "invites" (
+                    "orgId",
+                    "projectId",
+                    "email",
+                    "token",
+                    "expiresAt",
+                    "createdBy",
+                    "invitedUserId"
+                ) VALUES (
+                    ${req.session.orgId},
+                    ${id},
+                    ${email},
+                    ${token},
+                    ${sql`NOW() + INTERVAL '24 hours'`},
+                    ${req.session.userId},
+                    ${invitedUser ? invitedUser.id : null}
+                )
+            `.then(([x]) => x);
+
+            console.log(url);
+            req.flash("info", "Invite created successfully.");
+            return res.redirect(`/projects/${id}`);
+
         } catch (err) {
             next(err);
         }
