@@ -14,7 +14,7 @@ block content
 
                 include ../includes/flash
 
-                form(action=`/projects`, method="get") 
+                form(action="/projects", method="get") 
                     .mb-4
                         input(type="hidden", name="orderBy", value=orderBy)
                         input(type="hidden", name="orderDir", value=orderDir)
@@ -39,7 +39,7 @@ block content
                                     td= project.key
                                     td 
                                         a(href=`/projects/${project.id}`)= project.name
-                                    td= project.dueDate || 'N/A'
+                                    td(class=isDue ? "red" : "")= project.dueDate || 'N/A'
                                     td= project.firstName + " " + project.lastName
                         else
                             tr

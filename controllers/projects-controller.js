@@ -183,8 +183,11 @@ module.exports = {
                     p."dueDate", 
                     p.description,
                     p."createdAt",
+                    p."updatedAt",
                     u."firstName",
-                    u."lastName"
+                    u."lastName",
+                    uu."firstName" as "updatedByFirstName",
+                    uu."lastName" as "updatedByLastName"
                 FROM 
                     projects p
                 JOIN
@@ -196,6 +199,10 @@ module.exports = {
                     users u
                 ON
                     p."createdBy" = u.id
+                LEFT JOIN
+                    users uu
+                ON
+                    p."updatedBy" = uu.id
                 WHERE 
                     p.id = ${id} AND 
                     p."orgId" = ${req.session.orgId} AND 
@@ -336,7 +343,9 @@ module.exports = {
                     name = ${name},
                     key = ${key},
                     "dueDate" = ${dueDate},
-                    description = ${description}
+                    description = ${description},
+                    "updatedAt" = ${sql`now()`},
+                    "updatedBy" = ${req.session.userId}
                 WHERE 
                     id = ${id} AND 
                     "orgId" = ${req.session.orgId} AND 

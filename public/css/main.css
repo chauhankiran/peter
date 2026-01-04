@@ -287,6 +287,9 @@ td {
     font-weight: bold;
 }
 
+.d-block {
+    display: block !important;
+}
 .d-inline {
     display: inline !important;
 }

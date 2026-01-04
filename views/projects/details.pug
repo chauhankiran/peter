@@ -1,0 +1,42 @@
+.mb-4
+    strong Name
+    p= project.name
+
+.mb-4
+    strong Key
+    p= project.key
+
+.mb-4
+    strong Due date
+    - const now = new Date()
+    - const isDue = project.dueDate && new Date(project.dueDate) <= now
+    p(class=isDue ? "red" : "")= project.dueDate || 'N/A'
+
+.mb-4 
+    strong Description
+    p.italic= project.description || 'N/A'
+
+hr
+
+.row
+    .col-6
+        .mb-4
+            strong Created by
+            p= project.firstName + " " + project.lastName
+    .col-6
+        .mb-4
+            strong Created at
+            p= project.createdAt
+
+.row
+    .col-6
+        .mb-4
+            strong Updated by
+            if project.updatedByFirstName
+                p= project.updatedByFirstName + " " + project.updatedByLastName
+            else
+                p N/A
+    .col-6
+        .mb-4
+            strong Updated at
+            p= project.updatedAt
