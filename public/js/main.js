@@ -22,6 +22,37 @@ if (nameInput && keyInput) {
     });
 }
 
+// Project manage: completed modal.
+const projectStatusSelect = document.getElementById("projectStatus");
+if (projectStatusSelect) {
+    let previous = projectStatusSelect.getAttribute("data-current") || "active";
+
+    projectStatusSelect.addEventListener("change", function () {
+        const selected = this.value;
+
+        if (selected !== "completed") {
+            previous = selected;
+            this.setAttribute("data-current", selected);
+            return;
+        }
+
+        const modal = document.querySelector(".complete-project-modal");
+        const closeBtn = document.querySelector(".complete-project-close");
+        if (!modal || !closeBtn) return;
+
+        modal.style.display = "block";
+
+        closeBtn.addEventListener(
+            "click",
+            function () {
+                modal.style.display = "none";
+                projectStatusSelect.value = previous;
+            },
+            { once: true },
+        );
+    });
+}
+
 // Delete project.
 const deleteProjectButton = document.querySelector(".delete-project");
 if (deleteProjectButton) {

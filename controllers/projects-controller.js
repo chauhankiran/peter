@@ -86,6 +86,169 @@ module.exports = {
         }
     },
 
+    manage: async (req, res, next) => {
+        const id = req.params.id;
+
+        try {
+            const project = await sql`
+                SELECT
+                    p.id,
+                    p.name,
+                    p.key,
+                    p."dueDate",
+                    p.description,
+                    p."status",
+                    p."completedDetails"
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${id} AND
+                    p."orgId" = ${req.session.orgId}
+            `.then(([x]) => x);
+
+            if (!project) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
+            return res.render("projects/manage", { project });
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    updateManage: async (req, res, next) => {
+        const id = req.params.id;
+        const { name, key, dueDate, description, status, completedDetails } = req.body;
+
+        let validationFailed = false;
+        let errors = [];
+
+        if (!name) {
+            errors.push("Name is required.");
+            validationFailed = true;
+        }
+
+        if (!key) {
+            errors.push("Key is required.");
+            validationFailed = true;
+        }
+
+        const allowedStatuses = ["active", "archived", "completed"];
+        if (status && !allowedStatuses.includes(status)) {
+            errors.push("Status is invalid.");
+            validationFailed = true;
+        }
+
+        if (status === "completed" && !completedDetails) {
+            errors.push("Completion details are required.");
+            validationFailed = true;
+        }
+
+        try {
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    projects p
+                ON
+                    p.id = pm."projectId"
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId} AND
+                    p."orgId" = ${req.session.orgId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
+            const project = {
+                id,
+                name: name || "",
+                key: key || "",
+                dueDate: dueDate || "",
+                description: description || "",
+                status: status || "active",
+                completedDetails: completedDetails || "",
+            };
+
+            if (validationFailed) {
+                res.locals.errors = errors;
+                return res.render("projects/manage", { project });
+            }
+
+            const effectiveCompletedDetails = status === "completed" ? completedDetails : null;
+
+            const updated = await sql`
+                UPDATE
+                    projects
+                SET
+                    name = ${name},
+                    key = ${key},
+                    "dueDate" = ${dueDate || null},
+                    description = ${description || null},
+                    "status" = ${status || 'active'},
+                    "completedDetails" = ${effectiveCompletedDetails},
+                    "updatedAt" = ${sql`now()`},
+                    "updatedBy" = ${req.session.userId}
+                WHERE
+                    id = ${id} AND
+                    "orgId" = ${req.session.orgId}
+                RETURNING id
+            `.then(([x]) => x);
+
+            if (!updated) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            req.flash("info", "Project updated successfully.");
+            return res.redirect(`/projects/${id}`);
+        } catch (err) {
+            next(err);
+        }
+    },
+
     new: (req, res) => {
         const project = {};
         return res.render(views.newProjectPath, { project });
@@ -222,8 +385,7 @@ module.exports = {
                     p."updatedBy" = uu.id
                 WHERE 
                     p.id = ${id} AND 
-                    p."orgId" = ${req.session.orgId} AND 
-                    p."status" = 'active'
+                    p."orgId" = ${req.session.orgId}
             `.then(([x]) => x);
 
             if (!project) {
@@ -252,7 +414,7 @@ module.exports = {
                 WHERE
                     pm."projectId" = ${id} AND
                     p."orgId" = ${req.session.orgId} AND
-                    p."status" = 'active'
+                    p."status" IN ('active', 'archived', 'completed')
                 ORDER BY
                     pm.role ASC,
                     u."firstName" ASC,
@@ -320,6 +482,34 @@ module.exports = {
         const id = req.params.id;
 
         try {
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    projects p
+                ON
+                    p.id = pm."projectId"
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId} AND
+                    p."orgId" = ${req.session.orgId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
             const project = await sql`
                 SELECT
                     p.id, 
@@ -381,6 +571,34 @@ module.exports = {
         }
 
         try {
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    projects p
+                ON
+                    p.id = pm."projectId"
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId} AND
+                    p."orgId" = ${req.session.orgId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
             // Check first that project is exists.
             const exists = await sql`
                 SELECT
@@ -432,6 +650,34 @@ module.exports = {
         const id = req.params.id;
 
         try {
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    projects p
+                ON
+                    p.id = pm."projectId"
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId} AND
+                    p."orgId" = ${req.session.orgId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
             const exists = await sql`
                 SELECT
                     1

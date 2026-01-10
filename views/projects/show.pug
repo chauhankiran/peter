@@ -16,8 +16,7 @@ block content
 
                 .mb-4.pt-2
                     a(href="/projects").btn.is-muted.mr-2 &larr; Back
-                    a(href=`/projects/${project.id}/edit`).btn.mr-4  Edit project
-                    button.btn.is-danger.delete-project Delete project
+                    a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project
             .col-4.mt-4
                 .mb-4 
                     .d-block.mb-4
@@ -73,4 +72,4 @@ block content
 
             .col-1.mt-4
 
-    include ./delete-project-modal
+    

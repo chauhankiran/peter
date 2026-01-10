@@ -1,0 +1,51 @@
+extend ../layout
+
+block content 
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-3.mt-4 
+                h1.mb-4 Manage project 
+
+                include ../includes/flash
+
+                form(action=`/projects/${project.id}/manage?_method=put`, method="post", id="project-manage-form") 
+                    include ./form
+
+                    .mb-4
+                        label(for="status") Status
+                        select(name="status", id="projectStatus", data-current=project.status)
+                            option(value="active", selected=project.status === 'active') active
+                            option(value="archived", selected=project.status === 'archived') archived
+                            option(value="completed", selected=project.status === 'completed') completed
+
+                    input(type="hidden", name="completedDetails", id="completedDetails", value=project.completedDetails || '')
+
+                    .mb-4.pt-2
+                        a(href=`/projects/${project.id}`).btn.is-muted.mr-2 &larr; Back
+                        button(type="submit") Update project
+                        button.btn.is-danger.delete-project.ml-2(type="button") Delete project
+
+                include ./delete-project-modal
+
+                //- Completed details modal.
+                .modal.complete-project-modal
+                    .modal-content
+                        h3.mb-4 Mark project as completed
+
+                        form(action=`/projects/${project.id}/manage?_method=put`, method="post", id="complete-project-form")
+                            input(type="hidden", name="name", value=project.name)
+                            input(type="hidden", name="key", value=project.key)
+                            input(type="hidden", name="dueDate", value=project.dueDate)
+                            input(type="hidden", name="description", value=project.description)
+                            input(type="hidden", name="status", value="completed")
+
+                            .mb-4
+                                label(for="completedDetailsModal") Completion details
+                                    span.red *
+                                textarea(name="completedDetails", id="completedDetailsModal", rows="5", placeholder="What was delivered? Anything important to note?")
+
+                            .text-end.pt-4
+                                button.complete-project-close.is-muted.mr-4(type="button") Cancel
+                                button(type="submit") Mark completed
+            .col-8.mt-4

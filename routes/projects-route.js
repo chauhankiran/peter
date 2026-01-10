@@ -5,6 +5,8 @@ const router = express.Router();
 router.get("/", projectsController.index);
 router.get("/new", projectsController.new);
 router.post("/", projectsController.create);
+router.get("/:id/manage", projectsController.manage);
+router.put("/:id/manage", projectsController.updateManage);
 router.get("/:id", projectsController.show);
 router.get("/:id/edit", projectsController.edit);
 router.put("/:id", projectsController.update);
