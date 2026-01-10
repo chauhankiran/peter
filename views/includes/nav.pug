@@ -7,6 +7,8 @@ nav.nav
             a(href="/work").nav-item Work
             a(href="/work/new").nav-item New work
         .nav-end 
+            if role === 'admin' || role === 'owner'
+                a(href="/admin").nav-item.red Admin
             a(href="/settings").nav-item Settings
             a(href="/logout").nav-item Logout
     else

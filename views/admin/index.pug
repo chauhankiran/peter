@@ -1,0 +1,67 @@
+extend ../layout
+
+block content
+    .container-fluid
+        .row
+            .col-1.mt-4
+            .col-10.mt-4
+                .mb-4
+                    h1 Admin
+
+                include ../includes/flash
+
+                h3.mb-2 Organization
+                form(action="/admin/org", method="post")
+                    .mb-4
+                        label(for="name") Name
+                            span.red *
+                        input(type="text", name="name", id="name", value=org.name)
+                    .mb-4.pt-2
+                        button(type="submit") Update organization
+
+                hr
+
+                h3.mb-2 Users
+                if users && users.length
+                    table.mb-4
+                        thead
+                            tr.antiqueWhite
+                                th Name
+                                th Email
+                                th Role
+                                th Status
+                        tbody
+                            each u in users
+                                tr
+                                    td= u.firstName + " " + u.lastName
+                                    td= u.email
+                                    td= u.role
+                                    td= u.status
+                else
+                    p.gray No users found.
+
+                h3.mb-2 Projects
+                if projects && projects.length
+                    table.mb-0
+                        thead
+                            tr.antiqueWhite
+                                th Key
+                                th Name
+                                th Status
+                                th Due date
+                        tbody
+                            each p in projects
+                                tr
+                                    td
+                                        a(href=`/projects/${p.id}`)= p.key
+                                    td
+                                        a(href=`/projects/${p.id}`)= p.name
+                                    td= p.status
+                                    td
+                                        if p.dueDate
+                                            = new Date(p.dueDate).toISOString().slice(0, 10)
+                                        else
+                                            span.gray -
+                else
+                    p.gray No projects found.
+            .col-1.mt-4

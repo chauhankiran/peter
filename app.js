@@ -51,6 +51,7 @@ app.use((req, res, next) => {
     res.locals.email = req.session.email || null;
     res.locals.userName = req.session.userName || null;
     res.locals.orgId = req.session.orgId || null;
+    res.locals.role = req.session.role || null;
 
     res.locals.isLoggedIn = Boolean(req.session.userId) || false;
 
