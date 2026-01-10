@@ -163,6 +163,15 @@ module.exports = {
                         (${req.session.orgId}, ${project.id}, 'In progress', 20, false, ${req.session.userId}),
                         (${req.session.orgId}, ${project.id}, 'Done', 30, true, ${req.session.userId})
                 `;
+
+                await sql`
+                    INSERT INTO "priorities" ("orgId", "projectId", name, sequence, "createdBy")
+                    VALUES
+                        (${req.session.orgId}, ${project.id}, 'Low', 10, ${req.session.userId}),
+                        (${req.session.orgId}, ${project.id}, 'Normal', 20, ${req.session.userId}),
+                        (${req.session.orgId}, ${project.id}, 'High', 30, ${req.session.userId}),
+                        (${req.session.orgId}, ${project.id}, 'Urgent', 40, ${req.session.userId})
+                `;
             });
 
             req.flash("info", "Project created successfully.");
@@ -269,6 +278,7 @@ module.exports = {
                     w."dueDate",
                     w."completedAt",
                     s.name as "statusName",
+                    pr.name as "priorityName",
                     u."firstName" as "assigneeFirstName",
                     u."lastName" as "assigneeLastName"
                 FROM
@@ -277,6 +287,10 @@ module.exports = {
                     "statuses" s
                 ON
                     s.id = w."statusId"
+                JOIN
+                    "priorities" pr
+                ON
+                    pr.id = w."priorityId"
                 LEFT JOIN
                     users u
                 ON

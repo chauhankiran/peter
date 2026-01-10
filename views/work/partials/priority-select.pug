@@ -1,0 +1,8 @@
+label(for="priorityId") Priority
+select(name="priorityId", id="priorityId")
+    - const effectivePriorityId = (typeof selectedPriorityId !== 'undefined' && selectedPriorityId !== null) ? selectedPriorityId : (typeof work !== 'undefined' && work ? work.priorityId : '')
+    each p in priorities
+        if String(p.id) === String(effectivePriorityId)
+            option(value=p.id, selected=true)= p.name
+        else
+            option(value=p.id)= p.name

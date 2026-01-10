@@ -28,7 +28,7 @@ block content
                                             else
                                                 option(value=project.id)= project.name
                                 else
-                                    select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container", data-status-partial-url="/work/partial/statuses", data-status-partial-target="#status-container")
+                                    select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container", data-status-partial-url="/work/partial/statuses", data-status-partial-target="#status-container", data-priority-partial-url="/work/partial/priorities", data-priority-partial-target="#priority-container")
                                         option(value="") Select a project
                                         each project in projects
                                             if String(project.id) === String(work.projectId)
@@ -52,12 +52,8 @@ block content
                             .mb-4#status-container
                                 include ./partials/status-select
 
-                            .mb-4
-                                label(for="priority") Priority
-                                select(name="priority", id="priority")
-                                    option(value="low", selected=work.priority === 'low') low
-                                    option(value="medium", selected=work.priority === 'medium') medium
-                                    option(value="high", selected=work.priority === 'high') high
+                            .mb-4#priority-container
+                                include ./partials/priority-select
 
                             .mb-4
                                 label(for="dueDate") Due date

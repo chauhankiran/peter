@@ -37,7 +37,7 @@ block content
                                             = item.assigneeFirstName + " " + item.assigneeLastName
                                         else
                                             | Unassigned
-                                        |  | #{item.statusName} | due 
+                                        |  | #{item.statusName} | #{item.priorityName} | due 
                                         if dueDateStr
                                             = dueDateStr
                                         else

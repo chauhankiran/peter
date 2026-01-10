@@ -51,6 +51,12 @@ if (projectSelect && !projectSelect.disabled) {
     const statusPartialTarget = projectSelect.getAttribute(
         "data-status-partial-target",
     );
+    const priorityPartialUrl = projectSelect.getAttribute(
+        "data-priority-partial-url",
+    );
+    const priorityPartialTarget = projectSelect.getAttribute(
+        "data-priority-partial-target",
+    );
 
     if (partialUrl && partialTarget) {
         projectSelect.addEventListener("change", async function () {
@@ -92,6 +98,28 @@ if (projectSelect && !projectSelect.disabled) {
                     headers: { "X-Requested-With": "XMLHttpRequest" },
                 });
                 statusTarget.innerHTML = await res.text();
+            }
+
+            if (priorityPartialUrl && priorityPartialTarget) {
+                const priorityTarget = document.querySelector(
+                    priorityPartialTarget,
+                );
+                if (!priorityTarget) return;
+
+                const url = new URL(priorityPartialUrl, window.location.origin);
+                if (projectId) {
+                    url.searchParams.set("projectId", projectId);
+                }
+
+                const currentPriority = document.getElementById("priorityId");
+                if (currentPriority && currentPriority.value) {
+                    url.searchParams.set("priorityId", currentPriority.value);
+                }
+
+                const res = await fetch(url.toString(), {
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                });
+                priorityTarget.innerHTML = await res.text();
             }
         });
     }

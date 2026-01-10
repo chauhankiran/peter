@@ -28,6 +28,7 @@ block content
                             th Project
                             th Assignee
                             th Status
+                            th Priority
                     tbody
                         if workItems.length > 0
                             each item in workItems
@@ -44,9 +45,10 @@ block content
                                         else
                                             span.gray Unassigned
                                     td= item.statusName
+                                    td= item.priorityName
                         else
                             tr
-                                td(colspan="5").text-center.gray No work found.
+                                td(colspan="6").text-center.gray No work found.
 
                 +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
 
