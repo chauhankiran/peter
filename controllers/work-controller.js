@@ -1,64 +1,795 @@
+const sql = require("../db/sql");
+const { PER_PAGE } = require("../constants/app");
+const generatePaginationLinks = require("../helpers/generate-pagination-links");
+
 module.exports = {
     index: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const orgId = req.session.orgId;
+        const userId = req.session.userId;
 
-        return res.status(404).render("error", { err });
+        const search = req.query.search || null;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || PER_PAGE;
+        const skip = (page - 1) * limit;
+        const orderBy = req.query.orderBy || "id";
+        const orderDir = req.query.orderDir || "DESC";
+
+        const whereClauses = [];
+
+        if (search) {
+            whereClauses.push(
+                sql`w.title iLIKE ${"%" + search + "%"} OR p.name iLIKE ${"%" + search + "%"}`,
+            );
+        }
+
+        const whereClause = whereClauses.flatMap((x, i) =>
+            i ? [sql`and`, x] : x,
+        );
+
+        try {
+            const workItems = await sql`
+                SELECT
+                    w.id,
+                    w.title,
+                    w."workId",
+                    p.id as "projectId",
+                    p.name as "projectName",
+                    p.key as "projectKey",
+                    u."firstName" as "assigneeFirstName",
+                    u."lastName" as "assigneeLastName"
+                FROM
+                    "work" w
+                JOIN
+                    projects p
+                ON
+                    p.id = w."projectId"
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                LEFT JOIN
+                    users u
+                ON
+                    u.id = w."assigneeId"
+                WHERE
+                    ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
+                    w."orgId" = ${orgId} AND
+                    w."isActive" = true AND
+                    p."status" = 'active'
+                ORDER BY
+                    ${sql(orderBy)}
+                    ${orderDir === "ASC" ? sql`ASC` : sql`DESC`}
+                LIMIT
+                    ${limit}
+                OFFSET
+                    ${skip}
+            `;
+
+            const { count } = await sql`
+                SELECT
+                    count(DISTINCT w.id)
+                FROM
+                    "work" w
+                JOIN
+                    projects p
+                ON
+                    p.id = w."projectId"
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                WHERE
+                    ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
+                    w."orgId" = ${orgId} AND
+                    w."isActive" = true AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            const pages = Math.ceil((+count || 0) / limit) || 1;
+
+            const paginationLinks = generatePaginationLinks({
+                link: "/work",
+                page,
+                pages,
+                search,
+                limit,
+                orderBy,
+                orderDir,
+            });
+
+            console.log("count: ", count);
+
+            return res.render("work/index", {
+                workItems,
+                search,
+                paginationLinks,
+                orderBy,
+                orderDir,
+                count,
+            });
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    partialAssignees: async (req, res, next) => {
+        const projectId = req.query.projectId;
+        const assigneeId = req.query.assigneeId || "";
+
+        if (!projectId) {
+            return res.render("work/partials/assignee-select", {
+                assignees: [],
+                assigneeId,
+            });
+        }
+
+        try {
+            const projectAccess = await sql`
+                SELECT
+                    p.id
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${projectId} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!projectAccess) {
+                return res.render("work/partials/assignee-select", {
+                    assignees: [],
+                    assigneeId,
+                });
+            }
+
+            const assignees = await sql`
+                SELECT
+                    u.id,
+                    u."firstName",
+                    u."lastName",
+                    u.email
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    users u
+                ON
+                    u.id = pm."userId"
+                WHERE
+                    pm."projectId" = ${projectId}
+                ORDER BY
+                    u."firstName" ASC,
+                    u."lastName" ASC
+            `;
+
+            return res.render("work/partials/assignee-select", {
+                assignees,
+                assigneeId,
+            });
+        } catch (err) {
+            next(err);
+        }
     },
 
     new: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const projectId = req.query.projectId;
 
-        return res.status(404).render("error", { err });
+        try {
+            const projects = await sql`
+                SELECT
+                    p.id,
+                    p.name
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+                ORDER BY
+                    p.name ASC
+            `;
+
+            const canUseProjectFromQuery =
+                !!projectId &&
+                projects.some((p) => String(p.id) === String(projectId));
+
+            const selectedProjectId = canUseProjectFromQuery ? projectId : "";
+            const projectLocked = canUseProjectFromQuery;
+
+            const assignees = selectedProjectId
+                ? await sql`
+                      SELECT
+                          u.id,
+                          u."firstName",
+                          u."lastName",
+                          u.email
+                      FROM
+                          "projectMembers" pm
+                      JOIN
+                          users u
+                      ON
+                          u.id = pm."userId"
+                      WHERE
+                          pm."projectId" = ${selectedProjectId}
+                      ORDER BY
+                          u."firstName" ASC,
+                          u."lastName" ASC
+                  `
+                : await sql`
+                      SELECT
+                          u.id,
+                          u."firstName",
+                          u."lastName",
+                          u.email
+                      FROM
+                          "userOrgs" uo
+                      JOIN
+                          users u
+                      ON
+                          u.id = uo."userId"
+                      WHERE
+                          uo."orgId" = ${req.session.orgId} AND
+                          uo."isActive" = true
+                      ORDER BY
+                          u."firstName" ASC,
+                          u."lastName" ASC
+                  `;
+
+            const work = {
+                projectId: selectedProjectId,
+                title: "",
+                description: "",
+                assigneeId: "",
+                status: "todo",
+                priority: "medium",
+                dueDate: "",
+            };
+
+            return res.render("work/new", {
+                work,
+                projects,
+                assignees,
+                projectLocked,
+            });
+        } catch (err) {
+            next(err);
+        }
     },
 
     create: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const {
+            projectId,
+            title,
+            description,
+            assigneeId,
+            status,
+            priority,
+            dueDate,
+            projectLocked,
+        } = req.body;
 
-        return res.status(404).render("error", { err });
+        let validationFailed = false;
+        let errors = [];
+
+        if (!projectId) {
+            errors.push("Project is required.");
+            validationFailed = true;
+        }
+
+        if (!title) {
+            errors.push("Title is required.");
+            validationFailed = true;
+        }
+
+        try {
+            const projects = await sql`
+                SELECT
+                    p.id,
+                    p.name
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+                ORDER BY
+                    p.name ASC
+            `;
+
+            const assignees = await sql`
+                SELECT
+                    u.id,
+                    u."firstName",
+                    u."lastName",
+                    u.email
+                FROM
+                    "userOrgs" uo
+                JOIN
+                    users u
+                ON
+                    u.id = uo."userId"
+                WHERE
+                    uo."orgId" = ${req.session.orgId} AND
+                    uo."isActive" = true
+                ORDER BY
+                    u."firstName" ASC,
+                    u."lastName" ASC
+            `;
+
+            const work = {
+                projectId: projectId || "",
+                title: title || "",
+                description: description || "",
+                assigneeId: assigneeId || "",
+                status: status || "todo",
+                priority: priority || "medium",
+                dueDate: dueDate || "",
+            };
+
+            if (validationFailed) {
+                res.locals.errors = errors;
+                return res.render("work/new", {
+                    work,
+                    projects,
+                    assignees,
+                    projectLocked: !!projectLocked,
+                });
+            }
+
+            const projectAccess = await sql`
+                SELECT
+                    p.id
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${projectId} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!projectAccess) {
+                res.locals.errors = ["Project not found."];
+                return res.render("work/new", {
+                    work,
+                    projects,
+                    assignees,
+                    projectLocked: !!projectLocked,
+                });
+            }
+
+            const priorityMap = {
+                low: 1,
+                medium: 2,
+                high: 3,
+            };
+
+            const priorityId =
+                priorityMap[String(priority || "").toLowerCase()] || 2;
+            const assignedTo = assigneeId || req.session.userId;
+
+            await sql`
+                INSERT INTO "work" (
+                    "orgId",
+                    "projectId",
+                    title,
+                    description,
+                    "typeId",
+                    "priorityId",
+                    "milestoneId",
+                    "targetId",
+                    "assigneeId",
+                    "reporterId",
+                    "dueDate",
+                    "createdBy"
+                ) VALUES (
+                    ${req.session.orgId},
+                    ${projectId},
+                    ${title},
+                    ${description || ""},
+                    1,
+                    ${priorityId},
+                    1,
+                    1,
+                    ${assignedTo},
+                    ${req.session.userId},
+                    ${dueDate ? dueDate : null},
+                    ${req.session.userId}
+                )
+            `;
+
+            req.flash("info", "Work created successfully.");
+            return res.redirect("/work");
+        } catch (err) {
+            next(err);
+        }
     },
 
     show: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const orgId = req.session.orgId;
+        const userId = req.session.userId;
+        const workId = req.params.id;
 
-        return res.status(404).render("error", { err });
+        try {
+            const work = await sql`
+                SELECT
+                    w.id,
+                    w.title,
+                    w.description,
+                    w."dueDate",
+                    w."priorityId",
+                    w."assigneeId",
+                    w."reporterId",
+                    p.id as "projectId",
+                    p.name as "projectName",
+                    au."firstName" as "assigneeFirstName",
+                    au."lastName" as "assigneeLastName",
+                    ru."firstName" as "reporterFirstName",
+                    ru."lastName" as "reporterLastName"
+                FROM
+                    "work" w
+                JOIN
+                    projects p
+                ON
+                    p.id = w."projectId"
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                LEFT JOIN
+                    users au
+                ON
+                    au.id = w."assigneeId"
+                LEFT JOIN
+                    users ru
+                ON
+                    ru.id = w."reporterId"
+                WHERE
+                    w.id = ${workId} AND
+                    w."orgId" = ${orgId} AND
+                    w."isActive" = true AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!work) {
+                const err = {
+                    code: 404,
+                    message: "Work not found.",
+                };
+                return res.status(404).render("error", { err });
+            }
+
+            return res.render("work/show", { work });
+        } catch (err) {
+            next(err);
+        }
     },
 
     edit: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const orgId = req.session.orgId;
+        const userId = req.session.userId;
+        const workId = req.params.id;
 
-        return res.status(404).render("error", { err });
+        try {
+            const workRow = await sql`
+                SELECT
+                    w.id,
+                    w."projectId",
+                    p.name as "projectName",
+                    w.title,
+                    w.description,
+                    w."assigneeId",
+                    w."dueDate",
+                    w."priorityId"
+                FROM
+                    "work" w
+                JOIN
+                    projects p
+                ON
+                    p.id = w."projectId"
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                WHERE
+                    w.id = ${workId} AND
+                    w."orgId" = ${orgId} AND
+                    w."isActive" = true AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!workRow) {
+                const err = {
+                    code: 404,
+                    message: "Work not found.",
+                };
+                return res.status(404).render("error", { err });
+            }
+
+            const projects = await sql`
+                SELECT
+                    p.id,
+                    p.name
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                WHERE
+                    p."orgId" = ${orgId} AND
+                    p."status" = 'active'
+                ORDER BY
+                    p.name ASC
+            `;
+
+            const assignees = await sql`
+                SELECT
+                    u.id,
+                    u."firstName",
+                    u."lastName",
+                    u.email
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    users u
+                ON
+                    u.id = pm."userId"
+                WHERE
+                    pm."projectId" = ${workRow.projectId}
+                ORDER BY
+                    u."firstName" ASC,
+                    u."lastName" ASC
+            `;
+
+            const priorityReverseMap = {
+                1: "low",
+                2: "medium",
+                3: "high",
+            };
+
+            const work = {
+                id: workRow.id,
+                projectId: workRow.projectId,
+                title: workRow.title,
+                description: workRow.description,
+                assigneeId: workRow.assigneeId,
+                status: "todo",
+                priority: priorityReverseMap[workRow.priorityId] || "medium",
+                dueDate: workRow.dueDate
+                    ? new Date(workRow.dueDate).toISOString().slice(0, 10)
+                    : "",
+            };
+
+            return res.render("work/edit", {
+                work,
+                projects,
+                assignees,
+                projectLocked: true,
+            });
+        } catch (err) {
+            next(err);
+        }
     },
 
     update: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const orgId = req.session.orgId;
+        const userId = req.session.userId;
+        const workId = req.params.id;
 
-        return res.status(404).render("error", { err });
+        const { title, description, assigneeId, priority, dueDate } = req.body;
+
+        let validationFailed = false;
+        let errors = [];
+
+        if (!title) {
+            errors.push("Title is required.");
+            validationFailed = true;
+        }
+
+        try {
+            const existingWork = await sql`
+                SELECT
+                    w.id,
+                    w."projectId",
+                    w."priorityId"
+                FROM
+                    "work" w
+                JOIN
+                    projects p
+                ON
+                    p.id = w."projectId"
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                WHERE
+                    w.id = ${workId} AND
+                    w."orgId" = ${orgId} AND
+                    w."isActive" = true AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!existingWork) {
+                const err = {
+                    code: 404,
+                    message: "Work not found.",
+                };
+                return res.status(404).render("error", { err });
+            }
+
+            const projects = await sql`
+                SELECT
+                    p.id,
+                    p.name
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                WHERE
+                    p."orgId" = ${orgId} AND
+                    p."status" = 'active'
+                ORDER BY
+                    p.name ASC
+            `;
+
+            const assignees = await sql`
+                SELECT
+                    u.id,
+                    u."firstName",
+                    u."lastName",
+                    u.email
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    users u
+                ON
+                    u.id = pm."userId"
+                WHERE
+                    pm."projectId" = ${existingWork.projectId}
+                ORDER BY
+                    u."firstName" ASC,
+                    u."lastName" ASC
+            `;
+
+            const priorityMap = {
+                low: 1,
+                medium: 2,
+                high: 3,
+            };
+
+            const priorityId =
+                priorityMap[String(priority || "").toLowerCase()] || 2;
+            const assignedTo = assigneeId || userId;
+            const isAssigneeValid = assignees.some(
+                (a) => String(a.id) === String(assignedTo),
+            );
+
+            if (!isAssigneeValid) {
+                errors.push("Assignee is not a member of this project.");
+                validationFailed = true;
+            }
+
+            const work = {
+                id: workId,
+                projectId: existingWork.projectId,
+                title: title || "",
+                description: description || "",
+                assigneeId: assignedTo,
+                status: "todo",
+                priority: String(priority || "medium").toLowerCase(),
+                dueDate: dueDate || "",
+            };
+
+            if (validationFailed) {
+                res.locals.errors = errors;
+                return res.render("work/edit", {
+                    work,
+                    projects,
+                    assignees,
+                    projectLocked: true,
+                });
+            }
+
+            await sql`
+                UPDATE
+                    "work"
+                SET
+                    title = ${title},
+                    description = ${description || ""},
+                    "assigneeId" = ${assignedTo},
+                    "priorityId" = ${priorityId},
+                    "dueDate" = ${dueDate ? dueDate : null},
+                    "updatedBy" = ${userId},
+                    "updatedAt" = now()
+                WHERE
+                    id = ${workId} AND
+                    "orgId" = ${orgId}
+            `;
+
+            req.flash("info", "Work updated successfully.");
+            return res.redirect(`/work/${workId}`);
+        } catch (err) {
+            next(err);
+        }
     },
 
     destroy: async (req, res, next) => {
-        const err = {
-            code: 504,
-            message: "Not Implemented",
-        };
+        const orgId = req.session.orgId;
+        const userId = req.session.userId;
+        const workId = req.params.id;
 
-        return res.status(404).render("error", { err });
+        try {
+            const workAccess = await sql`
+                SELECT
+                    w.id
+                FROM
+                    "work" w
+                JOIN
+                    projects p
+                ON
+                    p.id = w."projectId"
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${userId}
+                WHERE
+                    w.id = ${workId} AND
+                    w."orgId" = ${orgId} AND
+                    w."isActive" = true AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!workAccess) {
+                const err = {
+                    code: 404,
+                    message: "Work not found.",
+                };
+                return res.status(404).render("error", { err });
+            }
+
+            await sql`
+                UPDATE
+                    "work"
+                SET
+                    "isActive" = false,
+                    "updatedBy" = ${userId},
+                    "updatedAt" = now()
+                WHERE
+                    id = ${workId} AND
+                    "orgId" = ${orgId}
+            `;
+
+            req.flash("info", "Work deleted successfully.");
+            return res.redirect("/work");
+        } catch (err) {
+            next(err);
+        }
     },
 };

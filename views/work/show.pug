@@ -1,0 +1,59 @@
+extend ../layout
+
+block content
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-10.mt-4 
+                h1 Work details
+
+                include ../includes/flash
+
+                .mb-4
+                    strong ID
+                    p.gray= work.id
+
+                .mb-4
+                    strong Title
+                    p= work.title
+
+                .mb-4
+                    strong Project
+                    p
+                        a(href=`/projects/${work.projectId}`)= work.projectName
+
+                .mb-4
+                    strong Assignee
+                    p
+                        if work.assigneeFirstName
+                            = work.assigneeFirstName + " " + work.assigneeLastName
+                        else
+                            span.gray Unassigned
+
+                .mb-4
+                    strong Reporter
+                    p
+                        if work.reporterFirstName
+                            = work.reporterFirstName + " " + work.reporterLastName
+                        else
+                            span.gray N/A
+
+                .mb-4
+                    strong Due date
+                    p
+                        if work.dueDate
+                            = new Date(work.dueDate).toISOString().slice(0, 10)
+                        else
+                            span.gray N/A
+
+                .mb-4
+                    strong Description
+                    if work.description
+                        p= work.description
+                    else
+                        p.gray No description.
+
+                .mb-4.pt-2
+                    a(href="/work").btn.is-muted.mr-2 &larr; Back
+
+            .col-1.mt-4

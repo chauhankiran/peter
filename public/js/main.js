@@ -41,3 +41,33 @@ if (deleteProjectButton) {
         });
     });
 }
+
+// Work: update assignees by project selection (HTML partial).
+const projectSelect = document.getElementById("projectId");
+if (projectSelect && !projectSelect.disabled) {
+    const partialUrl = projectSelect.getAttribute("data-partial-url");
+    const partialTarget = projectSelect.getAttribute("data-partial-target");
+
+    if (partialUrl && partialTarget) {
+        projectSelect.addEventListener("change", async function () {
+            const projectId = this.value;
+            const target = document.querySelector(partialTarget);
+            if (!target) return;
+
+            const url = new URL(partialUrl, window.location.origin);
+            if (projectId) {
+                url.searchParams.set("projectId", projectId);
+            }
+
+            const currentAssignee = document.getElementById("assigneeId");
+            if (currentAssignee && currentAssignee.value) {
+                url.searchParams.set("assigneeId", currentAssignee.value);
+            }
+
+            const res = await fetch(url.toString(), {
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+            });
+            target.innerHTML = await res.text();
+        });
+    }
+}

@@ -1,0 +1,10 @@
+label(for="assigneeId") Assignee
+select(name="assigneeId", id="assigneeId")
+    option(value="") Unassigned
+    - const selectedAssigneeId = (typeof assigneeId !== 'undefined' && assigneeId !== null) ? assigneeId : (typeof work !== 'undefined' && work ? work.assigneeId : '')
+    each member in assignees
+        - const memberName = member.firstName + " " + member.lastName
+        if String(member.id) === String(selectedAssigneeId)
+            option(value=member.id, selected=true)= memberName
+        else
+            option(value=member.id)= memberName

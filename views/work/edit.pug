@@ -1,0 +1,75 @@
+extend ../layout
+
+block content 
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-10.mt-4 
+                h1.mb-4 Edit work
+
+                include ../includes/flash
+
+                form(action=`/work/${work.id}?_method=put`, method="post") 
+                    if projectLocked
+                        input(type="hidden", name="projectLocked", value="1")
+                        input(type="hidden", name="projectId", value=work.projectId)
+
+                    .row
+                        .col-4
+                            .mb-4
+                                label(for="projectId") Project
+                                    span.red *
+                                if projectLocked
+                                    select(name="projectId", id="projectId", disabled=true)
+                                        option(value="") Select a project
+                                        each project in projects
+                                            if String(project.id) === String(work.projectId)
+                                                option(value=project.id, selected=true)= project.name
+                                            else
+                                                option(value=project.id)= project.name
+                                else
+                                    select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container")
+                                        option(value="") Select a project
+                                        each project in projects
+                                            if String(project.id) === String(work.projectId)
+                                                option(value=project.id, selected=true)= project.name
+                                            else
+                                                option(value=project.id)= project.name
+
+                            .mb-4
+                                label(for="title") Title
+                                    span.red *
+                                input(type="text", name="title", id="title", value=work.title, placeholder="Add a title", autofocus=true)
+
+                            .mb-4 
+                                label(for="description") Description
+                                textarea(name="description", id="description", rows="4", placeholder="Optional details...")= work.description
+
+                        .col-3
+                            .mb-4#assignee-container
+                                include ./partials/assignee-select
+
+                            .mb-4
+                                label(for="priority") Priority
+                                select(name="priority", id="priority")
+                                    option(value="low", selected=work.priority === 'low') low
+                                    option(value="medium", selected=work.priority === 'medium') medium
+                                    option(value="high", selected=work.priority === 'high') high
+
+                            .mb-4
+                                label(for="dueDate") Due date
+                                input(type="text", name="dueDate", id="dueDate", value=work.dueDate, placeholder="YYYY-MM-DD")
+
+                        .col-5
+
+                    .row
+                        .col-3
+                            .mb-4.pt-2
+                                a(href=`/work/${work.id}`).btn.is-muted.mr-2 Cancel
+                                button(type="submit") Update work
+
+                        .col-9.text-end
+                            form(action=`/work/${work.id}?_method=delete`, method="post")
+                                button.is-danger(type="submit") Delete work
+
+            .col-1.mt-4
