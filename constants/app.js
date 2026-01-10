@@ -6,6 +6,7 @@ module.exports = {
         loginPath: "accounts/login",
         homePath: "home",
         dashboardPath: "dashboard/index",
+        settingsPath: "settings/index",
         verifyEmailPath: "accounts/verify-email",
         checkEmailPath: "accounts/check-email",
         onboardingPath: "accounts/onboarding",

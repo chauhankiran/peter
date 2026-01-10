@@ -1,0 +1,53 @@
+extend ../layout
+
+block content
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-3.mt-4 
+                h1.mb-4 Settings
+
+                include ../includes/flash
+
+                h3.mb-2 Profile
+                form(action="/settings/profile", method="post")
+                    .mb-4
+                        label(for="firstName") First name
+                            span.red *
+                        input(type="text", name="firstName", id="firstName", value=user.firstName)
+
+                    .mb-4
+                        label(for="lastName") Last name
+                            span.red *
+                        input(type="text", name="lastName", id="lastName", value=user.lastName)
+
+                    .mb-4
+                        label(for="email") Email
+                            span.red *
+                        input(type="text", name="email", id="email", value=user.email)
+
+                    .mb-4.pt-2
+                        button(type="submit") Update profile
+
+                hr
+
+                h3.mb-2 Change password
+                form(action="/settings/password", method="post")
+                    .mb-4
+                        label(for="currentPassword") Current password
+                            span.red *
+                        input(type="password", name="currentPassword", id="currentPassword")
+
+                    .mb-4
+                        label(for="newPassword") New password
+                            span.red *
+                        input(type="password", name="newPassword", id="newPassword")
+
+                    .mb-4
+                        label(for="confirmNewPassword") Confirm new password
+                            span.red *
+                        input(type="password", name="confirmNewPassword", id="confirmNewPassword")
+
+                    .mb-4.pt-2
+                        button(type="submit") Update password
+            .col-8.mt-4
