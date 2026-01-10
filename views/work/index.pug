@@ -27,6 +27,7 @@ block content
                             th Title
                             th Project
                             th Assignee
+                            th Status
                     tbody
                         if workItems.length > 0
                             each item in workItems
@@ -42,9 +43,10 @@ block content
                                             = item.assigneeFirstName + " " + item.assigneeLastName
                                         else
                                             span.gray Unassigned
+                                    td= item.statusName
                         else
                             tr
-                                td(colspan="3").text-center.gray No work found.
+                                td(colspan="5").text-center.gray No work found.
 
                 +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
 

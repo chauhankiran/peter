@@ -18,7 +18,7 @@ module.exports = {
 
         if (search) {
             whereClauses.push(
-                sql`w.title iLIKE ${"%" + search + "%"} OR p.name iLIKE ${"%" + search + "%"}`,
+                sql`w.title iLIKE ${"%" + search + "%"} OR p.name iLIKE ${"%" + search + "%"} OR p.key iLIKE ${"%" + search + "%"}`,
             );
         }
 
@@ -32,6 +32,7 @@ module.exports = {
                     w.id,
                     w.title,
                     w."workId",
+                    s.name as "statusName",
                     p.id as "projectId",
                     p.name as "projectName",
                     p.key as "projectKey",
@@ -43,6 +44,10 @@ module.exports = {
                     projects p
                 ON
                     p.id = w."projectId"
+                JOIN
+                    "statuses" s
+                ON
+                    s.id = w."statusId"
                 JOIN
                     "projectMembers" pm
                 ON
@@ -108,6 +113,65 @@ module.exports = {
                 orderBy,
                 orderDir,
                 count,
+            });
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    partialStatuses: async (req, res, next) => {
+        const projectId = req.query.projectId;
+        const selectedStatusId = req.query.statusId || "";
+
+        if (!projectId) {
+            return res.render("work/partials/status-select", {
+                statuses: [],
+                selectedStatusId,
+            });
+        }
+
+        try {
+            const projectAccess = await sql`
+                SELECT
+                    p.id
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${projectId} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!projectAccess) {
+                return res.render("work/partials/status-select", {
+                    statuses: [],
+                    selectedStatusId,
+                });
+            }
+
+            const statuses = await sql`
+                SELECT
+                    s.id,
+                    s.name,
+                    s.sequence,
+                    s."isDone"
+                FROM
+                    "statuses" s
+                WHERE
+                    s."orgId" = ${req.session.orgId} AND
+                    s."projectId" = ${projectId}
+                ORDER BY
+                    s.sequence DESC
+            `;
+
+            return res.render("work/partials/status-select", {
+                statuses,
+                selectedStatusId,
             });
         } catch (err) {
             next(err);
@@ -245,12 +309,31 @@ module.exports = {
                           u."lastName" ASC
                   `;
 
+            const statuses = selectedProjectId
+                ? await sql`
+                      SELECT
+                          s.id,
+                          s.name,
+                          s.sequence,
+                          s."isDone"
+                      FROM
+                          "statuses" s
+                      WHERE
+                          s."orgId" = ${req.session.orgId} AND
+                          s."projectId" = ${selectedProjectId}
+                      ORDER BY
+                          s.sequence DESC
+                  `
+                : [];
+
+            const defaultStatusId = statuses.length > 0 ? statuses[0].id : "";
+
             const work = {
                 projectId: selectedProjectId,
                 title: "",
                 description: "",
                 assigneeId: "",
-                status: "todo",
+                statusId: defaultStatusId,
                 priority: "medium",
                 dueDate: "",
             };
@@ -259,6 +342,7 @@ module.exports = {
                 work,
                 projects,
                 assignees,
+                statuses,
                 projectLocked,
             });
         } catch (err) {
@@ -272,7 +356,7 @@ module.exports = {
             title,
             description,
             assigneeId,
-            status,
+            statusId,
             priority,
             dueDate,
             projectLocked,
@@ -335,10 +419,32 @@ module.exports = {
                 title: title || "",
                 description: description || "",
                 assigneeId: assigneeId || "",
-                status: status || "todo",
+                statusId: statusId || "",
                 priority: priority || "medium",
                 dueDate: dueDate || "",
             };
+
+            const statuses = projectId
+                ? await sql`
+                      SELECT
+                          s.id,
+                          s.name,
+                          s.sequence,
+                          s."isDone"
+                      FROM
+                          "statuses" s
+                      WHERE
+                          s."orgId" = ${req.session.orgId} AND
+                          s."projectId" = ${projectId}
+                      ORDER BY
+                          s.sequence DESC
+                  `
+                : [];
+
+            const effectiveStatusId =
+                statusId || (statuses.length > 0 ? statuses[0].id : "");
+
+            work.statusId = effectiveStatusId;
 
             if (validationFailed) {
                 res.locals.errors = errors;
@@ -346,6 +452,7 @@ module.exports = {
                     work,
                     projects,
                     assignees,
+                    statuses,
                     projectLocked: !!projectLocked,
                 });
             }
@@ -372,6 +479,29 @@ module.exports = {
                     work,
                     projects,
                     assignees,
+                    statuses,
+                    projectLocked: !!projectLocked,
+                });
+            }
+
+            const statusAccess = await sql`
+                SELECT
+                    s.id
+                FROM
+                    "statuses" s
+                WHERE
+                    s.id = ${effectiveStatusId} AND
+                    s."orgId" = ${req.session.orgId} AND
+                    s."projectId" = ${projectId}
+            `.then(([x]) => x);
+
+            if (!statusAccess) {
+                res.locals.errors = ["Status is invalid."];
+                return res.render("work/new", {
+                    work,
+                    projects,
+                    assignees,
+                    statuses,
                     projectLocked: !!projectLocked,
                 });
             }
@@ -396,6 +526,7 @@ module.exports = {
                     "priorityId",
                     "milestoneId",
                     "targetId",
+                    "statusId",
                     "assigneeId",
                     "reporterId",
                     "dueDate",
@@ -409,6 +540,7 @@ module.exports = {
                     ${priorityId},
                     1,
                     1,
+                    ${effectiveStatusId},
                     ${assignedTo},
                     ${req.session.userId},
                     ${dueDate ? dueDate : null},
@@ -438,6 +570,7 @@ module.exports = {
                     w."priorityId",
                     w."assigneeId",
                     w."reporterId",
+                    s.name as "statusName",
                     p.id as "projectId",
                     p.name as "projectName",
                     au."firstName" as "assigneeFirstName",
@@ -450,6 +583,10 @@ module.exports = {
                     projects p
                 ON
                     p.id = w."projectId"
+                JOIN
+                    "statuses" s
+                ON
+                    s.id = w."statusId"
                 JOIN
                     "projectMembers" pm
                 ON
@@ -499,7 +636,8 @@ module.exports = {
                     w.description,
                     w."assigneeId",
                     w."dueDate",
-                    w."priorityId"
+                    w."priorityId",
+                    w."statusId"
                 FROM
                     "work" w
                 JOIN
@@ -569,13 +707,28 @@ module.exports = {
                 3: "high",
             };
 
+            const statuses = await sql`
+                SELECT
+                    s.id,
+                    s.name,
+                    s.sequence,
+                    s."isDone"
+                FROM
+                    "statuses" s
+                WHERE
+                    s."orgId" = ${orgId} AND
+                    s."projectId" = ${workRow.projectId}
+                ORDER BY
+                    s.sequence DESC
+            `;
+
             const work = {
                 id: workRow.id,
                 projectId: workRow.projectId,
                 title: workRow.title,
                 description: workRow.description,
                 assigneeId: workRow.assigneeId,
-                status: "todo",
+                statusId: workRow.statusId,
                 priority: priorityReverseMap[workRow.priorityId] || "medium",
                 dueDate: workRow.dueDate
                     ? new Date(workRow.dueDate).toISOString().slice(0, 10)
@@ -586,6 +739,7 @@ module.exports = {
                 work,
                 projects,
                 assignees,
+                statuses,
                 projectLocked: true,
             });
         } catch (err) {
@@ -598,7 +752,8 @@ module.exports = {
         const userId = req.session.userId;
         const workId = req.params.id;
 
-        const { title, description, assigneeId, priority, dueDate } = req.body;
+        const { title, description, assigneeId, priority, dueDate, statusId } =
+            req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -613,7 +768,8 @@ module.exports = {
                 SELECT
                     w.id,
                     w."projectId",
-                    w."priorityId"
+                    w."priorityId",
+                    w."statusId"
                 FROM
                     "work" w
                 JOIN
@@ -677,6 +833,32 @@ module.exports = {
                     u."lastName" ASC
             `;
 
+            const statuses = await sql`
+                SELECT
+                    s.id,
+                    s.name,
+                    s.sequence,
+                    s."isDone"
+                FROM
+                    "statuses" s
+                WHERE
+                    s."orgId" = ${orgId} AND
+                    s."projectId" = ${existingWork.projectId}
+                ORDER BY
+                    s.sequence DESC
+            `;
+
+            const effectiveStatusId = statusId || existingWork.statusId;
+
+            const isStatusValid = statuses.some(
+                (s) => String(s.id) === String(effectiveStatusId),
+            );
+
+            if (!isStatusValid) {
+                errors.push("Status is invalid.");
+                validationFailed = true;
+            }
+
             const priorityMap = {
                 low: 1,
                 medium: 2,
@@ -701,7 +883,7 @@ module.exports = {
                 title: title || "",
                 description: description || "",
                 assigneeId: assignedTo,
-                status: "todo",
+                statusId: effectiveStatusId,
                 priority: String(priority || "medium").toLowerCase(),
                 dueDate: dueDate || "",
             };
@@ -712,6 +894,7 @@ module.exports = {
                     work,
                     projects,
                     assignees,
+                    statuses,
                     projectLocked: true,
                 });
             }
@@ -724,6 +907,7 @@ module.exports = {
                     description = ${description || ""},
                     "assigneeId" = ${assignedTo},
                     "priorityId" = ${priorityId},
+                    "statusId" = ${effectiveStatusId},
                     "dueDate" = ${dueDate ? dueDate : null},
                     "updatedBy" = ${userId},
                     "updatedAt" = now()

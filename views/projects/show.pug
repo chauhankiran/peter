@@ -21,30 +21,32 @@ block content
             .col-4.mt-4
                 .mb-4 
                     .d-block.mb-4
-                        strong Work (3) &middot; 
+                        strong Work (#{workCount}) &middot; 
                         a(href=`/work/new?projectId=${project.id}`) New work
 
-                    .mb-2
-                        p 
-                            a(href="#") HC-1 
-                            | - We've problem with connection.
-                        p 
-                            span.gray Kai Doe | In-progress | due in 2 days
-                    .mb-2
-                        p 
-                            a(href="#") HC-2 
-                            | - Unable to fetch the details of work load.
-                        p 
-                        span.gray Unassigned | Todo | due -
-                    .mb-2
-                        p 
-                            a(href="#") HC-3 
-                            | - We can't adjust the limit from problem.
-                        p 
-                        span.gray Fat Doe | Blocked | due already
-                    .mb-2 
-                        p 
-                            a(href="#").italic More...
+                    if workItems && workItems.length > 0
+                        each item in workItems
+                            - const dueDateStr = item.dueDate ? new Date(item.dueDate).toISOString().slice(0, 10) : null
+                            .mb-2
+                                p 
+                                    a(href=`/work/${item.id}`)= project.key + "-" + item.workId
+                                    |  - #{item.title}
+                                p 
+                                    span.gray
+                                        if item.assigneeFirstName
+                                            = item.assigneeFirstName + " " + item.assigneeLastName
+                                        else
+                                            | Unassigned
+                                        |  | #{item.statusName} | due 
+                                        if dueDateStr
+                                            = dueDateStr
+                                        else
+                                            | -
+                        .mb-2 
+                            p 
+                                a(href=`/work?search=${encodeURIComponent(project.key)}`).italic More...
+                    else
+                        p.gray No work yet.
                     
                     hr
             .col-3.mt-4

@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get("/", workController.index);
 router.get("/partial/assignees", workController.partialAssignees);
+router.get("/partial/statuses", workController.partialStatuses);
 router.get("/new", workController.new);
 router.post("/", workController.create);
 router.get("/:id", workController.show);

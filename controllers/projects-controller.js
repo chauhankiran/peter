@@ -155,6 +155,14 @@ module.exports = {
                         'admin'
                     )
                 `.then(([x]) => x);
+
+                await sql`
+                    INSERT INTO "statuses" ("orgId", "projectId", name, sequence, "isDone", "createdBy")
+                    VALUES
+                        (${req.session.orgId}, ${project.id}, 'To do', 10, false, ${req.session.userId}),
+                        (${req.session.orgId}, ${project.id}, 'In progress', 20, false, ${req.session.userId}),
+                        (${req.session.orgId}, ${project.id}, 'Done', 30, true, ${req.session.userId})
+                `;
             });
 
             req.flash("info", "Project created successfully.");
@@ -242,7 +250,53 @@ module.exports = {
                     u."lastName" ASC
             `;
 
-            return res.render(views.showProjectPath, { project, projectMembers });
+            const { count: workCount } = await sql`
+                SELECT
+                    count(*)
+                FROM
+                    "work" w
+                WHERE
+                    w."orgId" = ${req.session.orgId} AND
+                    w."projectId" = ${id} AND
+                    w."isActive" = true
+            `.then(([x]) => x);
+
+            const workItems = await sql`
+                SELECT
+                    w.id,
+                    w."workId",
+                    w.title,
+                    w."dueDate",
+                    w."completedAt",
+                    s.name as "statusName",
+                    u."firstName" as "assigneeFirstName",
+                    u."lastName" as "assigneeLastName"
+                FROM
+                    "work" w
+                JOIN
+                    "statuses" s
+                ON
+                    s.id = w."statusId"
+                LEFT JOIN
+                    users u
+                ON
+                    u.id = w."assigneeId"
+                WHERE
+                    w."orgId" = ${req.session.orgId} AND
+                    w."projectId" = ${id} AND
+                    w."isActive" = true
+                ORDER BY
+                    w.id DESC
+                LIMIT
+                    3
+            `;
+
+            return res.render(views.showProjectPath, {
+                project,
+                projectMembers,
+                workItems,
+                workCount: +workCount || 0,
+            });
         } catch (err) {
             next(err);
         }

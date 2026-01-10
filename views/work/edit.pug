@@ -28,7 +28,7 @@ block content
                                             else
                                                 option(value=project.id)= project.name
                                 else
-                                    select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container")
+                                    select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container", data-status-partial-url="/work/partial/statuses", data-status-partial-target="#status-container")
                                         option(value="") Select a project
                                         each project in projects
                                             if String(project.id) === String(work.projectId)
@@ -49,6 +49,9 @@ block content
                             .mb-4#assignee-container
                                 include ./partials/assignee-select
 
+                            .mb-4#status-container
+                                include ./partials/status-select
+
                             .mb-4
                                 label(for="priority") Priority
                                 select(name="priority", id="priority")
@@ -68,8 +71,11 @@ block content
                                 a(href=`/work/${work.id}`).btn.is-muted.mr-2 Cancel
                                 button(type="submit") Update work
 
-                        .col-9.text-end
-                            form(action=`/work/${work.id}?_method=delete`, method="post")
-                                button.is-danger(type="submit") Delete work
+                .row
+                    .col-1.mt-4
+                    .col-10.text-end
+                        form(action=`/work/${work.id}?_method=delete`, method="post")
+                            button.is-danger(type="submit") Delete work
+                    .col-1.mt-4
 
             .col-1.mt-4

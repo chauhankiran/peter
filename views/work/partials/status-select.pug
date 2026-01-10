@@ -1,0 +1,8 @@
+label(for="statusId") Status
+select(name="statusId", id="statusId")
+    - const effectiveStatusId = (typeof selectedStatusId !== 'undefined' && selectedStatusId !== null) ? selectedStatusId : (typeof work !== 'undefined' && work ? work.statusId : '')
+    each s in statuses
+        if String(s.id) === String(effectiveStatusId)
+            option(value=s.id, selected=true)= s.name
+        else
+            option(value=s.id)= s.name
