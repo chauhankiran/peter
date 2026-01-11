@@ -741,7 +741,30 @@ module.exports = {
                 return res.status(404).render("error", { err });
             }
 
-            return res.render("work/show", { work });
+            const comments = await sql`
+                SELECT
+                    c.id,
+                    c.body,
+                    c."userId",
+                    c."createdAt",
+                    c."updatedAt",
+                    u."firstName",
+                    u."lastName"
+                FROM
+                    "comments" c
+                JOIN
+                    users u
+                ON
+                    u.id = c."userId"
+                WHERE
+                    c."workId" = ${workId} AND
+                    c."orgId" = ${orgId} AND
+                    c."isActive" = true
+                ORDER BY
+                    c."createdAt" ASC
+            `;
+
+            return res.render("work/show", { work, comments });
         } catch (err) {
             next(err);
         }

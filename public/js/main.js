@@ -73,6 +73,63 @@ if (deleteProjectButton) {
     });
 }
 
+// Comment modals (edit and delete)
+const commentsContainer = document.querySelector("[data-work-id]");
+if (commentsContainer) {
+    const workId = commentsContainer.getAttribute("data-work-id");
+
+    // Edit comment modal
+    document.querySelectorAll(".edit-comment").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const commentId = this.getAttribute("data-comment-id");
+            const commentBody = this.getAttribute("data-comment-body");
+            const modal = document.querySelector(".edit-comment-modal");
+            const form = document.getElementById("edit-comment-form");
+            const textarea = document.getElementById("editCommentBody");
+
+            form.action =
+                "/work/" + workId + "/comments/" + commentId + "?_method=PUT";
+            textarea.value = commentBody;
+            modal.style.display = "block";
+        });
+    });
+
+    const editCloseBtn = document.querySelector(".edit-comment-close");
+    if (editCloseBtn) {
+        editCloseBtn.addEventListener("click", function () {
+            document.querySelector(".edit-comment-modal").style.display =
+                "none";
+        });
+    }
+
+    // Delete comment modal
+    document.querySelectorAll(".delete-comment").forEach(function (btn) {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const commentId = this.getAttribute("data-comment-id");
+            const modal = document.querySelector(".delete-comment-modal");
+            const form = document.getElementById("delete-comment-form");
+
+            form.action =
+                "/work/" +
+                workId +
+                "/comments/" +
+                commentId +
+                "?_method=DELETE";
+            modal.style.display = "block";
+        });
+    });
+
+    const deleteCloseBtn = document.querySelector(".delete-comment-close");
+    if (deleteCloseBtn) {
+        deleteCloseBtn.addEventListener("click", function () {
+            document.querySelector(".delete-comment-modal").style.display =
+                "none";
+        });
+    }
+}
+
 // Work: update assignees by project selection (HTML partial).
 const projectSelect = document.getElementById("projectId");
 if (projectSelect && !projectSelect.disabled) {
