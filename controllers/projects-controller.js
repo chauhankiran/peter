@@ -19,7 +19,7 @@ module.exports = {
 
         if (search) {
             whereClauses.push(
-                sql`p.key iLIKE ${"%" + search + "%"} OR p.name iLIKE ${"%" + search + "%"}`,
+                sql`p.name iLIKE ${"%" + search + "%"}`,
             );
         }
 
@@ -32,7 +32,6 @@ module.exports = {
                 SELECT
                     p.id, 
                     p.name, 
-                    p.key, 
                     p."dueDate", 
                     p."createdAt",
                     u."firstName",
@@ -94,7 +93,6 @@ module.exports = {
                 SELECT
                     p.id,
                     p.name,
-                    p.key,
                     p."dueDate",
                     p.description,
                     p."status",
@@ -149,18 +147,13 @@ module.exports = {
 
     updateManage: async (req, res, next) => {
         const id = req.params.id;
-        const { name, key, dueDate, description, status, completedDetails, milestonesEnabled, targetsEnabled } = req.body;
+        const { name, dueDate, description, status, completedDetails, milestonesEnabled, targetsEnabled } = req.body;
 
         let validationFailed = false;
         let errors = [];
 
         if (!name) {
             errors.push("Name is required.");
-            validationFailed = true;
-        }
-
-        if (!key) {
-            errors.push("Key is required.");
             validationFailed = true;
         }
 
@@ -207,7 +200,6 @@ module.exports = {
             const project = {
                 id,
                 name: name || "",
-                key: key || "",
                 dueDate: dueDate || "",
                 description: description || "",
                 status: status || "active",
@@ -228,7 +220,6 @@ module.exports = {
                     projects
                 SET
                     name = ${name},
-                    key = ${key},
                     "dueDate" = ${dueDate || null},
                     description = ${description || null},
                     "status" = ${status || 'active'},
@@ -261,7 +252,7 @@ module.exports = {
     },
 
     create: async (req, res, next) => {
-        const { name, key, dueDate, description } = req.body;
+        const { name, dueDate, description } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -271,17 +262,11 @@ module.exports = {
             validationFailed = true;
         }
 
-        if (!key) {
-            errors.push("Key is required.");
-            validationFailed = true;
-        }
-
         if (validationFailed) {
             res.locals.errors = errors;
 
             const project = {
                 name,
-                key,
                 dueDate,
                 description,
             };
@@ -297,14 +282,12 @@ module.exports = {
                 const project = await sql`
                     INSERT INTO projects (
                         name, 
-                        key,
                         "dueDate", 
                         description,
                         "orgId", 
                         "createdBy"
                     ) VALUES (
                         ${name}, 
-                        ${key}, 
                         ${dueDate}, 
                         ${description},
                         ${req.session.orgId}, 
@@ -346,13 +329,6 @@ module.exports = {
             req.flash("info", "Project created successfully.");
             res.redirect("/projects");
         } catch (err) {
-            if (err.code === "23505") {
-                // Unique violation.
-                res.locals.errors = ["Project key must be unique."];
-
-                const project = { name, dueDate, description };
-                return res.render(views.newProjectPath, { project });
-            }
             next(err);
         }
     },
@@ -365,7 +341,6 @@ module.exports = {
                 SELECT
                     p.id, 
                     p.name, 
-                    p.key, 
                     p."dueDate", 
                     p.description,
                     p."createdAt",
@@ -443,7 +418,6 @@ module.exports = {
             const workItems = await sql`
                 SELECT
                     w.id,
-                    w."workId",
                     w.title,
                     w."dueDate",
                     w."completedAt",
@@ -522,7 +496,6 @@ module.exports = {
                 SELECT
                     p.id, 
                     p.name, 
-                    p.key, 
                     p."dueDate", 
                     p.description
                 FROM 
@@ -551,7 +524,7 @@ module.exports = {
 
     update: async (req, res, next) => {
         const id = req.params.id;
-        const { name, key, dueDate, description } = req.body;
+        const { name, dueDate, description } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -561,17 +534,11 @@ module.exports = {
             validationFailed = true;
         }
 
-        if (!key) {
-            errors.push("Key is required.");
-            validationFailed = true;
-        }
-
         if (validationFailed) {
             res.locals.errors = errors;
 
             const project = {
                 name,
-                key,
                 dueDate,
                 description,
             };
@@ -635,7 +602,6 @@ module.exports = {
                     projects
                 SET
                     name = ${name},
-                    key = ${key},
                     "dueDate" = ${dueDate},
                     description = ${description},
                     "updatedAt" = ${sql`now()`},

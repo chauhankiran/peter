@@ -306,11 +306,9 @@ module.exports = {
                 SELECT
                     w.id,
                     w.title,
-                    w."workId",
                     s.name as "statusName",
                     s."isDone",
-                    pr.name as "priorityName",
-                    p.key as "projectKey"
+                    pr.name as "priorityName"
                 FROM
                     work w
                 JOIN

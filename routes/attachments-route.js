@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const attachmentsController = require("../controllers/attachments-controller");
+const { checkPermission } = require("../middleware/check-permission");
 const router = express.Router({ mergeParams: true });
 
 // Ensure uploads directory exists
@@ -29,8 +30,8 @@ const upload = multer({
     },
 });
 
-router.post("/", upload.single("file"), attachmentsController.create);
-router.get("/:id/download", attachmentsController.download);
-router.delete("/:id", attachmentsController.destroy);
+router.post("/", checkPermission("attachments", "create"), upload.single("file"), attachmentsController.create);
+router.get("/:id/download", checkPermission("attachments", "read"), attachmentsController.download);
+router.delete("/:id", checkPermission("attachments", "delete"), attachmentsController.destroy);
 
 module.exports = router;

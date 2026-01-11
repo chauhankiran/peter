@@ -60,7 +60,7 @@ block content
                             each item in workItems
                                 tr
                                     td
-                                        a(href=`/work/${item.id}`)= item.projectKey + '-' + item.workId
+                                        a(href=`/work/${item.id}`)= item.id
                                     td= item.title
                                     td
                                         if item.isDone

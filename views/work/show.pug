@@ -16,40 +16,44 @@ block content
                         a(href="/work").btn.is-muted.mr-2 &larr; Back
 
                 .col-7
-                    h2.mb-3 Attachments
+                    if permissions && permissions.attachments && permissions.attachments.read
+                        h2.mb-3 Attachments
 
-                    form(action=`/work/${work.id}/attachments` method="POST" enctype="multipart/form-data")
-                        .mb-3
-                            input(type="file" name="file" id="file")
-                        button.btn.is-primary(type="submit") Upload
+                        if permissions.attachments.create
+                            form(action=`/work/${work.id}/attachments` method="POST" enctype="multipart/form-data")
+                                .mb-3
+                                    input(type="file" name="file" id="file")
+                                button.btn.is-primary(type="submit") Upload
 
-                    if attachments && attachments.length > 0
-                        .mt-4
-                            each attachment in attachments
-                                .attachment-item.pb-2.mb-2(style="border-bottom: 1px solid #e0e0e0")
-                                    .d-flex.justify-content-between.align-items-center
-                                        div
-                                            a(href=`/work/${work.id}/attachments/${attachment.id}/download`)= attachment.originalName
-                                            span.gray.ml-2 (#{Math.round(attachment.fileSize / 1024)} KB)
-                                        div
-                                            span.gray.small= attachment.firstName + " " + attachment.lastName
-                                            span.gray.small.ml-2= new Date(attachment.createdAt).toLocaleString()
-                                            if role === "admin" || role === "owner" || String(attachment.userId) === String(userId)
-                                                form.d-inline.ml-2(action=`/work/${work.id}/attachments/${attachment.id}?_method=DELETE` method="POST")
-                                                    button.btn.is-danger.btn-sm(type="submit" onclick="return confirm('Delete this attachment?')") Delete
-                    else
-                        p.gray.mt-3 No attachments yet.
+                        if attachments && attachments.length > 0
+                            .mt-4
+                                each attachment in attachments
+                                    .attachment-item.pb-2.mb-2(style="border-bottom: 1px solid #e0e0e0")
+                                        .d-flex.justify-content-between.align-items-center
+                                            div
+                                                a(href=`/work/${work.id}/attachments/${attachment.id}/download`)= attachment.originalName
+                                                span.gray.ml-2 (#{Math.round(attachment.fileSize / 1024)} KB)
+                                            div
+                                                span.gray.small= attachment.firstName + " " + attachment.lastName
+                                                span.gray.small.ml-2= new Date(attachment.createdAt).toLocaleString()
+                                                if permissions.attachments.delete && (role === "admin" || role === "owner" || String(attachment.userId) === String(userId))
+                                                    form.d-inline.ml-2(action=`/work/${work.id}/attachments/${attachment.id}?_method=DELETE` method="POST")
+                                                        button.btn.is-danger.btn-sm(type="submit" onclick="return confirm('Delete this attachment?')") Delete
+                        else
+                            p.gray.mt-3 No attachments yet.
 
-                    hr.my-4
+                        hr.my-4
 
-                    h2.mb-3 Comments
+                    if permissions && permissions.comments && permissions.comments.read
+                        h2.mb-3 Comments
 
-                    form(action=`/work/${work.id}/comments` method="POST")
-                        .mb-3
-                            textarea.form-control(name="body" rows="3" placeholder="Add a comment...")
-                        button.btn.is-primary(type="submit") Add Comment
+                        if permissions.comments.create
+                            form(action=`/work/${work.id}/comments` method="POST")
+                                .mb-3
+                                    textarea.form-control(name="body" rows="3" placeholder="Add a comment...")
+                                button.btn.is-primary(type="submit") Add Comment
 
-                    include ./comments
+                        include ./comments
 
             
             include ./edit-comment-modal

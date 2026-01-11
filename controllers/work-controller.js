@@ -18,7 +18,7 @@ module.exports = {
 
         if (search) {
             whereClauses.push(
-                sql`w.title iLIKE ${"%" + search + "%"} OR p.name iLIKE ${"%" + search + "%"} OR p.key iLIKE ${"%" + search + "%"}`,
+                sql`w.title iLIKE ${"%" + search + "%"} OR p.name iLIKE ${"%" + search + "%"}`,
             );
         }
 
@@ -31,12 +31,10 @@ module.exports = {
                 SELECT
                     w.id,
                     w.title,
-                    w."workId",
                     s.name as "statusName",
                     pr.name as "priorityName",
                     p.id as "projectId",
                     p.name as "projectName",
-                    p.key as "projectKey",
                     u."firstName" as "assigneeFirstName",
                     u."lastName" as "assigneeLastName"
                 FROM
@@ -711,7 +709,6 @@ module.exports = {
             const work = await sql`
                 SELECT
                     w.id,
-                    w."workId",
                     w.title,
                     w.description,
                     w."dueDate",
@@ -721,7 +718,6 @@ module.exports = {
                     s.name as "statusName",
                     p.id as "projectId",
                     p.name as "projectName",
-                    p.key as "projectKey",
                     au."firstName" as "assigneeFirstName",
                     au."lastName" as "assigneeLastName",
                     ru."firstName" as "reporterFirstName",

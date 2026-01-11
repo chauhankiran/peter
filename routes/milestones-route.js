@@ -1,13 +1,14 @@
 const express = require("express");
 const milestonesController = require("../controllers/milestones-controller");
+const { checkPermission } = require("../middleware/check-permission");
 const router = express.Router({ mergeParams: true });
 
-router.get("/", milestonesController.index);
-router.get("/new", milestonesController.new);
-router.post("/", milestonesController.create);
-router.get("/:id", milestonesController.show);
-router.get("/:id/edit", milestonesController.edit);
-router.put("/:id", milestonesController.update);
-router.delete("/:id", milestonesController.destroy);
+router.get("/", checkPermission("milestones", "read"), milestonesController.index);
+router.get("/new", checkPermission("milestones", "create"), milestonesController.new);
+router.post("/", checkPermission("milestones", "create"), milestonesController.create);
+router.get("/:id", checkPermission("milestones", "read"), milestonesController.show);
+router.get("/:id/edit", checkPermission("milestones", "update"), milestonesController.edit);
+router.put("/:id", checkPermission("milestones", "update"), milestonesController.update);
+router.delete("/:id", checkPermission("milestones", "delete"), milestonesController.destroy);
 
 module.exports = router;

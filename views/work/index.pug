@@ -9,7 +9,8 @@ block content
                 .col-8 
                     h1 Work (#{count})
                 .col-4.text-end 
-                    a(href=`/work/new`).btn New work
+                    if permissions && permissions.work && permissions.work.create
+                        a(href=`/work/new`).btn New work
 
             include ../includes/flash
 
@@ -33,7 +34,7 @@ block content
                         each item in workItems
                             tr
                                 td 
-                                    a(href=`/work/${item.id}`) #{item.projectKey + "-" + item.workId}
+                                    a(href=`/work/${item.id}`) #{item.id}
                                 td
                                     a(href=`/work/${item.id}`) #{item.title}
                                 td

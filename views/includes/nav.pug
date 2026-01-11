@@ -3,9 +3,12 @@ nav.nav
         .nav-start 
             a(href="/").nav-brand Peter
             a(href="/dashboard").nav-item Dashboard
-            a(href="/projects").nav-item Projects
-            a(href="/work").nav-item Work
-            a(href="/work/new").nav-item New work
+            if permissions && permissions.projects && permissions.projects.read
+                a(href="/projects").nav-item Projects
+            if permissions && permissions.work && permissions.work.read
+                a(href="/work").nav-item Work
+            if permissions && permissions.work && permissions.work.create
+                a(href="/work/new").nav-item New work
         .nav-end 
             if role === 'admin' || role === 'owner'
                 a(href="/admin").nav-item.red Admin

@@ -1,0 +1,165 @@
+extend ../layout
+
+block content
+    .container-fluid
+        .row
+            .col-1.mt-4
+            .col-8.mt-4
+                h1.mb-4 User Permissions
+
+                include ../includes/flash
+
+                p.mb-4
+                    a(href="/admin") Admin
+                    span.gray  / 
+                    span= user.firstName + " " + user.lastName
+                    span.gray  / Permissions
+
+                .card.mb-4
+                    .card-body
+                        p
+                            strong User: 
+                            span= user.firstName + " " + user.lastName
+                        p
+                            strong Email: 
+                            span= user.email
+                        p
+                            strong Role: 
+                            span= user.role
+
+                form(action=`/admin/users/${user.id}/permissions?_method=put`, method="post")
+                    h3.mb-3 Account Status
+
+                    .mb-4
+                        label
+                            input(type="checkbox", name="isEnabled", value="true", checked=userPermissions.isEnabled)
+                            span.ml-2 User Enabled
+                        p.gray.small When disabled, user cannot access any features
+
+                    hr.my-4
+
+                    h3.mb-3 Projects
+
+                    .row.mb-4
+                        .col-3
+                            label
+                                input(type="checkbox", name="projectsCreate", value="true", checked=userPermissions.projectsCreate)
+                                span.ml-2 Create
+                        .col-3
+                            label
+                                input(type="checkbox", name="projectsRead", value="true", checked=userPermissions.projectsRead)
+                                span.ml-2 Read
+                        .col-3
+                            label
+                                input(type="checkbox", name="projectsUpdate", value="true", checked=userPermissions.projectsUpdate)
+                                span.ml-2 Update
+                        .col-3
+                            label
+                                input(type="checkbox", name="projectsDelete", value="true", checked=userPermissions.projectsDelete)
+                                span.ml-2 Delete
+
+                    h3.mb-3 Work
+
+                    .row.mb-4
+                        .col-3
+                            label
+                                input(type="checkbox", name="workCreate", value="true", checked=userPermissions.workCreate)
+                                span.ml-2 Create
+                        .col-3
+                            label
+                                input(type="checkbox", name="workRead", value="true", checked=userPermissions.workRead)
+                                span.ml-2 Read
+                        .col-3
+                            label
+                                input(type="checkbox", name="workUpdate", value="true", checked=userPermissions.workUpdate)
+                                span.ml-2 Update
+                        .col-3
+                            label
+                                input(type="checkbox", name="workDelete", value="true", checked=userPermissions.workDelete)
+                                span.ml-2 Delete
+
+                    h3.mb-3 Milestones
+
+                    .row.mb-4
+                        .col-3
+                            label
+                                input(type="checkbox", name="milestonesCreate", value="true", checked=userPermissions.milestonesCreate)
+                                span.ml-2 Create
+                        .col-3
+                            label
+                                input(type="checkbox", name="milestonesRead", value="true", checked=userPermissions.milestonesRead)
+                                span.ml-2 Read
+                        .col-3
+                            label
+                                input(type="checkbox", name="milestonesUpdate", value="true", checked=userPermissions.milestonesUpdate)
+                                span.ml-2 Update
+                        .col-3
+                            label
+                                input(type="checkbox", name="milestonesDelete", value="true", checked=userPermissions.milestonesDelete)
+                                span.ml-2 Delete
+
+                    h3.mb-3 Targets
+
+                    .row.mb-4
+                        .col-3
+                            label
+                                input(type="checkbox", name="targetsCreate", value="true", checked=userPermissions.targetsCreate)
+                                span.ml-2 Create
+                        .col-3
+                            label
+                                input(type="checkbox", name="targetsRead", value="true", checked=userPermissions.targetsRead)
+                                span.ml-2 Read
+                        .col-3
+                            label
+                                input(type="checkbox", name="targetsUpdate", value="true", checked=userPermissions.targetsUpdate)
+                                span.ml-2 Update
+                        .col-3
+                            label
+                                input(type="checkbox", name="targetsDelete", value="true", checked=userPermissions.targetsDelete)
+                                span.ml-2 Delete
+
+                    h3.mb-3 Comments
+
+                    .row.mb-4
+                        .col-3
+                            label
+                                input(type="checkbox", name="commentsCreate", value="true", checked=userPermissions.commentsCreate)
+                                span.ml-2 Create
+                        .col-3
+                            label
+                                input(type="checkbox", name="commentsRead", value="true", checked=userPermissions.commentsRead)
+                                span.ml-2 Read
+                        .col-3
+                            label
+                                input(type="checkbox", name="commentsUpdate", value="true", checked=userPermissions.commentsUpdate)
+                                span.ml-2 Update
+                        .col-3
+                            label
+                                input(type="checkbox", name="commentsDelete", value="true", checked=userPermissions.commentsDelete)
+                                span.ml-2 Delete
+
+                    h3.mb-3 Attachments
+
+                    .row.mb-4
+                        .col-3
+                            label
+                                input(type="checkbox", name="attachmentsCreate", value="true", checked=userPermissions.attachmentsCreate)
+                                span.ml-2 Create
+                        .col-3
+                            label
+                                input(type="checkbox", name="attachmentsRead", value="true", checked=userPermissions.attachmentsRead)
+                                span.ml-2 Read
+                        .col-3
+                            label
+                                input(type="checkbox", name="attachmentsUpdate", value="true", checked=userPermissions.attachmentsUpdate)
+                                span.ml-2 Update
+                        .col-3
+                            label
+                                input(type="checkbox", name="attachmentsDelete", value="true", checked=userPermissions.attachmentsDelete)
+                                span.ml-2 Delete
+
+                    .mb-4.pt-2
+                        a(href="/admin").btn.is-muted.mr-2 &larr; Back
+                        button(type="submit") Save Permissions
+
+            .col-3.mt-4

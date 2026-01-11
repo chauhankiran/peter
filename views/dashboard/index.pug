@@ -13,14 +13,11 @@ block content
                 table.mb-4
                     thead
                         tr.antiqueWhite
-                            th Key
                             th Name
                             th Due date
                     tbody
                         each p in projects
                             tr
-                                td
-                                    a(href=`/projects/${p.id}`)= p.key
                                 td
                                     a(href=`/projects/${p.id}`)= p.name
                                 td
@@ -46,7 +43,7 @@ block content
                         each w in assignedWork
                             tr
                                 td
-                                    a(href=`/work/${w.id}`) #{w.projectKey + "-" + w.workId}
+                                    a(href=`/work/${w.id}`) #{w.id}
                                 td
                                     a(href=`/work/${w.id}`)= w.title
                                 td

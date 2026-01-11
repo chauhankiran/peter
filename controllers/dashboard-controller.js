@@ -13,7 +13,6 @@ module.exports = {
                 SELECT
                     p.id,
                     p.name,
-                    p.key,
                     p."dueDate"
                 FROM
                     projects p
@@ -33,10 +32,8 @@ module.exports = {
                 SELECT
                     w.id,
                     w.title,
-                    w."workId",
                     w."dueDate",
                     p.id as "projectId",
-                    p.key as "projectKey",
                     p.name as "projectName",
                     s.name as "statusName",
                     pr.name as "priorityName"

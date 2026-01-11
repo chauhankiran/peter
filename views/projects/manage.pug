@@ -45,7 +45,6 @@ block content
 
                     form(action=`/projects/${project.id}/manage?_method=put`, method="post", id="complete-project-form")
                         input(type="hidden", name="name", value=project.name)
-                        input(type="hidden", name="key", value=project.key)
                         input(type="hidden", name="dueDate", value=project.dueDate)
                         input(type="hidden", name="description", value=project.description)
                         input(type="hidden", name="status", value="completed")

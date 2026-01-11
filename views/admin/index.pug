@@ -19,6 +19,9 @@ block content
                     .mb-4.pt-2
                         button(type="submit") Update organization
 
+                .mb-4
+                    a(href="/admin/permissions").btn.is-muted Manage Organization Permissions
+
                 hr
 
                 h3.mb-2 Users
@@ -30,6 +33,7 @@ block content
                                 th Email
                                 th Role
                                 th Status
+                                th Actions
                         tbody
                             each u in users
                                 tr
@@ -37,6 +41,8 @@ block content
                                     td= u.email
                                     td= u.role
                                     td= u.status
+                                    td
+                                        a(href=`/admin/users/${u.id}/permissions`) Permissions
                 else
                     p.gray No users found.
 
@@ -45,15 +51,12 @@ block content
                     table.mb-0
                         thead
                             tr.antiqueWhite
-                                th Key
                                 th Name
                                 th Status
                                 th Due date
                         tbody
                             each p in projects
                                 tr
-                                    td
-                                        a(href=`/projects/${p.id}`)= p.key
                                     td
                                         a(href=`/projects/${p.id}`)= p.name
                                     td= p.status

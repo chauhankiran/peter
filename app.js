@@ -58,6 +58,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// Load permissions into res.locals for views
+const { loadPermissions } = require("./middleware/check-permission");
+app.use(loadPermissions);
+
 app.use("/", require("./routes"));
 
 // 404 error

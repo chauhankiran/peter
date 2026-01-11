@@ -7,7 +7,8 @@ block content
             .col-10.mt-4 
                 .d-flex.justify-content-between.align-items-center.mb-4
                     h1 Milestones
-                    a(href=`/projects/${project.id}/milestones/new`).btn New milestone
+                    if permissions && permissions.milestones && permissions.milestones.create
+                        a(href=`/projects/${project.id}/milestones/new`).btn New milestone
 
                 include ../includes/flash
 

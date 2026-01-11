@@ -9,7 +9,8 @@ block content
                 .col-8 
                     h1 Projects
                 .col-4.text-end 
-                    a(href=`/projects/new`).btn New project
+                    if permissions && permissions.projects && permissions.projects.create
+                        a(href=`/projects/new`).btn New project
 
             include ../includes/flash
 
@@ -23,10 +24,9 @@ block content
                 thead 
                     tr.antiqueWhite 
                         th ID
-                        th Key
                         th Name 
                         th Due date
-                        th Name
+                        th Created by
                 tbody
                     if projects.length > 0
                         //- If the project is due or past due, highlight the row
@@ -35,14 +35,13 @@ block content
                             - const isDue = project.dueDate && new Date(project.dueDate) <= now
                             tr(class=isDue ? "due" : "")
                                 td= project.id
-                                td= project.key
                                 td 
                                     a(href=`/projects/${project.id}`)= project.name
                                 td(class=isDue ? "red" : "")= project.dueDate || 'N/A'
                                 td= project.firstName + " " + project.lastName
                     else
                         tr
-                            td(colspan="5").text-center.gray No projects found.
+                            td(colspan="4").text-center.gray No projects found.
         
             small 
                 sup *

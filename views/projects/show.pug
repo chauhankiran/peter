@@ -13,30 +13,32 @@ block content
             include ./details
             
 
-            if project.milestonesEnabled
+            if project.milestonesEnabled && permissions && permissions.milestones && permissions.milestones.read
                 .mb-4
                     a(href=`/projects/${project.id}/milestones`) View milestones
 
-            if project.targetsEnabled
+            if project.targetsEnabled && permissions && permissions.targets && permissions.targets.read
                 .mb-4
                     a(href=`/projects/${project.id}/targets`) View targets
 
             .mb-4.pt-2
                 a(href="/projects").btn.is-muted.mr-2 &larr; Back
-                a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project
+                if permissions && permissions.projects && permissions.projects.update
+                    a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project
         .col-4.mt-4
             .mb-4 
                 .d-block.mb-4
-                    strong Work (#{workCount}) &middot; 
-                    a(href=`/work/new?projectId=${project.id}`) New work
+                    strong Work (#{workCount})
+                    if permissions && permissions.work && permissions.work.create
+                        |  &middot; 
+                        a(href=`/work/new?projectId=${project.id}`) New work
 
                 if workItems && workItems.length > 0
                     each item in workItems
                         - const dueDateStr = item.dueDate ? new Date(item.dueDate).toISOString().slice(0, 10) : null
                         .mb-2
                             p 
-                                a(href=`/work/${item.id}`)= project.key + "-" + item.workId
-                                |  - #{item.title}
+                                a(href=`/work/${item.id}`)= item.title
                             p 
                                 span.gray
                                     if item.assigneeFirstName
@@ -50,7 +52,7 @@ block content
                                         | -
                     .mb-2 
                         p 
-                            a(href=`/work?search=${encodeURIComponent(project.key)}`).italic More...
+                            a(href=`/work?search=${encodeURIComponent(project.name)}`).italic More...
                 else
                     p.gray No work yet.
                 

@@ -7,7 +7,8 @@ block content
             .col-10.mt-4 
                 .d-flex.justify-content-between.align-items-center.mb-4
                     h1 Targets
-                    a(href=`/projects/${project.id}/targets/new`).btn New target
+                    if permissions && permissions.targets && permissions.targets.create
+                        a(href=`/projects/${project.id}/targets/new`).btn New target
 
                 include ../includes/flash
 

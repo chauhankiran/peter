@@ -3,10 +3,6 @@
     p= project.name
 
 .mb-4
-    strong Key
-    p= project.key
-
-.mb-4
     strong Due date
     - const now = new Date()
     - const isDue = project.dueDate && new Date(project.dueDate) <= now
