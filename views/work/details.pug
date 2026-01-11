@@ -1,0 +1,63 @@
+.row 
+    .col-6
+        .mb-4
+            strong Title
+            p= work.projectKey + "-" + work.workId + " " + work.title
+        .mb-4
+            strong Description
+            p.italic= work.description || 'N/A'
+    .col-6 
+        .mb-4
+            strong Assignee
+            p
+                if work.assigneeFirstName
+                    = work.assigneeFirstName + " " + work.assigneeLastName
+                else
+                    span.gray Unassigned
+
+        .mb-4
+            strong Status
+            p= work.statusName
+
+        .mb-4
+            strong Priority
+            p= work.priorityName
+
+        .mb-4
+            strong Due date
+            p
+                if work.dueDate
+                    = new Date(work.dueDate).toISOString().slice(0, 10)
+                else
+                    span.gray N/A
+
+hr
+
+.row
+    .col-6
+        .mb-4
+            strong Reporter
+            p= work.reporterFirstName + " " + work.reporterLastName
+
+.row
+    .col-6
+        .mb-4
+            strong Created by
+            p= work.createdByFirstName + " " + work.createdByLastName
+    .col-6
+        .mb-4
+            strong Created at
+            p= work.createdAt
+
+.row
+    .col-6
+        .mb-4
+            strong Updated by
+            if work.updatedByFirstName
+                p= work.updatedByFirstName + " " + work.updatedByLastName
+            else
+                p N/A
+    .col-6
+        .mb-4
+            strong Updated at
+            p= work.updatedAt

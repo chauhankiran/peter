@@ -1,0 +1,15 @@
+//- Edit comment modal
+.modal.edit-comment-modal
+    .modal-content
+        h3.mb-4 Edit comment
+
+        form(action="" method="POST" id="edit-comment-form")
+            input(type="hidden" name="_method" value="PUT")
+            .mb-4
+                label(for="editCommentBody") Comment
+                    span.red *
+                textarea(name="body" id="editCommentBody" rows="4" placeholder="Edit your comment...")
+
+            .text-end.pt-4
+                button.edit-comment-close.is-muted.mr-4(type="button") Cancel
+                button(type="submit") Update comment

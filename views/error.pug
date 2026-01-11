@@ -1,10 +1,9 @@
 extends layout
 
 block content
-    .container-fluid 
-        .row
-                .col-1.mt-4  
-                .col-11.mt-4 
-                    h1= err.code 
-                    p.gray= err.message 
-                    pre.gray= err.stack
+    .row
+        .col-1.mt-4  
+        .col-11.mt-4 
+            h1= err.code 
+            p.gray= err.message 
+            pre.gray= err.stack

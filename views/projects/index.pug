@@ -2,53 +2,52 @@ extend ../layout
 include ../mixins/pagination
 
 block content
-    .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-10.mt-4 
-                .row.mb-4.align-items-center 
-                    .col-8 
-                        h1 Projects
-                    .col-4.text-end 
-                        a(href=`/projects/new`).btn New project
+    .row
+        .col-1.mt-4  
+        .col-10.mt-4 
+            .row.mb-4.align-items-center 
+                .col-8 
+                    h1 Projects
+                .col-4.text-end 
+                    a(href=`/projects/new`).btn New project
 
-                include ../includes/flash
+            include ../includes/flash
 
-                form(action="/projects", method="get") 
-                    .mb-4
-                        input(type="hidden", name="orderBy", value=orderBy)
-                        input(type="hidden", name="orderDir", value=orderDir)
-                        input(type="text", name="search", value=search, autofocus=true, placeholder="Enter name and press Enter")
+            form(action="/projects", method="get") 
+                .mb-4
+                    input(type="hidden", name="orderBy", value=orderBy)
+                    input(type="hidden", name="orderDir", value=orderDir)
+                    input(type="text", name="search", value=search, autofocus=true, placeholder="Enter name and press Enter")
 
-                table.mb-0 
-                    thead 
-                        tr.antiqueWhite 
-                            th ID
-                            th Key
-                            th Name 
-                            th Due date
-                            th Name
-                    tbody
-                        if projects.length > 0
-                            //- If the project is due or past due, highlight the row
-                            - const now = new Date()
-                            each project in projects
-                                - const isDue = project.dueDate && new Date(project.dueDate) <= now
-                                tr(class=isDue ? "due" : "")
-                                    td= project.id
-                                    td= project.key
-                                    td 
-                                        a(href=`/projects/${project.id}`)= project.name
-                                    td(class=isDue ? "red" : "")= project.dueDate || 'N/A'
-                                    td= project.firstName + " " + project.lastName
-                        else
-                            tr
-                                td(colspan="5").text-center.gray No projects found.
-            
-                small 
-                    sup *
-                        i highlighted projects rows indicate projects that are due or past due.
+            table.mb-0 
+                thead 
+                    tr.antiqueWhite 
+                        th ID
+                        th Key
+                        th Name 
+                        th Due date
+                        th Name
+                tbody
+                    if projects.length > 0
+                        //- If the project is due or past due, highlight the row
+                        - const now = new Date()
+                        each project in projects
+                            - const isDue = project.dueDate && new Date(project.dueDate) <= now
+                            tr(class=isDue ? "due" : "")
+                                td= project.id
+                                td= project.key
+                                td 
+                                    a(href=`/projects/${project.id}`)= project.name
+                                td(class=isDue ? "red" : "")= project.dueDate || 'N/A'
+                                td= project.firstName + " " + project.lastName
+                    else
+                        tr
+                            td(colspan="5").text-center.gray No projects found.
         
-                +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
+            small 
+                sup *
+                    i highlighted projects rows indicate projects that are due or past due.
+    
+            +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
 
-            .col-1.mt-4  
+        .col-1.mt-4  

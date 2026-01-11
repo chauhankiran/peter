@@ -1,0 +1,17 @@
+if comments && comments.length > 0
+    .mt-4(data-work-id=work.id)
+        each comment in comments
+            .comment-item.pb-2.mb-3(style="border-bottom: 1px solid #e0e0e0")
+                div
+                    strong= comment.firstName + " " + comment.lastName
+                    span.gray.ml-2= new Date(comment.createdAt).toLocaleString()
+                    if comment.updatedAt
+                        span.gray.ml-2 &middot; (edited)
+                p.mt-2.mb-2= comment.body
+                if role === "admin" || role === "owner" || String(comment.userId) === String(userId)
+                    small
+                        a.gray.small.edit-comment(href="#" data-comment-id=comment.id data-comment-body=comment.body style="text-decoration: none") Edit
+                        span.gray.small.ml-1.mr-1 &middot;
+                        a.gray.small.delete-comment(href="#" data-comment-id=comment.id style="text-decoration: none") Delete
+else
+    p.gray.mt-3 No comments yet.

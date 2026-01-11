@@ -1,21 +1,20 @@
 extend ../layout
 
 block content 
-    .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-3.mt-4 
-                h1.mb-4 Create organization
-                p.mb-4.gray This will create your organization (org) and make you the admin.
-                
-                include ../includes/flash
+    .row
+        .col-1.mt-4  
+        .col-3.mt-4 
+            h1.mb-4 Create organization
+            p.mb-4.gray This will create your organization (org) and make you the admin.
+            
+            include ../includes/flash
 
-                form(action="/onboarding", method="post") 
-                    .mb-4
-                        label(for="name") Org name
-                            span.red *
-                        input(type="text", name="name", id="name", placeholder="Example, Inc.", autofocus=true)
-        
-                    .mb-4.pt-2
-                        button(type="submit") Create
-            .col-8.mt-4
+            form(action="/onboarding", method="post") 
+                .mb-4
+                    label(for="name") Org name
+                        span.red *
+                    input(type="text", name="name", id="name", placeholder="Example, Inc.", autofocus=true)
+    
+                .mb-4.pt-2
+                    button(type="submit") Create
+        .col-8.mt-4

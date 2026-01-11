@@ -1,64 +1,63 @@
 extend ../layout
 
 block content
-    .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-10.mt-4 
-                .mb-4
-                    h1 Dashboard 
-                    p.gray Welcome #{userName} @ #{now ? now.toLocaleString() : ''}!
+    .row
+        .col-1.mt-4  
+        .col-10.mt-4 
+            .mb-4
+                h1 Dashboard 
+                p.gray Welcome #{userName} @ #{now ? now.toLocaleString() : ''}!
 
-                h3.mb-2 Your projects
-                if projects && projects.length
-                    table.mb-4
-                        thead
-                            tr.antiqueWhite
-                                th Key
-                                th Name
-                                th Due date
-                        tbody
-                            each p in projects
-                                tr
-                                    td
-                                        a(href=`/projects/${p.id}`)= p.key
-                                    td
-                                        a(href=`/projects/${p.id}`)= p.name
-                                    td
-                                        if p.dueDate
-                                            = new Date(p.dueDate).toISOString().slice(0, 10)
-                                        else
-                                            span.gray -
-                else
-                    p.gray You are not a member of any projects.
+            h3.mb-2 Your projects
+            if projects && projects.length
+                table.mb-4
+                    thead
+                        tr.antiqueWhite
+                            th Key
+                            th Name
+                            th Due date
+                    tbody
+                        each p in projects
+                            tr
+                                td
+                                    a(href=`/projects/${p.id}`)= p.key
+                                td
+                                    a(href=`/projects/${p.id}`)= p.name
+                                td
+                                    if p.dueDate
+                                        = new Date(p.dueDate).toISOString().slice(0, 10)
+                                    else
+                                        span.gray -
+            else
+                p.gray You are not a member of any projects.
 
-                h3.mb-2 Assigned to you
-                if assignedWork && assignedWork.length
-                    table.mb-0
-                        thead
-                            tr.antiqueWhite
-                                th Id
-                                th Title
-                                th Project
-                                th Status
-                                th Priority
-                                th Due date
-                        tbody
-                            each w in assignedWork
-                                tr
-                                    td
-                                        a(href=`/work/${w.id}`) #{w.projectKey + "-" + w.workId}
-                                    td
-                                        a(href=`/work/${w.id}`)= w.title
-                                    td
-                                        a(href=`/projects/${w.projectId}`)= w.projectName
-                                    td= w.statusName
-                                    td= w.priorityName
-                                    td
-                                        if w.dueDate
-                                            = new Date(w.dueDate).toISOString().slice(0, 10)
-                                        else
-                                            span.gray -
-                else
-                    p.gray No issues assigned to you.
-            .col-10.mt-4 
+            h3.mb-2 Assigned to you
+            if assignedWork && assignedWork.length
+                table.mb-0
+                    thead
+                        tr.antiqueWhite
+                            th Id
+                            th Title
+                            th Project
+                            th Status
+                            th Priority
+                            th Due date
+                    tbody
+                        each w in assignedWork
+                            tr
+                                td
+                                    a(href=`/work/${w.id}`) #{w.projectKey + "-" + w.workId}
+                                td
+                                    a(href=`/work/${w.id}`)= w.title
+                                td
+                                    a(href=`/projects/${w.projectId}`)= w.projectName
+                                td= w.statusName
+                                td= w.priorityName
+                                td
+                                    if w.dueDate
+                                        = new Date(w.dueDate).toISOString().slice(0, 10)
+                                    else
+                                        span.gray -
+            else
+                p.gray No issues assigned to you.
+        .col-10.mt-4 

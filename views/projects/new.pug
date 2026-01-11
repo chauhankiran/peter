@@ -1,18 +1,17 @@
 extend ../layout
 
 block content 
-    .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-3.mt-4 
-                h1.mb-4 New project 
+    .row
+        .col-1.mt-4  
+        .col-3.mt-4 
+            h1.mb-4 New project 
 
-                include ../includes/flash
+            include ../includes/flash
 
-                form(action="/projects", method="post") 
-                    include ./form
+            form(action="/projects", method="post") 
+                include ./form
 
-                    .mb-4.pt-2
-                        a(href="/projects").btn.is-muted.mr-2 Cancel
-                        button(type="submit") Create project
-            .col-8.mt-4
+                .mb-4.pt-2
+                    a(href="/projects").btn.is-muted.mr-2 Cancel
+                    button(type="submit") Create project
+        .col-8.mt-4

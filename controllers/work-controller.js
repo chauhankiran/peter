@@ -686,6 +686,7 @@ module.exports = {
             const work = await sql`
                 SELECT
                     w.id,
+                    w."workId",
                     w.title,
                     w.description,
                     w."dueDate",
@@ -695,10 +696,17 @@ module.exports = {
                     s.name as "statusName",
                     p.id as "projectId",
                     p.name as "projectName",
+                    p.key as "projectKey",
                     au."firstName" as "assigneeFirstName",
                     au."lastName" as "assigneeLastName",
                     ru."firstName" as "reporterFirstName",
-                    ru."lastName" as "reporterLastName"
+                    ru."lastName" as "reporterLastName",
+                    cu."firstName" as "createdByFirstName",
+                    cu."lastName" as "createdByLastName",
+                    uu."firstName" as "updatedByFirstName",
+                    uu."lastName" as "updatedByLastName",
+                    w."createdAt",
+                    w."updatedAt"
                 FROM
                     "work" w
                 JOIN
@@ -726,6 +734,14 @@ module.exports = {
                     users ru
                 ON
                     ru.id = w."reporterId"
+                LEFT JOIN
+                    users cu
+                ON
+                    w."createdBy" = cu.id
+                LEFT JOIN
+                    users uu
+                ON
+                    w."updatedBy" = uu.id
                 WHERE
                     w.id = ${workId} AND
                     w."orgId" = ${orgId} AND
@@ -1044,7 +1060,9 @@ module.exports = {
             `;
 
             const effectivePriorityId =
-                priorityId || existingWork.priorityId || (priorities[0] ? priorities[0].id : "");
+                priorityId ||
+                existingWork.priorityId ||
+                (priorities[0] ? priorities[0].id : "");
 
             const isPriorityValid = priorities.some(
                 (p) => String(p.id) === String(effectivePriorityId),

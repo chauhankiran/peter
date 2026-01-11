@@ -1,123 +1,32 @@
 extend ../layout
 
 block content
-    .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-10.mt-4 
-                h1 Work details
+    .row
+        .col-1.mt-4  
+        .col-10.mt-4 
+            h1.mb-4 Work details
 
-                include ../includes/flash
+            include ../includes/flash
 
-                .mb-4
-                    strong ID
-                    p.gray= work.id
+            .row 
+                .col-5
+                    include ./details
 
-                .mb-4
-                    strong Title
-                    p= work.title
+                    .mb-4.pt-2
+                        a(href="/work").btn.is-muted.mr-2 &larr; Back
 
-                .mb-4
-                    strong Project
-                    p
-                        a(href=`/projects/${work.projectId}`)= work.projectName
+                .col-7
+                    h2.mb-3 Comments
 
-                .mb-4
-                    strong Assignee
-                    p
-                        if work.assigneeFirstName
-                            = work.assigneeFirstName + " " + work.assigneeLastName
-                        else
-                            span.gray Unassigned
+                    form(action=`/work/${work.id}/comments` method="POST")
+                        .mb-3
+                            textarea.form-control(name="body" rows="3" placeholder="Add a comment...")
+                        button.btn.is-primary(type="submit") Add Comment
 
-                .mb-4
-                    strong Status
-                    p= work.statusName
+                    include ./comments
 
-                .mb-4
-                    strong Priority
-                    p= work.priorityName
+            
+            include ./edit-comment-modal
+            include ./delete-comment-modal
 
-                .mb-4
-                    strong Reporter
-                    p
-                        if work.reporterFirstName
-                            = work.reporterFirstName + " " + work.reporterLastName
-                        else
-                            span.gray N/A
-
-                .mb-4
-                    strong Due date
-                    p
-                        if work.dueDate
-                            = new Date(work.dueDate).toISOString().slice(0, 10)
-                        else
-                            span.gray N/A
-
-                .mb-4
-                    strong Description
-                    if work.description
-                        p= work.description
-                    else
-                        p.gray No description.
-
-                .mb-4.pt-2
-                    a(href="/work").btn.is-muted.mr-2 &larr; Back
-
-                hr.my-4
-
-                h2.mb-3 Comments
-
-                form(action=`/work/${work.id}/comments` method="POST")
-                    .mb-3
-                        textarea.form-control(name="body" rows="3" placeholder="Add a comment...")
-                    button.btn.is-primary(type="submit") Add Comment
-
-                if comments && comments.length > 0
-                    .mt-4(data-work-id=work.id)
-                        each comment in comments
-                            .comment-item.pb-2.mb-3(style="border-bottom: 1px solid #e0e0e0")
-                                div
-                                    strong= comment.firstName + " " + comment.lastName
-                                    span.gray.ml-2= new Date(comment.createdAt).toLocaleString()
-                                    if comment.updatedAt
-                                        span.gray.ml-2 &middot; (edited)
-                                p.mt-2.mb-2= comment.body
-                                if role === "admin" || role === "owner" || String(comment.userId) === String(userId)
-                                    small
-                                        a.gray.small.edit-comment(href="#" data-comment-id=comment.id data-comment-body=comment.body style="text-decoration: none") Edit
-                                        span.gray.small.ml-1.mr-1 &middot;
-                                        a.gray.small.delete-comment(href="#" data-comment-id=comment.id style="text-decoration: none") Delete
-                else
-                    p.gray.mt-3 No comments yet.
-
-                //- Edit comment modal
-                .modal.edit-comment-modal
-                    .modal-content
-                        h3.mb-4 Edit comment
-
-                        form(action="" method="POST" id="edit-comment-form")
-                            input(type="hidden" name="_method" value="PUT")
-                            .mb-4
-                                label(for="editCommentBody") Comment
-                                    span.red *
-                                textarea(name="body" id="editCommentBody" rows="4" placeholder="Edit your comment...")
-
-                            .text-end.pt-4
-                                button.edit-comment-close.is-muted.mr-4(type="button") Cancel
-                                button(type="submit") Update comment
-
-                //- Delete comment modal
-                .modal.delete-comment-modal
-                    .modal-content
-                        h3.mb-4 Delete comment
-
-                        form(action="" method="POST" id="delete-comment-form")
-                            input(type="hidden" name="_method" value="DELETE")
-                            p.mb-4 Are you sure you want to delete this comment?
-
-                            .text-end.pt-4
-                                button.delete-comment-close.is-muted.mr-4(type="button") Cancel
-                                button.is-danger(type="submit") Yes
-
-            .col-1.mt-4
+        .col-1.mt-4

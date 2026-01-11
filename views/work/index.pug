@@ -2,54 +2,53 @@ extend ../layout
 include ../mixins/pagination
 
 block content
-    .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-10.mt-4 
-                .row.mb-4.align-items-center 
-                    .col-8 
-                        h1 Work (#{count})
-                    .col-4.text-end 
-                        a(href=`/work/new`).btn New work
+    .row
+        .col-1.mt-4  
+        .col-10.mt-4 
+            .row.mb-4.align-items-center 
+                .col-8 
+                    h1 Work (#{count})
+                .col-4.text-end 
+                    a(href=`/work/new`).btn New work
 
-                include ../includes/flash
+            include ../includes/flash
 
-                form(action="/work", method="get") 
-                    .mb-4
-                        input(type="hidden", name="orderBy", value=orderBy)
-                        input(type="hidden", name="orderDir", value=orderDir)
-                        input(type="text", name="search", value=search, autofocus=true, placeholder="Enter title or project and press Enter")
+            form(action="/work", method="get") 
+                .mb-4
+                    input(type="hidden", name="orderBy", value=orderBy)
+                    input(type="hidden", name="orderDir", value=orderDir)
+                    input(type="text", name="search", value=search, autofocus=true, placeholder="Enter title or project and press Enter")
 
-                table.mb-0 
-                    thead 
-                        tr.antiqueWhite 
-                            th Id
-                            th Title
-                            th Project
-                            th Assignee
-                            th Status
-                            th Priority
-                    tbody
-                        if workItems.length > 0
-                            each item in workItems
-                                tr
-                                    td 
-                                        a(href=`/work/${item.id}`) #{item.projectKey + "-" + item.workId}
-                                    td
-                                        a(href=`/work/${item.id}`) #{item.title}
-                                    td
-                                        a(href=`/projects/${item.projectId}`) #{item.projectName}
-                                    td
-                                        if item.assigneeFirstName
-                                            = item.assigneeFirstName + " " + item.assigneeLastName
-                                        else
-                                            span.gray Unassigned
-                                    td= item.statusName
-                                    td= item.priorityName
-                        else
+            table.mb-0 
+                thead 
+                    tr.antiqueWhite 
+                        th Id
+                        th Title
+                        th Project
+                        th Assignee
+                        th Status
+                        th Priority
+                tbody
+                    if workItems.length > 0
+                        each item in workItems
                             tr
-                                td(colspan="6").text-center.gray No work found.
+                                td 
+                                    a(href=`/work/${item.id}`) #{item.projectKey + "-" + item.workId}
+                                td
+                                    a(href=`/work/${item.id}`) #{item.title}
+                                td
+                                    a(href=`/projects/${item.projectId}`) #{item.projectName}
+                                td
+                                    if item.assigneeFirstName
+                                        = item.assigneeFirstName + " " + item.assigneeLastName
+                                    else
+                                        span.gray Unassigned
+                                td= item.statusName
+                                td= item.priorityName
+                    else
+                        tr
+                            td(colspan="6").text-center.gray No work found.
 
-                +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
+            +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
 
-            .col-1.mt-4
+        .col-1.mt-4
