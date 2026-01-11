@@ -1,0 +1,25 @@
+extend ../layout
+
+block content 
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-3.mt-4 
+                h1.mb-4 New milestone
+
+                include ../includes/flash
+
+                p.mb-4
+                    a(href=`/projects/${project.id}`)= project.name
+                    span.gray  / 
+                    a(href=`/projects/${project.id}/milestones`) Milestones
+                    span.gray  / New
+
+                form(action=`/projects/${project.id}/milestones`, method="post") 
+                    include ./form
+
+                    .mb-4.pt-2
+                        a(href=`/projects/${project.id}/milestones`).btn.is-muted.mr-2 Cancel
+                        button(type="submit") Create milestone
+
+            .col-8.mt-4

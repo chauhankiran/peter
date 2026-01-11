@@ -12,5 +12,6 @@ router.use("/admin", isAuth, isAdmin, require("./admin-route"));
 router.use("/projects", isAuth, require("./projects-route"));
 router.use("/work", isAuth, require("./work-route"));
 router.use("/work/:workId/comments", isAuth, require("./comments-route"));
+router.use("/projects/:projectId/milestones", isAuth, require("./milestones-route"));
 
 module.exports = router;

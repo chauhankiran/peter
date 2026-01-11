@@ -98,7 +98,8 @@ module.exports = {
                     p."dueDate",
                     p.description,
                     p."status",
-                    p."completedDetails"
+                    p."completedDetails",
+                    p."milestonesEnabled"
                 FROM
                     projects p
                 JOIN
@@ -147,7 +148,7 @@ module.exports = {
 
     updateManage: async (req, res, next) => {
         const id = req.params.id;
-        const { name, key, dueDate, description, status, completedDetails } = req.body;
+        const { name, key, dueDate, description, status, completedDetails, milestonesEnabled } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -210,6 +211,7 @@ module.exports = {
                 description: description || "",
                 status: status || "active",
                 completedDetails: completedDetails || "",
+                milestonesEnabled: milestonesEnabled === "true",
             };
 
             if (validationFailed) {
@@ -229,6 +231,7 @@ module.exports = {
                     description = ${description || null},
                     "status" = ${status || 'active'},
                     "completedDetails" = ${effectiveCompletedDetails},
+                    "milestonesEnabled" = ${milestonesEnabled === "true"},
                     "updatedAt" = ${sql`now()`},
                     "updatedBy" = ${req.session.userId}
                 WHERE
@@ -364,6 +367,7 @@ module.exports = {
                     p.description,
                     p."createdAt",
                     p."updatedAt",
+                    p."milestonesEnabled",
                     u."firstName",
                     u."lastName",
                     uu."firstName" as "updatedByFirstName",

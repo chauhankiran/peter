@@ -54,6 +54,9 @@ block content
                         .mb-4#priority-container
                             include ./partials/priority-select
 
+                        .mb-4#milestone-container
+                            include ./partials/milestone-select
+
                         .mb-4
                             label(for="dueDate") Due date
                             input(type="text", name="dueDate", id="dueDate", value=work.dueDate, placeholder="YYYY-MM-DD")

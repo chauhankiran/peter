@@ -1,0 +1,12 @@
+.mb-4
+    label(for="name") Name
+        span.red *
+    input(type="text", name="name", id="name", value=milestone.name, placeholder="Version 1.0", autofocus=true)
+
+.mb-4
+    label(for="dueDate") Due date
+    input(type="text", name="dueDate", id="dueDate", value=milestone.dueDate, placeholder="YYYY-MM-DD")
+
+.mb-4 
+    label(for="description") Description
+    textarea(name="description", id="description", rows="4", placeholder="Optional details...")= milestone.description

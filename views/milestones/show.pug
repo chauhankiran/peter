@@ -1,0 +1,77 @@
+extend ../layout
+
+block content
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-10.mt-4 
+                .d-flex.justify-content-between.align-items-center.mb-4
+                    h1= milestone.name
+                    a(href=`/projects/${project.id}/milestones/${milestone.id}/edit`).btn.is-muted Edit
+
+                include ../includes/flash
+
+                p.mb-4
+                    a(href=`/projects/${project.id}`)= project.name
+                    span.gray  / 
+                    a(href=`/projects/${project.id}/milestones`) Milestones
+                    span.gray  / #{milestone.name}
+
+                .card.mb-4
+                    .card-body
+                        .row
+                            .col-6
+                                if milestone.description
+                                    .mb-3
+                                        strong Description
+                                        p= milestone.description
+                                else
+                                    .mb-3
+                                        strong Description
+                                        p.gray No description.
+
+                                if milestone.dueDate
+                                    .mb-3
+                                        strong Due date
+                                        p= new Date(milestone.dueDate).toISOString().slice(0, 10)
+                                else
+                                    .mb-3
+                                        strong Due date
+                                        p.gray Not set
+
+                            .col-6.text-end
+                                .mb-3
+                                    h2 #{milestone.progress}%
+                                    p.gray #{milestone.completedWork} of #{milestone.totalWork} work items completed
+                                .progress-bar(style="width: 100%; height: 12px; background: #e0e0e0; border-radius: 6px;")
+                                    .progress-fill(style=`width: ${milestone.progress}%; height: 100%; background: ${milestone.progress === 100 ? '#28a745' : '#007bff'}; border-radius: 6px;`)
+
+                h2.mb-3 Work items
+
+                if workItems && workItems.length > 0
+                    table
+                        thead
+                            tr
+                                th ID
+                                th Title
+                                th Status
+                                th Priority
+                        tbody
+                            each item in workItems
+                                tr
+                                    td
+                                        a(href=`/work/${item.id}`)= item.projectKey + '-' + item.workId
+                                    td= item.title
+                                    td
+                                        if item.isDone
+                                            span.green= item.statusName
+                                        else
+                                            span= item.statusName
+                                    td= item.priorityName
+                else
+                    p.gray No work items assigned to this milestone.
+
+                .mb-4.pt-4
+                    a(href=`/projects/${project.id}/milestones`).btn.is-muted &larr; Back to milestones
+
+            .col-1.mt-4

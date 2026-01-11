@@ -13,6 +13,10 @@ block content
             include ./details
             
 
+            if project.milestonesEnabled
+                .mb-4
+                    a(href=`/projects/${project.id}/milestones`) View milestones
+
             .mb-4.pt-2
                 a(href="/projects").btn.is-muted.mr-2 &larr; Back
                 a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project

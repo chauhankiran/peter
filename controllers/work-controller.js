@@ -410,6 +410,28 @@ module.exports = {
             const defaultPriorityId =
                 priorities.length > 0 ? priorities[0].id : "";
 
+            // Fetch milestones if project has them enabled
+            const milestones = selectedProjectId
+                ? await sql`
+                      SELECT
+                          m.id,
+                          m.name
+                      FROM
+                          milestones m
+                      JOIN
+                          projects p
+                      ON
+                          p.id = m."projectId"
+                      WHERE
+                          m."orgId" = ${req.session.orgId} AND
+                          m."projectId" = ${selectedProjectId} AND
+                          m."isActive" = true AND
+                          p."milestonesEnabled" = true
+                      ORDER BY
+                          m.name ASC
+                  `
+                : [];
+
             const work = {
                 projectId: selectedProjectId,
                 title: "",
@@ -426,6 +448,8 @@ module.exports = {
                 assignees,
                 statuses,
                 priorities,
+                milestones,
+                selectedMilestoneId: "",
                 projectLocked,
             });
         } catch (err) {
@@ -441,6 +465,7 @@ module.exports = {
             assigneeId,
             statusId,
             priorityId,
+            milestoneId,
             dueDate,
             projectLocked,
         } = req.body;
@@ -660,7 +685,7 @@ module.exports = {
                     ${description || ""},
                     1,
                     ${effectivePriorityId},
-                    1,
+                    ${milestoneId || 0},
                     1,
                     ${effectiveStatusId},
                     ${assignedTo},
@@ -797,12 +822,14 @@ module.exports = {
                     w.id,
                     w."projectId",
                     p.name as "projectName",
+                    p."milestonesEnabled",
                     w.title,
                     w.description,
                     w."assigneeId",
                     w."dueDate",
                     w."priorityId",
-                    w."statusId"
+                    w."statusId",
+                    w."milestoneId"
                 FROM
                     "work" w
                 JOIN
@@ -895,6 +922,7 @@ module.exports = {
                 assigneeId: workRow.assigneeId,
                 statusId: workRow.statusId,
                 priorityId: workRow.priorityId,
+                milestoneId: workRow.milestoneId,
                 dueDate: workRow.dueDate
                     ? new Date(workRow.dueDate).toISOString().slice(0, 10)
                     : "",
@@ -914,12 +942,30 @@ module.exports = {
                     pr.sequence DESC
             `;
 
+            const milestones = workRow.milestonesEnabled
+                ? await sql`
+                      SELECT
+                          m.id,
+                          m.name
+                      FROM
+                          milestones m
+                      WHERE
+                          m."orgId" = ${orgId} AND
+                          m."projectId" = ${workRow.projectId} AND
+                          m."isActive" = true
+                      ORDER BY
+                          m.name ASC
+                  `
+                : [];
+
             return res.render("work/edit", {
                 work,
                 projects,
                 assignees,
                 statuses,
                 priorities,
+                milestones,
+                selectedMilestoneId: workRow.milestoneId || "",
                 projectLocked: true,
             });
         } catch (err) {
@@ -937,6 +983,7 @@ module.exports = {
             description,
             assigneeId,
             priorityId,
+            milestoneId,
             dueDate,
             statusId,
         } = req.body;
@@ -1114,6 +1161,7 @@ module.exports = {
                     "assigneeId" = ${assignedTo},
                     "priorityId" = ${effectivePriorityId},
                     "statusId" = ${effectiveStatusId},
+                    "milestoneId" = ${milestoneId || 0},
                     "dueDate" = ${dueDate ? dueDate : null},
                     "updatedBy" = ${userId},
                     "updatedAt" = now()

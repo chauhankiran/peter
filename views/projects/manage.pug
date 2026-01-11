@@ -19,6 +19,11 @@ block content
                         option(value="archived", selected=project.status === 'archived') archived
                         option(value="completed", selected=project.status === 'completed') completed
 
+                .mb-4
+                    label
+                        input(type="checkbox", name="milestonesEnabled", value="true", checked=project.milestonesEnabled)
+                        span.ml-2 Enable milestones
+
                 input(type="hidden", name="completedDetails", id="completedDetails", value=project.completedDetails || '')
 
                 .mb-4.pt-2

@@ -1,0 +1,30 @@
+extend ../layout
+
+block content 
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-3.mt-4 
+                h1.mb-4 Edit milestone
+
+                include ../includes/flash
+
+                p.mb-4
+                    a(href=`/projects/${project.id}`)= project.name
+                    span.gray  / 
+                    a(href=`/projects/${project.id}/milestones`) Milestones
+                    span.gray  / Edit
+
+                form(action=`/projects/${project.id}/milestones/${milestone.id}?_method=put`, method="post") 
+                    include ./form
+
+                    .mb-4.pt-2
+                        a(href=`/projects/${project.id}/milestones/${milestone.id}`).btn.is-muted.mr-2 Cancel
+                        button(type="submit") Update milestone
+
+                hr.my-4
+
+                form(action=`/projects/${project.id}/milestones/${milestone.id}?_method=delete`, method="post")
+                    button.is-danger(type="submit") Delete milestone
+
+            .col-8.mt-4

@@ -1,0 +1,9 @@
+label(for="milestoneId") Milestone
+select(name="milestoneId", id="milestoneId")
+    option(value="") No milestone
+    if milestones && milestones.length > 0
+        each milestone in milestones
+            if String(milestone.id) === String(selectedMilestoneId)
+                option(value=milestone.id, selected=true)= milestone.name
+            else
+                option(value=milestone.id)= milestone.name
