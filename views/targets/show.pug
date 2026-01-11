@@ -1,0 +1,69 @@
+extend ../layout
+
+block content
+    .container-fluid 
+        .row
+            .col-1.mt-4  
+            .col-10.mt-4 
+                .d-flex.justify-content-between.align-items-center.mb-4
+                    h1= target.name
+                    a(href=`/projects/${project.id}/targets/${target.id}/edit`).btn.is-muted Edit
+
+                include ../includes/flash
+
+                p.mb-4
+                    a(href=`/projects/${project.id}`)= project.name
+                    span.gray  / 
+                    a(href=`/projects/${project.id}/targets`) Targets
+                    span.gray  / #{target.name}
+
+                .card.mb-4
+                    .card-body
+                        .row
+                            .col-6
+                                if target.description
+                                    .mb-3
+                                        strong Description
+                                        p= target.description
+                                else
+                                    .mb-3
+                                        strong Description
+                                        p.gray No description.
+
+                                if target.dueDate
+                                    .mb-3
+                                        strong Due date
+                                        p= new Date(target.dueDate).toISOString().slice(0, 10)
+                                else
+                                    .mb-3
+                                        strong Due date
+                                        p.gray Not set
+
+                            .col-6.text-end
+                                .mb-3
+                                    h2 #{target.progress}%
+                                    p.gray #{target.completedMilestones} of #{target.totalMilestones} milestones completed
+                                .progress-bar(style="width: 100%; height: 12px; background: #e0e0e0; border-radius: 6px;")
+                                    .progress-fill(style=`width: ${target.progress}%; height: 100%; background: ${target.progress === 100 ? '#28a745' : '#007bff'}; border-radius: 6px;`)
+
+                h2.mb-3 Milestones
+
+                if milestones && milestones.length > 0
+                    each milestone in milestones
+                        .card.mb-2
+                            .card-body
+                                .d-flex.justify-content-between.align-items-center
+                                    div
+                                        a(href=`/projects/${project.id}/milestones/${milestone.id}`)= milestone.name
+                                        if milestone.dueDate
+                                            span.gray.ml-2 Due: #{new Date(milestone.dueDate).toISOString().slice(0, 10)}
+                                    div
+                                        span #{milestone.progress}%
+                                        span.gray.ml-2 (#{milestone.completedWork}/#{milestone.totalWork})
+                else
+                    p.gray No milestones assigned to this target.
+
+                .mb-4.pt-4
+                    a(href=`/projects/${project.id}/targets`).btn.is-muted &larr; Back to targets
+
+            .col-1.mt-4

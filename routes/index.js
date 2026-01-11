@@ -13,5 +13,6 @@ router.use("/projects", isAuth, require("./projects-route"));
 router.use("/work", isAuth, require("./work-route"));
 router.use("/work/:workId/comments", isAuth, require("./comments-route"));
 router.use("/projects/:projectId/milestones", isAuth, require("./milestones-route"));
+router.use("/projects/:projectId/targets", isAuth, require("./targets-route"));
 
 module.exports = router;

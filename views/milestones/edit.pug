@@ -18,6 +18,10 @@ block content
                 form(action=`/projects/${project.id}/milestones/${milestone.id}?_method=put`, method="post") 
                     include ./form
 
+                    if targets && targets.length > 0
+                        .mb-4
+                            include ./partials/target-select
+
                     .mb-4.pt-2
                         a(href=`/projects/${project.id}/milestones/${milestone.id}`).btn.is-muted.mr-2 Cancel
                         button(type="submit") Update milestone

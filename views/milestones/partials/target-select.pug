@@ -1,0 +1,9 @@
+label(for="targetId") Target
+select(name="targetId", id="targetId")
+    option(value="") No target
+    if targets && targets.length > 0
+        each target in targets
+            if String(target.id) === String(selectedTargetId)
+                option(value=target.id, selected=true)= target.name
+            else
+                option(value=target.id)= target.name

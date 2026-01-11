@@ -24,6 +24,11 @@ block content
                         input(type="checkbox", name="milestonesEnabled", value="true", checked=project.milestonesEnabled)
                         span.ml-2 Enable milestones
 
+                .mb-4
+                    label
+                        input(type="checkbox", name="targetsEnabled", value="true", checked=project.targetsEnabled)
+                        span.ml-2 Enable targets
+
                 input(type="hidden", name="completedDetails", id="completedDetails", value=project.completedDetails || '')
 
                 .mb-4.pt-2

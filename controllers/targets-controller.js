@@ -7,12 +7,12 @@ module.exports = {
         const projectId = req.params.projectId;
 
         try {
-            // Verify project access and milestones enabled
+            // Verify project access and targets enabled
             const project = await sql`
                 SELECT
                     p.id,
                     p.name,
-                    p."milestonesEnabled"
+                    p."targetsEnabled"
                 FROM
                     projects p
                 JOIN
@@ -31,51 +31,59 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            if (!project.milestonesEnabled) {
-                req.flash("error", "Milestones are not enabled for this project.");
+            if (!project.targetsEnabled) {
+                req.flash("error", "Targets are not enabled for this project.");
                 return res.redirect(`/projects/${projectId}`);
             }
 
-            const milestones = await sql`
+            const targets = await sql`
                 SELECT
-                    m.id,
-                    m.name,
-                    m.description,
-                    m."dueDate",
-                    m."createdAt",
+                    t.id,
+                    t.name,
+                    t.description,
+                    t."dueDate",
+                    t."createdAt",
                     (
                         SELECT COUNT(*) 
-                        FROM work w 
-                        WHERE w."milestoneId" = m.id 
-                        AND w."isActive" = true
-                    ) as "totalWork",
+                        FROM milestones m 
+                        WHERE m."targetId" = t.id 
+                        AND m."isActive" = true
+                    ) as "totalMilestones",
                     (
                         SELECT COUNT(*) 
-                        FROM work w 
-                        JOIN statuses s ON s.id = w."statusId"
-                        WHERE w."milestoneId" = m.id 
-                        AND w."isActive" = true
-                        AND s."isDone" = true
-                    ) as "completedWork"
+                        FROM milestones m 
+                        WHERE m."targetId" = t.id 
+                        AND m."isActive" = true
+                        AND (
+                            SELECT COUNT(*) FROM work w WHERE w."milestoneId" = m.id AND w."isActive" = true
+                        ) > 0
+                        AND (
+                            SELECT COUNT(*) FROM work w WHERE w."milestoneId" = m.id AND w."isActive" = true
+                        ) = (
+                            SELECT COUNT(*) FROM work w 
+                            JOIN statuses s ON s.id = w."statusId"
+                            WHERE w."milestoneId" = m.id AND w."isActive" = true AND s."isDone" = true
+                        )
+                    ) as "completedMilestones"
                 FROM
-                    milestones m
+                    targets t
                 WHERE
-                    m."projectId" = ${projectId} AND
-                    m."orgId" = ${orgId} AND
-                    m."isActive" = true
+                    t."projectId" = ${projectId} AND
+                    t."orgId" = ${orgId} AND
+                    t."isActive" = true
                 ORDER BY
-                    m."dueDate" ASC NULLS LAST,
-                    m.name ASC
+                    t."dueDate" ASC NULLS LAST,
+                    t.name ASC
             `;
 
-            // Calculate progress percentage for each milestone
-            const milestonesWithProgress = milestones.map(m => ({
-                ...m,
-                progress: m.totalWork > 0 ? Math.round((m.completedWork / m.totalWork) * 100) : 0
+            // Calculate progress percentage for each target
+            const targetsWithProgress = targets.map(t => ({
+                ...t,
+                progress: t.totalMilestones > 0 ? Math.round((t.completedMilestones / t.totalMilestones) * 100) : 0
             }));
 
-            return res.render("milestones/index", {
-                milestones: milestonesWithProgress,
+            return res.render("targets/index", {
+                targets: targetsWithProgress,
                 project,
             });
         } catch (err) {
@@ -93,7 +101,6 @@ module.exports = {
                 SELECT
                     p.id,
                     p.name,
-                    p."milestonesEnabled",
                     p."targetsEnabled"
                 FROM
                     projects p
@@ -113,34 +120,18 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            if (!project.milestonesEnabled) {
-                req.flash("error", "Milestones are not enabled for this project.");
+            if (!project.targetsEnabled) {
+                req.flash("error", "Targets are not enabled for this project.");
                 return res.redirect(`/projects/${projectId}`);
             }
 
-            const targets = project.targetsEnabled
-                ? await sql`
-                      SELECT
-                          t.id,
-                          t.name
-                      FROM
-                          targets t
-                      WHERE
-                          t."orgId" = ${orgId} AND
-                          t."projectId" = ${projectId} AND
-                          t."isActive" = true
-                      ORDER BY
-                          t.name ASC
-                  `
-                : [];
-
-            const milestone = {
+            const target = {
                 name: "",
                 description: "",
                 dueDate: "",
             };
 
-            return res.render("milestones/new", { milestone, project, targets, selectedTargetId: "" });
+            return res.render("targets/new", { target, project });
         } catch (err) {
             next(err);
         }
@@ -150,7 +141,7 @@ module.exports = {
         const orgId = req.session.orgId;
         const userId = req.session.userId;
         const projectId = req.params.projectId;
-        const { name, description, dueDate, targetId } = req.body;
+        const { name, description, dueDate } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -165,7 +156,7 @@ module.exports = {
                 SELECT
                     p.id,
                     p.name,
-                    p."milestonesEnabled"
+                    p."targetsEnabled"
                 FROM
                     projects p
                 JOIN
@@ -184,12 +175,12 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            if (!project.milestonesEnabled) {
-                req.flash("error", "Milestones are not enabled for this project.");
+            if (!project.targetsEnabled) {
+                req.flash("error", "Targets are not enabled for this project.");
                 return res.redirect(`/projects/${projectId}`);
             }
 
-            const milestone = {
+            const target = {
                 name: name || "",
                 description: description || "",
                 dueDate: dueDate || "",
@@ -197,17 +188,16 @@ module.exports = {
 
             if (validationFailed) {
                 res.locals.errors = errors;
-                return res.render("milestones/new", { milestone, project });
+                return res.render("targets/new", { target, project });
             }
 
             await sql`
-                INSERT INTO milestones (
+                INSERT INTO targets (
                     "orgId",
                     "projectId",
                     name,
                     description,
                     "dueDate",
-                    "targetId",
                     "createdBy"
                 ) VALUES (
                     ${orgId},
@@ -215,13 +205,12 @@ module.exports = {
                     ${name},
                     ${description || null},
                     ${dueDate || null},
-                    ${targetId || 0},
                     ${userId}
                 )
             `;
 
-            req.flash("info", "Milestone created successfully.");
-            return res.redirect(`/projects/${projectId}/milestones`);
+            req.flash("info", "Target created successfully.");
+            return res.redirect(`/projects/${projectId}/targets`);
         } catch (err) {
             next(err);
         }
@@ -231,14 +220,14 @@ module.exports = {
         const orgId = req.session.orgId;
         const userId = req.session.userId;
         const projectId = req.params.projectId;
-        const milestoneId = req.params.id;
+        const targetId = req.params.id;
 
         try {
             const project = await sql`
                 SELECT
                     p.id,
                     p.name,
-                    p."milestonesEnabled"
+                    p."targetsEnabled"
                 FROM
                     projects p
                 JOIN
@@ -257,18 +246,65 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            if (!project.milestonesEnabled) {
-                req.flash("error", "Milestones are not enabled for this project.");
+            if (!project.targetsEnabled) {
+                req.flash("error", "Targets are not enabled for this project.");
                 return res.redirect(`/projects/${projectId}`);
             }
 
-            const milestone = await sql`
+            const target = await sql`
+                SELECT
+                    t.id,
+                    t.name,
+                    t.description,
+                    t."dueDate",
+                    t."createdAt",
+                    (
+                        SELECT COUNT(*) 
+                        FROM milestones m 
+                        WHERE m."targetId" = t.id 
+                        AND m."isActive" = true
+                    ) as "totalMilestones",
+                    (
+                        SELECT COUNT(*) 
+                        FROM milestones m 
+                        WHERE m."targetId" = t.id 
+                        AND m."isActive" = true
+                        AND (
+                            SELECT COUNT(*) FROM work w WHERE w."milestoneId" = m.id AND w."isActive" = true
+                        ) > 0
+                        AND (
+                            SELECT COUNT(*) FROM work w WHERE w."milestoneId" = m.id AND w."isActive" = true
+                        ) = (
+                            SELECT COUNT(*) FROM work w 
+                            JOIN statuses s ON s.id = w."statusId"
+                            WHERE w."milestoneId" = m.id AND w."isActive" = true AND s."isDone" = true
+                        )
+                    ) as "completedMilestones"
+                FROM
+                    targets t
+                WHERE
+                    t.id = ${targetId} AND
+                    t."projectId" = ${projectId} AND
+                    t."orgId" = ${orgId} AND
+                    t."isActive" = true
+            `.then(([x]) => x);
+
+            if (!target) {
+                req.flash("error", "Target not found.");
+                return res.redirect(`/projects/${projectId}/targets`);
+            }
+
+            target.progress = target.totalMilestones > 0 
+                ? Math.round((target.completedMilestones / target.totalMilestones) * 100) 
+                : 0;
+
+            // Get milestones in this target
+            const milestones = await sql`
                 SELECT
                     m.id,
                     m.name,
                     m.description,
                     m."dueDate",
-                    m."createdAt",
                     (
                         SELECT COUNT(*) 
                         FROM work w 
@@ -286,49 +322,20 @@ module.exports = {
                 FROM
                     milestones m
                 WHERE
-                    m.id = ${milestoneId} AND
-                    m."projectId" = ${projectId} AND
+                    m."targetId" = ${targetId} AND
                     m."orgId" = ${orgId} AND
                     m."isActive" = true
-            `.then(([x]) => x);
-
-            if (!milestone) {
-                req.flash("error", "Milestone not found.");
-                return res.redirect(`/projects/${projectId}/milestones`);
-            }
-
-            milestone.progress = milestone.totalWork > 0 
-                ? Math.round((milestone.completedWork / milestone.totalWork) * 100) 
-                : 0;
-
-            // Get work items in this milestone
-            const workItems = await sql`
-                SELECT
-                    w.id,
-                    w.title,
-                    w."workId",
-                    s.name as "statusName",
-                    s."isDone",
-                    pr.name as "priorityName",
-                    p.key as "projectKey"
-                FROM
-                    work w
-                JOIN
-                    statuses s ON s.id = w."statusId"
-                JOIN
-                    priorities pr ON pr.id = w."priorityId"
-                JOIN
-                    projects p ON p.id = w."projectId"
-                WHERE
-                    w."milestoneId" = ${milestoneId} AND
-                    w."orgId" = ${orgId} AND
-                    w."isActive" = true
                 ORDER BY
-                    s."isDone" ASC,
-                    w.id DESC
+                    m."dueDate" ASC NULLS LAST,
+                    m.name ASC
             `;
 
-            return res.render("milestones/show", { milestone, project, workItems });
+            const milestonesWithProgress = milestones.map(m => ({
+                ...m,
+                progress: m.totalWork > 0 ? Math.round((m.completedWork / m.totalWork) * 100) : 0
+            }));
+
+            return res.render("targets/show", { target, project, milestones: milestonesWithProgress });
         } catch (err) {
             next(err);
         }
@@ -338,14 +345,13 @@ module.exports = {
         const orgId = req.session.orgId;
         const userId = req.session.userId;
         const projectId = req.params.projectId;
-        const milestoneId = req.params.id;
+        const targetId = req.params.id;
 
         try {
             const project = await sql`
                 SELECT
                     p.id,
                     p.name,
-                    p."milestonesEnabled",
                     p."targetsEnabled"
                 FROM
                     projects p
@@ -365,56 +371,39 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            if (!project.milestonesEnabled) {
-                req.flash("error", "Milestones are not enabled for this project.");
+            if (!project.targetsEnabled) {
+                req.flash("error", "Targets are not enabled for this project.");
                 return res.redirect(`/projects/${projectId}`);
             }
 
-            const milestoneRow = await sql`
+            const targetRow = await sql`
                 SELECT
-                    m.id,
-                    m.name,
-                    m.description,
-                    m."dueDate",
-                    m."targetId"
+                    t.id,
+                    t.name,
+                    t.description,
+                    t."dueDate"
                 FROM
-                    milestones m
+                    targets t
                 WHERE
-                    m.id = ${milestoneId} AND
-                    m."projectId" = ${projectId} AND
-                    m."orgId" = ${orgId} AND
-                    m."isActive" = true
+                    t.id = ${targetId} AND
+                    t."projectId" = ${projectId} AND
+                    t."orgId" = ${orgId} AND
+                    t."isActive" = true
             `.then(([x]) => x);
 
-            if (!milestoneRow) {
-                req.flash("error", "Milestone not found.");
-                return res.redirect(`/projects/${projectId}/milestones`);
+            if (!targetRow) {
+                req.flash("error", "Target not found.");
+                return res.redirect(`/projects/${projectId}/targets`);
             }
 
-            const targets = project.targetsEnabled
-                ? await sql`
-                      SELECT
-                          t.id,
-                          t.name
-                      FROM
-                          targets t
-                      WHERE
-                          t."orgId" = ${orgId} AND
-                          t."projectId" = ${projectId} AND
-                          t."isActive" = true
-                      ORDER BY
-                          t.name ASC
-                  `
-                : [];
-
-            const milestone = {
-                id: milestoneRow.id,
-                name: milestoneRow.name,
-                description: milestoneRow.description || "",
-                dueDate: milestoneRow.dueDate || "",
+            const target = {
+                id: targetRow.id,
+                name: targetRow.name,
+                description: targetRow.description || "",
+                dueDate: targetRow.dueDate || "",
             };
 
-            return res.render("milestones/edit", { milestone, project, targets, selectedTargetId: milestoneRow.targetId || "" });
+            return res.render("targets/edit", { target, project });
         } catch (err) {
             next(err);
         }
@@ -424,8 +413,8 @@ module.exports = {
         const orgId = req.session.orgId;
         const userId = req.session.userId;
         const projectId = req.params.projectId;
-        const milestoneId = req.params.id;
-        const { name, description, dueDate, targetId } = req.body;
+        const targetId = req.params.id;
+        const { name, description, dueDate } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -440,7 +429,7 @@ module.exports = {
                 SELECT
                     p.id,
                     p.name,
-                    p."milestonesEnabled"
+                    p."targetsEnabled"
                 FROM
                     projects p
                 JOIN
@@ -459,13 +448,13 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            if (!project.milestonesEnabled) {
-                req.flash("error", "Milestones are not enabled for this project.");
+            if (!project.targetsEnabled) {
+                req.flash("error", "Targets are not enabled for this project.");
                 return res.redirect(`/projects/${projectId}`);
             }
 
-            const milestone = {
-                id: milestoneId,
+            const target = {
+                id: targetId,
                 name: name || "",
                 description: description || "",
                 dueDate: dueDate || "",
@@ -473,20 +462,19 @@ module.exports = {
 
             if (validationFailed) {
                 res.locals.errors = errors;
-                return res.render("milestones/edit", { milestone, project });
+                return res.render("targets/edit", { target, project });
             }
 
             const updated = await sql`
-                UPDATE milestones
+                UPDATE targets
                 SET
                     name = ${name},
                     description = ${description || null},
                     "dueDate" = ${dueDate || null},
-                    "targetId" = ${targetId || 0},
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
                 WHERE
-                    id = ${milestoneId} AND
+                    id = ${targetId} AND
                     "projectId" = ${projectId} AND
                     "orgId" = ${orgId} AND
                     "isActive" = true
@@ -494,12 +482,12 @@ module.exports = {
             `.then(([x]) => x);
 
             if (!updated) {
-                req.flash("error", "Milestone not found.");
-                return res.redirect(`/projects/${projectId}/milestones`);
+                req.flash("error", "Target not found.");
+                return res.redirect(`/projects/${projectId}/targets`);
             }
 
-            req.flash("info", "Milestone updated successfully.");
-            return res.redirect(`/projects/${projectId}/milestones/${milestoneId}`);
+            req.flash("info", "Target updated successfully.");
+            return res.redirect(`/projects/${projectId}/targets/${targetId}`);
         } catch (err) {
             next(err);
         }
@@ -509,13 +497,13 @@ module.exports = {
         const orgId = req.session.orgId;
         const userId = req.session.userId;
         const projectId = req.params.projectId;
-        const milestoneId = req.params.id;
+        const targetId = req.params.id;
 
         try {
             const project = await sql`
                 SELECT
                     p.id,
-                    p."milestonesEnabled"
+                    p."targetsEnabled"
                 FROM
                     projects p
                 JOIN
@@ -534,32 +522,32 @@ module.exports = {
                 return res.redirect("/projects");
             }
 
-            // Soft delete - set isActive to false and unassign work items
+            // Unassign milestones from this target
             await sql`
-                UPDATE work
+                UPDATE milestones
                 SET
-                    "milestoneId" = 0,
+                    "targetId" = 0,
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
                 WHERE
-                    "milestoneId" = ${milestoneId} AND
+                    "targetId" = ${targetId} AND
                     "orgId" = ${orgId}
             `;
 
             await sql`
-                UPDATE milestones
+                UPDATE targets
                 SET
                     "isActive" = false,
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
                 WHERE
-                    id = ${milestoneId} AND
+                    id = ${targetId} AND
                     "projectId" = ${projectId} AND
                     "orgId" = ${orgId}
             `;
 
-            req.flash("info", "Milestone deleted successfully.");
-            return res.redirect(`/projects/${projectId}/milestones`);
+            req.flash("info", "Target deleted successfully.");
+            return res.redirect(`/projects/${projectId}/targets`);
         } catch (err) {
             next(err);
         }

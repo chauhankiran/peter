@@ -17,6 +17,10 @@ block content
                 .mb-4
                     a(href=`/projects/${project.id}/milestones`) View milestones
 
+            if project.targetsEnabled
+                .mb-4
+                    a(href=`/projects/${project.id}/targets`) View targets
+
             .mb-4.pt-2
                 a(href="/projects").btn.is-muted.mr-2 &larr; Back
                 a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project
