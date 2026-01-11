@@ -1,1 +1,0 @@
-ALTER TABLE "milestones" ADD COLUMN "targetId" BIGINT NOT NULL DEFAULT 0;
