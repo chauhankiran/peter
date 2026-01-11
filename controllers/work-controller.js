@@ -805,7 +805,31 @@ module.exports = {
                     c."createdAt" ASC
             `;
 
-            return res.render("work/show", { work, comments });
+            const attachments = await sql`
+                SELECT
+                    a.id,
+                    a."originalName",
+                    a."fileSize",
+                    a."mimeType",
+                    a."userId",
+                    a."createdAt",
+                    u."firstName",
+                    u."lastName"
+                FROM
+                    "attachments" a
+                JOIN
+                    users u
+                ON
+                    u.id = a."userId"
+                WHERE
+                    a."workId" = ${workId} AND
+                    a."orgId" = ${orgId} AND
+                    a."isActive" = true
+                ORDER BY
+                    a."createdAt" DESC
+            `;
+
+            return res.render("work/show", { work, comments, attachments });
         } catch (err) {
             next(err);
         }
