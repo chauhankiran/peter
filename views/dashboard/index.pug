@@ -8,24 +8,6 @@ block content
                 h1 Dashboard 
                 p.gray Welcome #{userName} @ #{now ? now.toLocaleString() : ''}!
 
-            h3 Your projects
-            if projects && projects.length
-                table.mb-4
-                    thead
-                        tr.antiqueWhite
-                            th Name
-                            th Due date
-                    tbody
-                        each p in projects
-                            tr
-                                td
-                                    a(href=`/projects/${p.id}`)= p.name
-                                td= p.dueDate || 'N/A'
-            else
-                p.gray.italic You are not a member of any projects.
-
-            hr
-
             h3 Assigned to you
             if assignedWork && assignedWork.length
                 table.mb-0
@@ -51,4 +33,23 @@ block content
                                 td= w.dueDate || 'N/A'
             else
                 p.gray.italic No issues assigned to you.
+
+            hr
+            
+            h3 Your projects
+            if projects && projects.length
+                table.mb-4
+                    thead
+                        tr.antiqueWhite
+                            th Name
+                            th Due date
+                    tbody
+                        each p in projects
+                            tr
+                                td
+                                    a(href=`/projects/${p.id}`)= p.name
+                                td= p.dueDate || 'N/A'
+            else
+                p.gray.italic You are not a member of any projects.
+            
         .col-10.mt-4 

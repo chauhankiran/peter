@@ -3,6 +3,7 @@ const { PER_PAGE, views } = require("../constants/app");
 const generatePaginationLinks = require("../helpers/generate-pagination-links");
 const cipher = require("../helpers/cipher");
 const projectsService = require("../services/projects-service");
+const workService = require("../services/work-service");
 
 module.exports = {
     index: async (req, res, next) => {
@@ -16,22 +17,20 @@ module.exports = {
         const orderBy = req.query.orderBy || "id";
         const orderDir = req.query.orderDir || "DESC";
 
-        
-
         try {
             const projects = await projectsService.find({
-                search, 
-                limit, 
-                skip, 
-                orderBy, 
-                orderDir, 
-                orgId, 
-                userId
+                search,
+                limit,
+                skip,
+                orderBy,
+                orderDir,
+                orgId,
+                userId,
             });
             const { count } = await projectsService.count({
-                search,  
-                orgId, 
-                userId
+                search,
+                orgId,
+                userId,
             });
 
             const pages = Math.ceil(count / limit);
@@ -53,7 +52,7 @@ module.exports = {
                 paginationLinks,
                 orderBy,
                 orderDir,
-                count
+                count,
             });
         } catch (err) {
             next(err);
@@ -232,7 +231,10 @@ module.exports = {
 
     new: (req, res) => {
         const project = {}; // Needed for form.pug to work.
-        return res.render(views.newProjectPath, { project, title: "New project" });
+        return res.render(views.newProjectPath, {
+            project,
+            title: "New project",
+        });
     },
 
     create: async (req, res, next) => {
@@ -360,30 +362,10 @@ module.exports = {
             }
 
             // Get all project members.
-            const projectMembers = await sql`
-                SELECT
-                    pm."userId" as "userId",
-                    pm.role as role,
-                    u.name as name,
-                    u.email as email
-                FROM
-                    "projectMembers" pm
-                JOIN
-                    projects p
-                ON
-                    p.id = pm."projectId"
-                JOIN
-                    users u
-                ON
-                    u.id = pm."userId"
-                WHERE
-                    w."orgId" = ${req.session.orgId} AND
-                    w."projectId" = ${id} AND
-                    w."isActive" = true
-                ORDER BY
-                    pm.role ASC,
-                    u.name ASC
-            `.then(([x]) => x);
+            const projectMembers = await projectsService.getMembers({
+                projectId: id,
+                orgId: req.session.orgId,
+            });
 
             const workItems = await sql`
                 SELECT
@@ -417,6 +399,11 @@ module.exports = {
                 LIMIT
                     3
             `;
+
+            const { count: workCount } = await workService.getWorkCount({
+                projectId: id,
+                orgId: req.session.orgId,
+            });
 
             return res.render(views.showProjectPath, {
                 project,

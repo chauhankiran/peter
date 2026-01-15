@@ -79,4 +79,32 @@ module.exports = {
                 p."status" = 'active'
         `.then(([x]) => x);
     },
+
+    getMembers: async (opts) => {
+        const { projectId, orgId } = opts;
+
+        return await sql`
+            SELECT
+                pm."userId" as "userId",
+                pm.role as role,
+                u.name as name,
+                u.email as email
+            FROM
+                "projectMembers" pm
+            JOIN
+                projects p
+            ON
+                p.id = pm."projectId"
+            JOIN
+                users u
+            ON
+                u.id = pm."userId"
+            WHERE
+                p."orgId" = ${orgId} AND
+                pm."projectId" = ${projectId}
+            ORDER BY
+                pm.role ASC,
+                u.name ASC
+        `;
+    },
 }
