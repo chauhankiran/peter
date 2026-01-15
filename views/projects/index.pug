@@ -7,7 +7,7 @@ block content
         .col-10.mt-4 
             .row.mb-4.align-items-center 
                 .col-8 
-                    h1 Projects
+                    h1 Projects (#{count})
                 .col-4.text-end 
                     if permissions && permissions.projects && permissions.projects.create
                         a(href=`/projects/new`).btn New project
@@ -38,7 +38,7 @@ block content
                                 td 
                                     a(href=`/projects/${project.id}`)= project.name
                                 td(class=isDue ? "red" : "")= project.dueDate || 'N/A'
-                                td= project.firstName + " " + project.lastName
+                                td= project.createdByName
                     else
                         tr
                             td(colspan="4").text-center.gray No projects found.

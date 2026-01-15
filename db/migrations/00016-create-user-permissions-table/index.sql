@@ -2,7 +2,7 @@ CREATE TABLE "userPermissions" (
     id BIGSERIAL PRIMARY KEY,
     "orgId" BIGINT NOT NULL,
     "userId" BIGINT NOT NULL,
-    "isEnabled" BOOLEAN NOT NULL DEFAULT true,
+
     "projectsCreate" BOOLEAN NOT NULL DEFAULT true,
     "projectsRead" BOOLEAN NOT NULL DEFAULT true,
     "projectsUpdate" BOOLEAN NOT NULL DEFAULT true,
@@ -27,6 +27,7 @@ CREATE TABLE "userPermissions" (
     "attachmentsRead" BOOLEAN NOT NULL DEFAULT true,
     "attachmentsUpdate" BOOLEAN NOT NULL DEFAULT true,
     "attachmentsDelete" BOOLEAN NOT NULL DEFAULT true,
+
     "createdBy" BIGINT,
     "updatedBy" BIGINT,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),

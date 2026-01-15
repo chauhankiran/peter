@@ -12,6 +12,7 @@ block content
 
                 h3.mb-2 Organization
                 form(action="/admin/org", method="post")
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     .mb-4
                         label(for="name") Name
                             span.red *
@@ -37,7 +38,7 @@ block content
                         tbody
                             each u in users
                                 tr
-                                    td= u.firstName + " " + u.lastName
+                                    td= u.name
                                     td= u.email
                                     td= u.role
                                     td= u.status
@@ -60,11 +61,7 @@ block content
                                     td
                                         a(href=`/projects/${p.id}`)= p.name
                                     td= p.status
-                                    td
-                                        if p.dueDate
-                                            = new Date(p.dueDate).toISOString().slice(0, 10)
-                                        else
-                                            span.gray -
+                                    td= p.dueDate || 'N/A'
                 else
                     p.gray No projects found.
             .col-1.mt-4

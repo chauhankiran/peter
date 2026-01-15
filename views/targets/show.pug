@@ -33,7 +33,7 @@ block content
                                 if target.dueDate
                                     .mb-3
                                         strong Due date
-                                        p= new Date(target.dueDate).toISOString().slice(0, 10)
+                                        p= new Date(target.dueDate).toLocaleDateString('sv-SE')
                                 else
                                     .mb-3
                                         strong Due date
@@ -56,7 +56,7 @@ block content
                                     div
                                         a(href=`/projects/${project.id}/milestones/${milestone.id}`)= milestone.name
                                         if milestone.dueDate
-                                            span.gray.ml-2 Due: #{new Date(milestone.dueDate).toISOString().slice(0, 10)}
+                                            span.gray.ml-2 Due: #{new Date(milestone.dueDate).toLocaleDateString('sv-SE')}
                                     div
                                         span #{milestone.progress}%
                                         span.gray.ml-2 (#{milestone.completedWork}/#{milestone.totalWork})

@@ -4,6 +4,7 @@
         h3.mb-4 Edit comment
 
         form(action="" method="POST" id="edit-comment-form")
+            input(type="hidden", name="_csrf", value=csrfToken)
             input(type="hidden" name="_method" value="PUT")
             .mb-4
                 label(for="editCommentBody") Comment

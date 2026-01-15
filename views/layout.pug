@@ -3,7 +3,10 @@ html(lang="en")
     head
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        title Peter
+        title= title || "Peter"
+
+        meta(name="csrf-param" content=csrfParam)
+        meta(name="csrf-token" content=csrfToken)
 
         link(rel="stylesheet", href="/css/vendor/unpoly.min.css")
         link(rel="stylesheet", href="/css/main.css")

@@ -16,6 +16,7 @@ block content
                     span.gray  / Edit
 
                 form(action=`/projects/${project.id}/milestones/${milestone.id}?_method=put`, method="post") 
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     include ./form
 
                     if targets && targets.length > 0
@@ -29,6 +30,7 @@ block content
                 hr.my-4
 
                 form(action=`/projects/${project.id}/milestones/${milestone.id}?_method=delete`, method="post")
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     button.is-danger(type="submit") Delete milestone
 
             .col-8.mt-4

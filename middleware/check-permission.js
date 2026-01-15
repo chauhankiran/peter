@@ -31,7 +31,10 @@ const checkPermission = (module, action) => {
             if (orgPermissions) {
                 const moduleEnabledKey = `${module}Enabled`;
                 if (orgPermissions[moduleEnabledKey] === false) {
-                    req.flash("error", `${module.charAt(0).toUpperCase() + module.slice(1)} module is disabled for this organization.`);
+                    req.flash(
+                        "error",
+                        `${module.charAt(0).toUpperCase() + module.slice(1)} module is disabled for this organization.`,
+                    );
                     return res.redirect("/dashboard");
                 }
             }
@@ -44,7 +47,7 @@ const checkPermission = (module, action) => {
             // Check user-level permissions
             const userPermissions = await sql`
                 SELECT
-                    "isEnabled",
+                    
                     "projectsCreate", "projectsRead", "projectsUpdate", "projectsDelete",
                     "workCreate", "workRead", "workUpdate", "workDelete",
                     "milestonesCreate", "milestonesRead", "milestonesUpdate", "milestonesDelete",
@@ -63,31 +66,64 @@ const checkPermission = (module, action) => {
                 // Default: normal users can CRUD projects, work, comments, attachments
                 // but only read milestones and targets (no create/update/delete)
                 const defaultAllowed = {
-                    projects: { create: true, read: true, update: true, delete: true },
-                    work: { create: true, read: true, update: true, delete: true },
-                    milestones: { create: false, read: true, update: false, delete: false },
-                    targets: { create: false, read: true, update: false, delete: false },
-                    comments: { create: true, read: true, update: true, delete: true },
-                    attachments: { create: true, read: true, update: true, delete: true },
+                    projects: {
+                        create: true,
+                        read: true,
+                        update: true,
+                        delete: true,
+                    },
+                    work: {
+                        create: true,
+                        read: true,
+                        update: true,
+                        delete: true,
+                    },
+                    milestones: {
+                        create: false,
+                        read: true,
+                        update: false,
+                        delete: false,
+                    },
+                    targets: {
+                        create: false,
+                        read: true,
+                        update: false,
+                        delete: false,
+                    },
+                    comments: {
+                        create: true,
+                        read: true,
+                        update: true,
+                        delete: true,
+                    },
+                    attachments: {
+                        create: true,
+                        read: true,
+                        update: true,
+                        delete: true,
+                    },
                 };
 
-                if (!defaultAllowed[module] || !defaultAllowed[module][action]) {
-                    req.flash("error", "You don't have permission to perform this action.");
+                if (
+                    !defaultAllowed[module] ||
+                    !defaultAllowed[module][action]
+                ) {
+                    req.flash(
+                        "error",
+                        "You don't have permission to perform this action.",
+                    );
                     return res.redirect("back");
                 }
                 return next();
             }
 
-            // Check if user is enabled
-            if (!userPermissions.isEnabled) {
-                req.flash("error", "Your account has been disabled. Please contact an administrator.");
-                return res.redirect("/dashboard");
-            }
-
             // Check specific permission
             const permissionKey = `${module}${action.charAt(0).toUpperCase() + action.slice(1)}`;
             if (userPermissions[permissionKey] === false) {
-                req.flash("error", "You don't have permission to perform this action.");
+                req.flash(
+                    "error",
+                    "You don't have permission to perform this action.",
+                );
                 return res.redirect("back");
             }
 
@@ -138,7 +174,6 @@ const loadPermissions = async (req, res, next) => {
         // Admin and owner have all user-level permissions, but still bound by org-level
         if (role === "admin" || role === "owner") {
             res.locals.permissions = {
-                isEnabled: true,
                 projects: {
                     create: res.locals.orgPermissions.projectsEnabled,
                     read: res.locals.orgPermissions.projectsEnabled,
@@ -182,7 +217,7 @@ const loadPermissions = async (req, res, next) => {
         // Get user permissions
         const userPermissions = await sql`
             SELECT
-                "isEnabled",
+                
                 "projectsCreate", "projectsRead", "projectsUpdate", "projectsDelete",
                 "workCreate", "workRead", "workUpdate", "workDelete",
                 "milestonesCreate", "milestonesRead", "milestonesUpdate", "milestonesDelete",
@@ -198,48 +233,94 @@ const loadPermissions = async (req, res, next) => {
 
         if (userPermissions) {
             res.locals.permissions = {
-                isEnabled: userPermissions.isEnabled,
                 projects: {
-                    create: userPermissions.projectsCreate && res.locals.orgPermissions.projectsEnabled,
-                    read: userPermissions.projectsRead && res.locals.orgPermissions.projectsEnabled,
-                    update: userPermissions.projectsUpdate && res.locals.orgPermissions.projectsEnabled,
-                    delete: userPermissions.projectsDelete && res.locals.orgPermissions.projectsEnabled,
+                    create:
+                        userPermissions.projectsCreate &&
+                        res.locals.orgPermissions.projectsEnabled,
+                    read:
+                        userPermissions.projectsRead &&
+                        res.locals.orgPermissions.projectsEnabled,
+                    update:
+                        userPermissions.projectsUpdate &&
+                        res.locals.orgPermissions.projectsEnabled,
+                    delete:
+                        userPermissions.projectsDelete &&
+                        res.locals.orgPermissions.projectsEnabled,
                 },
                 work: {
-                    create: userPermissions.workCreate && res.locals.orgPermissions.workEnabled,
-                    read: userPermissions.workRead && res.locals.orgPermissions.workEnabled,
-                    update: userPermissions.workUpdate && res.locals.orgPermissions.workEnabled,
-                    delete: userPermissions.workDelete && res.locals.orgPermissions.workEnabled,
+                    create:
+                        userPermissions.workCreate &&
+                        res.locals.orgPermissions.workEnabled,
+                    read:
+                        userPermissions.workRead &&
+                        res.locals.orgPermissions.workEnabled,
+                    update:
+                        userPermissions.workUpdate &&
+                        res.locals.orgPermissions.workEnabled,
+                    delete:
+                        userPermissions.workDelete &&
+                        res.locals.orgPermissions.workEnabled,
                 },
                 milestones: {
-                    create: userPermissions.milestonesCreate && res.locals.orgPermissions.milestonesEnabled,
-                    read: userPermissions.milestonesRead && res.locals.orgPermissions.milestonesEnabled,
-                    update: userPermissions.milestonesUpdate && res.locals.orgPermissions.milestonesEnabled,
-                    delete: userPermissions.milestonesDelete && res.locals.orgPermissions.milestonesEnabled,
+                    create:
+                        userPermissions.milestonesCreate &&
+                        res.locals.orgPermissions.milestonesEnabled,
+                    read:
+                        userPermissions.milestonesRead &&
+                        res.locals.orgPermissions.milestonesEnabled,
+                    update:
+                        userPermissions.milestonesUpdate &&
+                        res.locals.orgPermissions.milestonesEnabled,
+                    delete:
+                        userPermissions.milestonesDelete &&
+                        res.locals.orgPermissions.milestonesEnabled,
                 },
                 targets: {
-                    create: userPermissions.targetsCreate && res.locals.orgPermissions.targetsEnabled,
-                    read: userPermissions.targetsRead && res.locals.orgPermissions.targetsEnabled,
-                    update: userPermissions.targetsUpdate && res.locals.orgPermissions.targetsEnabled,
-                    delete: userPermissions.targetsDelete && res.locals.orgPermissions.targetsEnabled,
+                    create:
+                        userPermissions.targetsCreate &&
+                        res.locals.orgPermissions.targetsEnabled,
+                    read:
+                        userPermissions.targetsRead &&
+                        res.locals.orgPermissions.targetsEnabled,
+                    update:
+                        userPermissions.targetsUpdate &&
+                        res.locals.orgPermissions.targetsEnabled,
+                    delete:
+                        userPermissions.targetsDelete &&
+                        res.locals.orgPermissions.targetsEnabled,
                 },
                 comments: {
-                    create: userPermissions.commentsCreate && res.locals.orgPermissions.commentsEnabled,
-                    read: userPermissions.commentsRead && res.locals.orgPermissions.commentsEnabled,
-                    update: userPermissions.commentsUpdate && res.locals.orgPermissions.commentsEnabled,
-                    delete: userPermissions.commentsDelete && res.locals.orgPermissions.commentsEnabled,
+                    create:
+                        userPermissions.commentsCreate &&
+                        res.locals.orgPermissions.commentsEnabled,
+                    read:
+                        userPermissions.commentsRead &&
+                        res.locals.orgPermissions.commentsEnabled,
+                    update:
+                        userPermissions.commentsUpdate &&
+                        res.locals.orgPermissions.commentsEnabled,
+                    delete:
+                        userPermissions.commentsDelete &&
+                        res.locals.orgPermissions.commentsEnabled,
                 },
                 attachments: {
-                    create: userPermissions.attachmentsCreate && res.locals.orgPermissions.attachmentsEnabled,
-                    read: userPermissions.attachmentsRead && res.locals.orgPermissions.attachmentsEnabled,
-                    update: userPermissions.attachmentsUpdate && res.locals.orgPermissions.attachmentsEnabled,
-                    delete: userPermissions.attachmentsDelete && res.locals.orgPermissions.attachmentsEnabled,
+                    create:
+                        userPermissions.attachmentsCreate &&
+                        res.locals.orgPermissions.attachmentsEnabled,
+                    read:
+                        userPermissions.attachmentsRead &&
+                        res.locals.orgPermissions.attachmentsEnabled,
+                    update:
+                        userPermissions.attachmentsUpdate &&
+                        res.locals.orgPermissions.attachmentsEnabled,
+                    delete:
+                        userPermissions.attachmentsDelete &&
+                        res.locals.orgPermissions.attachmentsEnabled,
                 },
             };
         } else {
             // Default permissions for normal users
             res.locals.permissions = {
-                isEnabled: true,
                 projects: {
                     create: res.locals.orgPermissions.projectsEnabled,
                     read: res.locals.orgPermissions.projectsEnabled,

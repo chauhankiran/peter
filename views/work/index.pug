@@ -40,8 +40,8 @@ block content
                                 td
                                     a(href=`/projects/${item.projectId}`) #{item.projectName}
                                 td
-                                    if item.assigneeFirstName
-                                        = item.assigneeFirstName + " " + item.assigneeLastName
+                                    if item.assigneeName
+                                        = item.assigneeName
                                     else
                                         span.gray Unassigned
                                 td= item.statusName

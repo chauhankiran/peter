@@ -10,8 +10,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email
                 FROM
                     users
@@ -35,18 +34,13 @@ module.exports = {
 
     updateProfile: async (req, res, next) => {
         const userId = req.session.userId;
-        const { firstName, lastName, email } = req.body;
+        const { name, email } = req.body;
 
         let validationFailed = false;
         let errors = [];
 
-        if (!firstName) {
-            errors.push("First name is required.");
-            validationFailed = true;
-        }
-
-        if (!lastName) {
-            errors.push("Last name is required.");
+        if (!name) {
+            errors.push("Name is required.");
             validationFailed = true;
         }
 
@@ -59,8 +53,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email
                 FROM
                     users
@@ -95,8 +88,7 @@ module.exports = {
 
             const viewUser = {
                 id: user.id,
-                firstName: firstName || "",
-                lastName: lastName || "",
+                name: name || "",
                 email: email || "",
             };
 
@@ -109,8 +101,7 @@ module.exports = {
                 UPDATE
                     users
                 SET
-                    "firstName" = ${firstName},
-                    "lastName" = ${lastName},
+                    name = ${name},
                     email = ${normalizedEmail},
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
@@ -118,14 +109,12 @@ module.exports = {
                     id = ${userId}
                 RETURNING
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email
             `.then(([x]) => x);
 
             req.session.email = updatedUser.email;
-            req.session.userName =
-                updatedUser.firstName + " " + updatedUser.lastName;
+            req.session.userName = updatedUser.name;
 
             req.flash("info", "Profile updated successfully.");
             return res.redirect("/settings");
@@ -135,8 +124,7 @@ module.exports = {
                 return res.render(views.settingsPath, {
                     user: {
                         id: userId,
-                        firstName: firstName || "",
-                        lastName: lastName || "",
+                        name: name || "",
                         email: email || "",
                     },
                 });
@@ -177,8 +165,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email,
                     "passwordHash"
                 FROM
@@ -206,8 +193,7 @@ module.exports = {
                 return res.render(views.settingsPath, {
                     user: {
                         id: user.id,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
+                        name: user.name,
                         email: user.email,
                     },
                 });

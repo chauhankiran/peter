@@ -16,6 +16,7 @@ block content
                     span.gray  / Edit
 
                 form(action=`/projects/${project.id}/targets/${target.id}?_method=put`, method="post") 
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     include ./form
 
                     .mb-4.pt-2
@@ -25,6 +26,7 @@ block content
                 hr.my-4
 
                 form(action=`/projects/${project.id}/targets/${target.id}?_method=delete`, method="post")
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     button.is-danger(type="submit") Delete target
 
             .col-8.mt-4

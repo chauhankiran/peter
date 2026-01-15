@@ -2,6 +2,7 @@ const sql = require("../db/sql");
 const { PER_PAGE, views } = require("../constants/app");
 const generatePaginationLinks = require("../helpers/generate-pagination-links");
 const cipher = require("../helpers/cipher");
+const projectsService = require("../services/projects-service");
 
 module.exports = {
     index: async (req, res, next) => {
@@ -15,52 +16,24 @@ module.exports = {
         const orderBy = req.query.orderBy || "id";
         const orderDir = req.query.orderDir || "DESC";
 
-        const whereClauses = [];
-
-        if (search) {
-            whereClauses.push(
-                sql`p.name iLIKE ${"%" + search + "%"}`,
-            );
-        }
-
-        const whereClause = whereClauses.flatMap((x, i) =>
-            i ? [sql`and`, x] : x,
-        );
+        
 
         try {
-            const projects = await sql`
-                SELECT
-                    p.id, 
-                    p.name, 
-                    p."dueDate", 
-                    p."createdAt",
-                    u."firstName",
-                    u."lastName"
-                FROM 
-                    projects p
-                JOIN
-                    "projectMembers" pm
-                ON 
-                    pm."projectId" = p.id AND 
-                    pm."userId" = ${userId}
-                LEFT JOIN
-                    users u
-                ON
-                    p."createdBy" = u.id
-                WHERE 
-                    ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
-                    p."orgId" = ${orgId} AND 
-                    p."status" = 'active'
-                ORDER BY
-                    ${sql(orderBy)}
-                    ${orderDir === "ASC" ? sql`ASC` : sql`DESC`}
-                LIMIT
-                    ${limit}
-                OFFSET
-                    ${skip}
-            `;
+            const projects = await projectsService.find({
+                search, 
+                limit, 
+                skip, 
+                orderBy, 
+                orderDir, 
+                orgId, 
+                userId
+            });
+            const { count } = await projectsService.count({
+                search,  
+                orgId, 
+                userId
+            });
 
-            const count = 9;
             const pages = Math.ceil(count / limit);
 
             const paginationLinks = generatePaginationLinks({
@@ -74,11 +47,13 @@ module.exports = {
             });
 
             return res.render(views.allProjectsPath, {
+                title: "Projects",
                 projects,
                 search,
                 paginationLinks,
                 orderBy,
                 orderDir,
+                count
             });
         } catch (err) {
             next(err);
@@ -147,7 +122,15 @@ module.exports = {
 
     updateManage: async (req, res, next) => {
         const id = req.params.id;
-        const { name, dueDate, description, status, completedDetails, milestonesEnabled, targetsEnabled } = req.body;
+        const {
+            name,
+            dueDate,
+            description,
+            status,
+            completedDetails,
+            milestonesEnabled,
+            targetsEnabled,
+        } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -213,7 +196,8 @@ module.exports = {
                 return res.render("projects/manage", { project });
             }
 
-            const effectiveCompletedDetails = status === "completed" ? completedDetails : null;
+            const effectiveCompletedDetails =
+                status === "completed" ? completedDetails : null;
 
             const updated = await sql`
                 UPDATE
@@ -222,7 +206,7 @@ module.exports = {
                     name = ${name},
                     "dueDate" = ${dueDate || null},
                     description = ${description || null},
-                    "status" = ${status || 'active'},
+                    "status" = ${status || "active"},
                     "completedDetails" = ${effectiveCompletedDetails},
                     "milestonesEnabled" = ${milestonesEnabled === "true"},
                     "targetsEnabled" = ${targetsEnabled === "true"},
@@ -247,12 +231,12 @@ module.exports = {
     },
 
     new: (req, res) => {
-        const project = {};
-        return res.render(views.newProjectPath, { project });
+        const project = {}; // Needed for form.pug to work.
+        return res.render(views.newProjectPath, { project, title: "New project" });
     },
 
     create: async (req, res, next) => {
-        const { name, dueDate, description } = req.body;
+        let { name, dueDate, description } = req.body;
 
         let validationFailed = false;
         let errors = [];
@@ -270,7 +254,8 @@ module.exports = {
                 dueDate,
                 description,
             };
-            return res.render(views.newProjectPath, { project });
+            res.render(views.newProjectPath, { project, title: "New project" });
+            return;
         }
 
         try {
@@ -288,8 +273,8 @@ module.exports = {
                         "createdBy"
                     ) VALUES (
                         ${name}, 
-                        ${dueDate}, 
-                        ${description},
+                        ${dueDate || null}, 
+                        ${description || null},
                         ${req.session.orgId}, 
                         ${req.session.userId}
                     ) returning id
@@ -347,10 +332,8 @@ module.exports = {
                     p."updatedAt",
                     p."milestonesEnabled",
                     p."targetsEnabled",
-                    u."firstName",
-                    u."lastName",
-                    uu."firstName" as "updatedByFirstName",
-                    uu."lastName" as "updatedByLastName"
+                    u.name,
+                    uu.name as "updatedByName"
                 FROM 
                     projects p
                 JOIN
@@ -381,8 +364,7 @@ module.exports = {
                 SELECT
                     pm."userId" as "userId",
                     pm.role as role,
-                    u."firstName" as "firstName",
-                    u."lastName" as "lastName",
+                    u.name as name,
                     u.email as email
                 FROM
                     "projectMembers" pm
@@ -395,24 +377,12 @@ module.exports = {
                 ON
                     u.id = pm."userId"
                 WHERE
-                    pm."projectId" = ${id} AND
-                    p."orgId" = ${req.session.orgId} AND
-                    p."status" IN ('active', 'archived', 'completed')
-                ORDER BY
-                    pm.role ASC,
-                    u."firstName" ASC,
-                    u."lastName" ASC
-            `;
-
-            const { count: workCount } = await sql`
-                SELECT
-                    count(*)
-                FROM
-                    "work" w
-                WHERE
                     w."orgId" = ${req.session.orgId} AND
                     w."projectId" = ${id} AND
                     w."isActive" = true
+                ORDER BY
+                    pm.role ASC,
+                    u.name ASC
             `.then(([x]) => x);
 
             const workItems = await sql`
@@ -423,8 +393,7 @@ module.exports = {
                     w."completedAt",
                     s.name as "statusName",
                     pr.name as "priorityName",
-                    u."firstName" as "assigneeFirstName",
-                    u."lastName" as "assigneeLastName"
+                    u.name as "assigneeName"
                 FROM
                     "work" w
                 JOIN
@@ -748,7 +717,10 @@ module.exports = {
                 `.then(([x]) => x);
 
                 if (existingMember) {
-                    req.flash("info", "User is already a member of this project.");
+                    req.flash(
+                        "info",
+                        "User is already a member of this project.",
+                    );
                     return res.redirect(`/projects/${id}`);
                 }
             }
@@ -801,7 +773,6 @@ module.exports = {
             console.log(url);
             req.flash("info", "Invite created successfully.");
             return res.redirect(`/projects/${id}`);
-
         } catch (err) {
             next(err);
         }

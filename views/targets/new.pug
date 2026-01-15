@@ -16,6 +16,7 @@ block content
                     span.gray  / New
 
                 form(action=`/projects/${project.id}/targets`, method="post") 
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     include ./form
 
                     .mb-4.pt-2

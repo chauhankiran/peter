@@ -9,23 +9,18 @@ module.exports = {
 
         res.render(views.registerPath, {
             inviteToken,
-            inviteEmail
+            inviteEmail,
         });
     },
 
     create: async (req, res, next) => {
-        const { firstName, lastName, email, password, confirmPassword, inviteToken } =
+        const { name, email, password, confirmPassword, inviteToken } =
             req.body;
 
         let validationFailed = false;
         let errors = [];
-        if (!firstName) {
-            errors.push("First name is required.");
-            validationFailed = true;
-        }
-
-        if (!lastName) {
-            errors.push("Last name is required.");
+        if (!name) {
+            errors.push("Name is required.");
             validationFailed = true;
         }
 
@@ -52,10 +47,9 @@ module.exports = {
         if (validationFailed) {
             res.locals.errors = errors;
             return res.render(views.registerPath, {
-                firstName,
-                lastName,
+                name,
                 email,
-                inviteToken
+                inviteToken,
             });
         }
 
@@ -83,10 +77,11 @@ module.exports = {
 
                     if (
                         !invite ||
-                        invite.status !== 'invited' ||
+                        invite.status !== "invited" ||
                         invite.acceptedAt ||
                         new Date(invite.expiresAt).getTime() < Date.now() ||
-                        String(invite.email).toLowerCase() !== String(email).toLowerCase()
+                        String(invite.email).toLowerCase() !==
+                            String(email).toLowerCase()
                     ) {
                         const err = {
                             code: 400,
@@ -97,16 +92,14 @@ module.exports = {
 
                     const user = await sql`
                         INSERT INTO users (
-                            "firstName",
-                            "lastName",
+                            name,
                             "email",
                             "passwordHash",
                             "isEmailVerified",
                             "verifiedAt",
                             "status"
                         ) VALUES (
-                            ${firstName},
-                            ${lastName},
+                            ${name},
                             ${email},
                             ${passwordHash},
                             true,
@@ -190,8 +183,7 @@ module.exports = {
                     const createdUser = await sql`
                         SELECT
                             id,
-                            "firstName",
-                            "lastName",
+                            name,
                             email
                         FROM
                             "users"
@@ -201,8 +193,7 @@ module.exports = {
 
                     req.session.userId = createdUser.id;
                     req.session.email = createdUser.email;
-                    req.session.userName =
-                        createdUser.firstName + " " + createdUser.lastName;
+                    req.session.userName = createdUser.name;
                     req.session.orgId = invite.orgId;
                     req.session.role = invite.role;
 
@@ -218,13 +209,11 @@ module.exports = {
 
             const user = await sql`
                 INSERT INTO users (
-                    "firstName",
-                    "lastName",
-                    "email",
+                    name,
+                    email,
                     "passwordHash"
                 ) VALUES (
-                    ${firstName},
-                    ${lastName},
+                    ${name},
                     ${email},
                     ${passwordHash}
                 ) returning id;
@@ -248,6 +237,11 @@ module.exports = {
 
             return res.render(views.checkEmailPath);
         } catch (err) {
+            if (err.code === "23505") {
+                res.locals.errors = ["Email is already in use."];
+                return res.render(views.registerPath);
+            }
+
             next(err);
         }
     },

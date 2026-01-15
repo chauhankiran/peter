@@ -11,16 +11,13 @@ block content
             
             form(action="/register", method="post") 
                 input(type="hidden", name="inviteToken", value=inviteToken)
-                input(type="hidden", name="email", value=inviteEmail)
+                input(type="hidden", name="inviteEmail", value=inviteEmail)
+                input(type="hidden", name="_csrf", value=csrfToken)
 
                 .mb-4
-                    label(for="firstName") First name
+                    label(for="name") Name
                         span.red *
-                    input(type="text", name="firstName", id="firstName", placeholder="Kai", value=firstName, autofocus=true)
-                .mb-4
-                    label(for="lastName") Last name
-                        span.red *
-                    input(type="text", name="lastName", id="lastName", placeholder="Doe", value=lastName)
+                    input(type="text", name="name", id="name", placeholder="Kai Doe", value=name, autofocus=true) 
                 .mb-4
                     label(for="email") Email
                         span.red *

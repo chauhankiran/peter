@@ -10,8 +10,8 @@
         .mb-4
             strong Assignee
             p
-                if work.assigneeFirstName
-                    = work.assigneeFirstName + " " + work.assigneeLastName
+                if work.assigneeName
+                    = work.assigneeName
                 else
                     span.gray Unassigned
 
@@ -27,7 +27,7 @@
             strong Due date
             p
                 if work.dueDate
-                    = new Date(work.dueDate).toISOString().slice(0, 10)
+                    = new Date(work.dueDate).toLocaleDateString('sv-SE')
                 else
                     span.gray N/A
 
@@ -37,13 +37,13 @@ hr
     .col-6
         .mb-4
             strong Reporter
-            p= work.reporterFirstName + " " + work.reporterLastName
+            p= work.reporterName
 
 .row
     .col-6
         .mb-4
             strong Created by
-            p= work.createdByFirstName + " " + work.createdByLastName
+            p= work.createdByName
     .col-6
         .mb-4
             strong Created at
@@ -53,8 +53,8 @@ hr
     .col-6
         .mb-4
             strong Updated by
-            if work.updatedByFirstName
-                p= work.updatedByFirstName + " " + work.updatedByLastName
+            if work.updatedByName
+                p= work.updatedByName
             else
                 p N/A
     .col-6

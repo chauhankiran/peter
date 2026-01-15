@@ -29,8 +29,7 @@ module.exports = {
             const users = await sql`
                 SELECT
                     u.id,
-                    u."firstName",
-                    u."lastName",
+                    u.name,
                     u.email,
                     u."status",
                     uo.role,
@@ -45,8 +44,7 @@ module.exports = {
                     uo."orgId" = ${orgId} AND
                     uo."isActive" = true
                 ORDER BY
-                    u."firstName" ASC,
-                    u."lastName" ASC
+                    u.name ASC
             `;
 
             const projects = await sql`
@@ -231,8 +229,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     u.id,
-                    u."firstName",
-                    u."lastName",
+                    u.name,
                     u.email,
                     uo.role
                 FROM
@@ -253,7 +250,6 @@ module.exports = {
 
             let userPermissions = await sql`
                 SELECT
-                    "isEnabled",
                     "projectsCreate", "projectsRead", "projectsUpdate", "projectsDelete",
                     "workCreate", "workRead", "workUpdate", "workDelete",
                     "milestonesCreate", "milestonesRead", "milestonesUpdate", "milestonesDelete",
@@ -269,9 +265,9 @@ module.exports = {
 
             // Default values based on role
             if (!userPermissions) {
-                const isAdminOrOwner = user.role === "admin" || user.role === "owner";
+                const isAdminOrOwner =
+                    user.role === "admin" || user.role === "owner";
                 userPermissions = {
-                    isEnabled: true,
                     projectsCreate: true,
                     projectsRead: true,
                     projectsUpdate: true,
@@ -299,7 +295,10 @@ module.exports = {
                 };
             }
 
-            return res.render("admin/user-permissions", { user, userPermissions });
+            return res.render("admin/user-permissions", {
+                user,
+                userPermissions,
+            });
         } catch (err) {
             next(err);
         }
@@ -310,13 +309,30 @@ module.exports = {
         const currentUserId = req.session.userId;
         const targetUserId = req.params.userId;
         const {
-            isEnabled,
-            projectsCreate, projectsRead, projectsUpdate, projectsDelete,
-            workCreate, workRead, workUpdate, workDelete,
-            milestonesCreate, milestonesRead, milestonesUpdate, milestonesDelete,
-            targetsCreate, targetsRead, targetsUpdate, targetsDelete,
-            commentsCreate, commentsRead, commentsUpdate, commentsDelete,
-            attachmentsCreate, attachmentsRead, attachmentsUpdate, attachmentsDelete,
+            projectsCreate,
+            projectsRead,
+            projectsUpdate,
+            projectsDelete,
+            workCreate,
+            workRead,
+            workUpdate,
+            workDelete,
+            milestonesCreate,
+            milestonesRead,
+            milestonesUpdate,
+            milestonesDelete,
+            targetsCreate,
+            targetsRead,
+            targetsUpdate,
+            targetsDelete,
+            commentsCreate,
+            commentsRead,
+            commentsUpdate,
+            commentsDelete,
+            attachmentsCreate,
+            attachmentsRead,
+            attachmentsUpdate,
+            attachmentsDelete,
         } = req.body;
 
         try {
@@ -330,7 +346,6 @@ module.exports = {
                 await sql`
                     UPDATE "userPermissions"
                     SET
-                        "isEnabled" = ${isEnabled === "true"},
                         "projectsCreate" = ${projectsCreate === "true"},
                         "projectsRead" = ${projectsRead === "true"},
                         "projectsUpdate" = ${projectsUpdate === "true"},
@@ -366,7 +381,7 @@ module.exports = {
                     INSERT INTO "userPermissions" (
                         "orgId",
                         "userId",
-                        "isEnabled",
+                        
                         "projectsCreate", "projectsRead", "projectsUpdate", "projectsDelete",
                         "workCreate", "workRead", "workUpdate", "workDelete",
                         "milestonesCreate", "milestonesRead", "milestonesUpdate", "milestonesDelete",
@@ -377,7 +392,7 @@ module.exports = {
                     ) VALUES (
                         ${orgId},
                         ${targetUserId},
-                        ${isEnabled === "true"},
+                        
                         ${projectsCreate === "true"}, ${projectsRead === "true"}, ${projectsUpdate === "true"}, ${projectsDelete === "true"},
                         ${workCreate === "true"}, ${workRead === "true"}, ${workUpdate === "true"}, ${workDelete === "true"},
                         ${milestonesCreate === "true"}, ${milestonesRead === "true"}, ${milestonesUpdate === "true"}, ${milestonesDelete === "true"},

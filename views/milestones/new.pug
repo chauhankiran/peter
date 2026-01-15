@@ -16,6 +16,7 @@ block content
                     span.gray  / New
 
                 form(action=`/projects/${project.id}/milestones`, method="post") 
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     include ./form
 
                     if targets && targets.length > 0

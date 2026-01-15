@@ -9,6 +9,7 @@ block content
             include ../includes/flash
 
             form(action=`/projects/${project.id}?_method=put`, method="post") 
+                input(type="hidden", name="_csrf", value=csrfToken)
                 include ./form
 
                 .mb-4.pt-2

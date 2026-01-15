@@ -35,8 +35,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email,
                     "passwordHash",
                     "status"
@@ -70,7 +69,7 @@ module.exports = {
             // All good.
             req.session.userId = user.id;
             req.session.email = user.email;
-            req.session.userName = user.firstName + " " + user.lastName;
+            req.session.userName = user.name;
 
             // Check if user is part of org or not.
             // If not then we need to show onboarding flow.

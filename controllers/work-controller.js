@@ -35,8 +35,7 @@ module.exports = {
                     pr.name as "priorityName",
                     p.id as "projectId",
                     p.name as "projectName",
-                    u."firstName" as "assigneeFirstName",
-                    u."lastName" as "assigneeLastName"
+                    u.name as "assigneeName"
                 FROM
                     "work" w
                 JOIN
@@ -277,8 +276,7 @@ module.exports = {
             const assignees = await sql`
                 SELECT
                     u.id,
-                    u."firstName",
-                    u."lastName",
+                    u.name,
                     u.email
                 FROM
                     "projectMembers" pm
@@ -289,8 +287,7 @@ module.exports = {
                 WHERE
                     pm."projectId" = ${projectId}
                 ORDER BY
-                    u."firstName" ASC,
-                    u."lastName" ASC
+                    u.name ASC
             `;
 
             return res.render("work/partials/assignee-select", {
@@ -335,8 +332,7 @@ module.exports = {
                 ? await sql`
                       SELECT
                           u.id,
-                          u."firstName",
-                          u."lastName",
+                          u.name,
                           u.email
                       FROM
                           "projectMembers" pm
@@ -347,14 +343,12 @@ module.exports = {
                       WHERE
                           pm."projectId" = ${selectedProjectId}
                       ORDER BY
-                          u."firstName" ASC,
-                          u."lastName" ASC
+                          u.name ASC
                   `
                 : await sql`
                       SELECT
                           u.id,
-                          u."firstName",
-                          u."lastName",
+                          u.name,
                           u.email
                       FROM
                           "userOrgs" uo
@@ -366,8 +360,7 @@ module.exports = {
                           uo."orgId" = ${req.session.orgId} AND
                           uo."isActive" = true
                       ORDER BY
-                          u."firstName" ASC,
-                          u."lastName" ASC
+                          u.name ASC
                   `;
 
             const statuses = selectedProjectId
@@ -503,8 +496,7 @@ module.exports = {
             const assignees = await sql`
                 SELECT
                     u.id,
-                    u."firstName",
-                    u."lastName",
+                    u.name,
                     u.email
                 FROM
                     "userOrgs" uo
@@ -516,8 +508,7 @@ module.exports = {
                     uo."orgId" = ${req.session.orgId} AND
                     uo."isActive" = true
                 ORDER BY
-                    u."firstName" ASC,
-                    u."lastName" ASC
+                    u.name ASC
             `;
 
             const work = {
@@ -718,14 +709,10 @@ module.exports = {
                     s.name as "statusName",
                     p.id as "projectId",
                     p.name as "projectName",
-                    au."firstName" as "assigneeFirstName",
-                    au."lastName" as "assigneeLastName",
-                    ru."firstName" as "reporterFirstName",
-                    ru."lastName" as "reporterLastName",
-                    cu."firstName" as "createdByFirstName",
-                    cu."lastName" as "createdByLastName",
-                    uu."firstName" as "updatedByFirstName",
-                    uu."lastName" as "updatedByLastName",
+                    au.name as "assigneeName",
+                    ru.name as "reporterName",
+                    cu.name as "createdByName",
+                    uu.name as "updatedByName",
                     w."createdAt",
                     w."updatedAt"
                 FROM
@@ -785,8 +772,7 @@ module.exports = {
                     c."userId",
                     c."createdAt",
                     c."updatedAt",
-                    u."firstName",
-                    u."lastName"
+                    u.name
                 FROM
                     "comments" c
                 JOIN
@@ -809,8 +795,7 @@ module.exports = {
                     a."mimeType",
                     a."userId",
                     a."createdAt",
-                    u."firstName",
-                    u."lastName"
+                    u.name
                 FROM
                     "attachments" a
                 JOIN
@@ -897,8 +882,7 @@ module.exports = {
             const assignees = await sql`
                 SELECT
                     u.id,
-                    u."firstName",
-                    u."lastName",
+                    u.name,
                     u.email
                 FROM
                     "projectMembers" pm
@@ -909,8 +893,7 @@ module.exports = {
                 WHERE
                     pm."projectId" = ${workRow.projectId}
                 ORDER BY
-                    u."firstName" ASC,
-                    u."lastName" ASC
+                    u.name ASC
             `;
 
             const priorityReverseMap = {
@@ -1070,8 +1053,7 @@ module.exports = {
             const assignees = await sql`
                 SELECT
                     u.id,
-                    u."firstName",
-                    u."lastName",
+                    u.name,
                     u.email
                 FROM
                     "projectMembers" pm
@@ -1082,8 +1064,7 @@ module.exports = {
                 WHERE
                     pm."projectId" = ${existingWork.projectId}
                 ORDER BY
-                    u."firstName" ASC,
-                    u."lastName" ASC
+                    u.name ASC
             `;
 
             const statuses = await sql`

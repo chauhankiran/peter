@@ -10,15 +10,11 @@ block content
 
             h3.mb-2 Profile
             form(action="/settings/profile", method="post")
+                input(type="hidden", name="_csrf", value=csrfToken)
                 .mb-4
-                    label(for="firstName") First name
+                    label(for="name") Name
                         span.red *
-                    input(type="text", name="firstName", id="firstName", value=user.firstName)
-
-                .mb-4
-                    label(for="lastName") Last name
-                        span.red *
-                    input(type="text", name="lastName", id="lastName", value=user.lastName)
+                    input(type="text", name="name", id="name", value=user.name)
 
                 .mb-4
                     label(for="email") Email
@@ -30,8 +26,11 @@ block content
 
             hr
 
+            hr
+
             h3.mb-2 Change password
             form(action="/settings/password", method="post")
+                input(type="hidden", name="_csrf", value=csrfToken)
                 .mb-4
                     label(for="currentPassword") Current password
                         span.red *

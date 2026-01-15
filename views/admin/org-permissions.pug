@@ -16,6 +16,7 @@ block content
                 p.gray.mb-4 Enable or disable modules for the entire organization. When a module is disabled, no users in the organization can access it.
 
                 form(action="/admin/permissions?_method=put", method="post")
+                    input(type="hidden", name="_csrf", value=csrfToken)
                     h3.mb-3 Modules
 
                     .mb-3

@@ -49,8 +49,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email,
                     status
                 FROM
@@ -153,7 +152,7 @@ module.exports = {
 
             req.session.userId = user.id;
             req.session.email = user.email;
-            req.session.userName = user.firstName + " " + user.lastName;
+            req.session.userName = user.name;
             req.session.orgId = invite.orgId;
 
             if (invite.projectId) {

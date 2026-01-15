@@ -33,7 +33,7 @@ block content
                                 if milestone.dueDate
                                     .mb-3
                                         strong Due date
-                                        p= new Date(milestone.dueDate).toISOString().slice(0, 10)
+                                        p= new Date(milestone.dueDate).toLocaleDateString('sv-SE')
                                 else
                                     .mb-3
                                         strong Due date

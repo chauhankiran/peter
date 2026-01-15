@@ -81,8 +81,7 @@ module.exports = {
             const user = await sql`
                 SELECT
                     id,
-                    "firstName",
-                    "lastName",
+                    name,
                     email,
                     "passwordHash",
                     "status"
@@ -94,7 +93,7 @@ module.exports = {
 
             req.session.userId = user.id;
             req.session.email = user.email;
-            req.session.userName = user.firstName + " " + user.lastName;
+            req.session.userName = user.name;
 
             return res.render(views.verifyEmailPath);
         } catch (err) {

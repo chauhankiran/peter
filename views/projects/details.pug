@@ -6,7 +6,7 @@
     strong Due date
     - const now = new Date()
     - const isDue = project.dueDate && new Date(project.dueDate) <= now
-    p(class=isDue ? "red" : "")= project.dueDate || 'N/A'
+    p(class=isDue ? "red" : "")= project.dueDate ? new Date(project.dueDate).toLocaleDateString('sv-SE') : 'N/A'
 
 .mb-4 
     strong Description
@@ -18,7 +18,7 @@ hr
     .col-6
         .mb-4
             strong Created by
-            p= project.firstName + " " + project.lastName
+            p= project.createdByName
     .col-6
         .mb-4
             strong Created at
@@ -28,8 +28,8 @@ hr
     .col-6
         .mb-4
             strong Updated by
-            if project.updatedByFirstName
-                p= project.updatedByFirstName + " " + project.updatedByLastName
+            if project.updatedByName
+                p= project.updatedByName
             else
                 p N/A
     .col-6

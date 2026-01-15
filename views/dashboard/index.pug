@@ -8,7 +8,7 @@ block content
                 h1 Dashboard 
                 p.gray Welcome #{userName} @ #{now ? now.toLocaleString() : ''}!
 
-            h3.mb-2 Your projects
+            h3 Your projects
             if projects && projects.length
                 table.mb-4
                     thead
@@ -20,15 +20,13 @@ block content
                             tr
                                 td
                                     a(href=`/projects/${p.id}`)= p.name
-                                td
-                                    if p.dueDate
-                                        = new Date(p.dueDate).toISOString().slice(0, 10)
-                                    else
-                                        span.gray -
+                                td= p.dueDate || 'N/A'
             else
-                p.gray You are not a member of any projects.
+                p.gray.italic You are not a member of any projects.
 
-            h3.mb-2 Assigned to you
+            hr
+
+            h3 Assigned to you
             if assignedWork && assignedWork.length
                 table.mb-0
                     thead
@@ -50,11 +48,7 @@ block content
                                     a(href=`/projects/${w.projectId}`)= w.projectName
                                 td= w.statusName
                                 td= w.priorityName
-                                td
-                                    if w.dueDate
-                                        = new Date(w.dueDate).toISOString().slice(0, 10)
-                                    else
-                                        span.gray -
+                                td= w.dueDate || 'N/A'
             else
-                p.gray No issues assigned to you.
+                p.gray.italic No issues assigned to you.
         .col-10.mt-4 

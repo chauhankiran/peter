@@ -10,6 +10,7 @@ block content
             include ../includes/flash
 
             form(action="/onboarding", method="post") 
+                input(type="hidden", name="_csrf", value=csrfToken)
                 .mb-4
                     label(for="name") Org name
                         span.red *

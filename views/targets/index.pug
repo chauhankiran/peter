@@ -27,7 +27,7 @@ block content
                                         if target.description
                                             p.gray= target.description
                                         if target.dueDate
-                                            p.small.gray Due: #{new Date(target.dueDate).toISOString().slice(0, 10)}
+                                            p.small.gray Due: #{new Date(target.dueDate).toLocaleDateString('sv-SE')}
                                     div.text-end
                                         .mb-2
                                             strong #{target.progress}%

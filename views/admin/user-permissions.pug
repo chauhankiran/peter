@@ -12,29 +12,20 @@ block content
                 p.mb-4
                     a(href="/admin") Admin
                     span.gray  / 
-                    span= user.firstName + " " + user.lastName
+                    span= user.name
                     span.gray  / Permissions
 
                 .card.mb-4
                     .card-body
                         p
                             strong User: 
-                            span= user.firstName + " " + user.lastName
+                            span= user.name
                         p
                             strong Email: 
                             span= user.email
                         p
                             strong Role: 
                             span= user.role
-
-                form(action=`/admin/users/${user.id}/permissions?_method=put`, method="post")
-                    h3.mb-3 Account Status
-
-                    .mb-4
-                        label
-                            input(type="checkbox", name="isEnabled", value="true", checked=userPermissions.isEnabled)
-                            span.ml-2 User Enabled
-                        p.gray.small When disabled, user cannot access any features
 
                     hr.my-4
 

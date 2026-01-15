@@ -27,7 +27,7 @@ block content
                                         if milestone.description
                                             p.gray= milestone.description
                                         if milestone.dueDate
-                                            p.small.gray Due: #{new Date(milestone.dueDate).toISOString().slice(0, 10)}
+                                            p.small.gray Due: #{new Date(milestone.dueDate).toLocaleDateString('sv-SE')}
                                     div.text-end
                                         .mb-2
                                             strong #{milestone.progress}%
