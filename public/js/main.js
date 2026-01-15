@@ -145,6 +145,12 @@ if (projectSelect && !projectSelect.disabled) {
     const priorityPartialTarget = projectSelect.getAttribute(
         "data-priority-partial-target",
     );
+    const milestonePartialUrl = projectSelect.getAttribute(
+        "data-milestone-partial-url",
+    );
+    const milestonePartialTarget = projectSelect.getAttribute(
+        "data-milestone-partial-target",
+    );
 
     if (partialUrl && partialTarget) {
         projectSelect.addEventListener("change", async function () {
@@ -208,6 +214,28 @@ if (projectSelect && !projectSelect.disabled) {
                     headers: { "X-Requested-With": "XMLHttpRequest" },
                 });
                 priorityTarget.innerHTML = await res.text();
+            }
+
+            if (milestonePartialUrl && milestonePartialTarget) {
+                const milestoneTarget = document.querySelector(
+                    milestonePartialTarget,
+                );
+                if (!milestoneTarget) return;
+
+                const url = new URL(milestonePartialUrl, window.location.origin);
+                if (projectId) {
+                    url.searchParams.set("projectId", projectId);
+                }
+
+                const currentMilestone = document.getElementById("milestoneId");
+                if (currentMilestone && currentMilestone.value) {
+                    url.searchParams.set("milestoneId", currentMilestone.value);
+                }
+
+                const res = await fetch(url.toString(), {
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                });
+                milestoneTarget.innerHTML = await res.text();
             }
         });
     }

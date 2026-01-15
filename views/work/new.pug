@@ -28,7 +28,7 @@ block content
                                         else
                                             option(value=project.id)= project.name
                             else
-                                select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container", data-status-partial-url="/work/partial/statuses", data-status-partial-target="#status-container", data-priority-partial-url="/work/partial/priorities", data-priority-partial-target="#priority-container")
+                                select(name="projectId", id="projectId", data-partial-url="/work/partial/assignees", data-partial-target="#assignee-container", data-status-partial-url="/work/partial/statuses", data-status-partial-target="#status-container", data-priority-partial-url="/work/partial/priorities", data-priority-partial-target="#priority-container", data-milestone-partial-url="/work/partial/milestones", data-milestone-partial-target="#milestone-container")
                                     option(value="") Select a project
                                     each project in projects
                                         if String(project.id) === String(work.projectId)

@@ -1229,4 +1229,62 @@ module.exports = {
             next(err);
         }
     },
+
+    partialMilestones: async (req, res, next) => {
+        const projectId = req.query.projectId;
+        const selectedMilestoneId = req.query.milestoneId || "";
+
+        if (!projectId) {
+            return res.render("work/partials/milestone-select", {
+                milestones: [],
+                selectedMilestoneId,
+            });
+        }
+
+        try {
+            const projectAccess = await sql`
+                SELECT
+                    p.id
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${projectId} AND
+                    p."orgId" = ${req.session.orgId} AND
+                    p."status" = 'active'
+            `.then(([x]) => x);
+
+            if (!projectAccess) {
+                return res.render("work/partials/milestone-select", {
+                    milestones: [],
+                    selectedMilestoneId,
+                });
+            }
+
+            const milestones = await sql`
+                SELECT
+                    m.id,
+                    m.name,
+                    m."dueDate"
+                FROM
+                    milestones m
+                WHERE
+                    m."orgId" = ${req.session.orgId} AND
+                    m."projectId" = ${projectId}
+                ORDER BY
+                    m."dueDate" ASC
+            `;
+
+            return res.render("work/partials/milestone-select", {
+                milestones,
+                selectedMilestoneId,
+            });
+        } catch (err) {
+            next(err);
+        }
+    },
 };
