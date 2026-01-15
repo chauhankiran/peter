@@ -62,7 +62,7 @@ module.exports = {
                 WHERE
                     m."projectId" = ${projectId} AND
                     m."orgId" = ${orgId} AND
-                    m."isActive" = true
+                    m."status" = 'active'
                 ORDER BY
                     m."dueDate" ASC NULLS LAST,
                     m.name ASC
@@ -128,7 +128,7 @@ module.exports = {
                       WHERE
                           t."orgId" = ${orgId} AND
                           t."projectId" = ${projectId} AND
-                          t."isActive" = true
+                          t."status" = 'active'
                       ORDER BY
                           t.name ASC
                   `
@@ -289,7 +289,7 @@ module.exports = {
                     m.id = ${milestoneId} AND
                     m."projectId" = ${projectId} AND
                     m."orgId" = ${orgId} AND
-                    m."isActive" = true
+                    m."status" = 'active'
             `.then(([x]) => x);
 
             if (!milestone) {
@@ -381,7 +381,7 @@ module.exports = {
                     m.id = ${milestoneId} AND
                     m."projectId" = ${projectId} AND
                     m."orgId" = ${orgId} AND
-                    m."isActive" = true
+                    m."status" = 'active'
             `.then(([x]) => x);
 
             if (!milestoneRow) {
@@ -399,7 +399,7 @@ module.exports = {
                       WHERE
                           t."orgId" = ${orgId} AND
                           t."projectId" = ${projectId} AND
-                          t."isActive" = true
+                          t."status" = 'active'
                       ORDER BY
                           t.name ASC
                   `
@@ -487,7 +487,7 @@ module.exports = {
                     id = ${milestoneId} AND
                     "projectId" = ${projectId} AND
                     "orgId" = ${orgId} AND
-                    "isActive" = true
+                    "status" = 'active'
                 RETURNING id
             `.then(([x]) => x);
 
@@ -547,7 +547,7 @@ module.exports = {
             await sql`
                 UPDATE milestones
                 SET
-                    "isActive" = false,
+                    "status" = 'archived',
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
                 WHERE

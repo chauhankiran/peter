@@ -16,9 +16,9 @@ block content
                 .mb-4
                     label(for="status") Status
                     select(name="status", id="projectStatus", data-current=project.status)
-                        option(value="active", selected=project.status === 'active') active
-                        option(value="archived", selected=project.status === 'archived') archived
-                        option(value="completed", selected=project.status === 'completed') completed
+                        option(value="active", selected=project.status === 'active') Active
+                        option(value="archived", selected=project.status === 'archived') Archived
+                        option(value="completed", selected=project.status === 'completed') Completed
 
                 .mb-4
                     label

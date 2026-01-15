@@ -376,7 +376,7 @@ module.exports = {
                           s."orgId" = ${req.session.orgId} AND
                           s."projectId" = ${selectedProjectId}
                       ORDER BY
-                          s.sequence DESC
+                          s.sequence ASC
                   `
                 : [];
 
@@ -394,7 +394,7 @@ module.exports = {
                           pr."orgId" = ${req.session.orgId} AND
                           pr."projectId" = ${selectedProjectId}
                       ORDER BY
-                          pr.sequence DESC
+                          pr.sequence ASC
                   `
                 : [];
 
@@ -416,7 +416,7 @@ module.exports = {
                       WHERE
                           m."orgId" = ${req.session.orgId} AND
                           m."projectId" = ${selectedProjectId} AND
-                          m."isActive" = true AND
+                          m."status" = 'active' AND
                           p."milestonesEnabled" = true
                       ORDER BY
                           m.name ASC
@@ -534,7 +534,7 @@ module.exports = {
                           s."orgId" = ${req.session.orgId} AND
                           s."projectId" = ${projectId}
                       ORDER BY
-                          s.sequence DESC
+                          s.sequence ASC
                   `
                 : [];
 
@@ -555,7 +555,7 @@ module.exports = {
                           pr."orgId" = ${req.session.orgId} AND
                           pr."projectId" = ${projectId}
                       ORDER BY
-                          pr.sequence DESC
+                          pr.sequence ASC
                   `
                 : [];
 
@@ -658,7 +658,6 @@ module.exports = {
                     "projectId",
                     title,
                     description,
-                    "typeId",
                     "priorityId",
                     "milestoneId",
                     "targetId",
@@ -672,7 +671,6 @@ module.exports = {
                     ${projectId},
                     ${title},
                     ${description || ""},
-                    1,
                     ${effectivePriorityId},
                     ${milestoneId || 0},
                     1,

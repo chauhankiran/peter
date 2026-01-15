@@ -10,7 +10,7 @@
 
 .mb-4 
     strong Description
-    p.italic= project.description || 'N/A'
+    p.italic= project.description || "N/A"
 
 hr
 
@@ -18,21 +18,18 @@ hr
     .col-6
         .mb-4
             strong Created by
-            p= project.createdByName
+            p= project.createdByName || "N/A"
     .col-6
         .mb-4
             strong Created at
-            p= project.createdAt
+            p= project.createdAt || "N/A"
 
 .row
     .col-6
         .mb-4
             strong Updated by
-            if project.updatedByName
-                p= project.updatedByName
-            else
-                p N/A
+            p= project.updatedByName || "N/A"
     .col-6
         .mb-4
             strong Updated at
-            p= project.updatedAt
+            p= project.updatedAt || "N/A"
