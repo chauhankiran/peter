@@ -1,4 +1,4 @@
-CREATE TABLE "emailVerificationTokens" (
+CREATE TABLE "passwordResetTokens" (
     id BIGSERIAL PRIMARY KEY,
 
     "userId" BIGINT NOT NULL,

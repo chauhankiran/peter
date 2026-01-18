@@ -1,3 +1,5 @@
+@import url("../fonts/fonts.css");
+
 *,
 *::before,
 *::after {
@@ -13,7 +15,7 @@ body {
 body {
     background-color: #fff;
     color: #222;
-    font-family: "DejaVu Serif", serif;
+    font-family: "DejaVuSerifCondensed", "DejaVu Serif", serif;
     font-size: 1rem;
     line-height: 1.42;
 }
@@ -634,10 +636,10 @@ input[type="file"] {
  * ============================================================================
  */
 .flash-info {
-    color: green;
+    color: darkgreen;
 }
 .flash-error {
-    color: red;
+    color: darkred;
 }
 
 /*

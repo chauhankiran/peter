@@ -17,40 +17,20 @@ module.exports = {
         const { name, email, password, confirmPassword, inviteToken } =
             req.body;
 
-        let validationFailed = false;
-        let errors = [];
-        if (!name) {
-            errors.push("Name is required.");
-            validationFailed = true;
-        }
-
-        if (!email) {
-            errors.push("Email is required.");
-            validationFailed = true;
-        }
-
-        if (!password) {
-            errors.push("Password is required.");
-            validationFailed = true;
+        // Validations.
+        if (!name || !email || !password || !confirmPassword) {
+            req.flash("error", "All fields are required.");
+            return res.redirect("/register");
         }
 
         if (password.length < 8) {
-            errors.push("Password must be at least 8 characters long.");
-            validationFailed = true;
+            req.flash("error", "Password must be at least 8 characters long.");
+            return res.redirect("/register");
         }
 
         if (password != confirmPassword) {
-            errors.push("Entered password doesn't match");
-            validationFailed = true;
-        }
-
-        if (validationFailed) {
-            res.locals.errors = errors;
-            return res.render(views.registerPath, {
-                name,
-                email,
-                inviteToken,
-            });
+            req.flash("error", "Entered password doesn't match");
+            return res.redirect("/register");
         }
 
         const passwordHash = cipher.hash(password);
@@ -238,8 +218,8 @@ module.exports = {
             return res.render(views.checkEmailPath);
         } catch (err) {
             if (err.code === "23505") {
-                res.locals.errors = ["Email is already in use."];
-                return res.render(views.registerPath);
+                req.flash("error", "Email is already in use.");
+                return res.redirect("/register");
             }
 
             next(err);

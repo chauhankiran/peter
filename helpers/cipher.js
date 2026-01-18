@@ -11,4 +11,7 @@ module.exports = {
     token: (size = 32) => {
         return crypto.randomBytes(size).toString("hex");
     },
+    sha: (data) => {
+        return crypto.createHash("sha256").update(data).digest("hex");
+    },
 };

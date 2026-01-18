@@ -1,25 +1,25 @@
 extend ../layout
 
 block content 
-    .row
-        .col-1.mt-4  
-        .col-3.mt-4 
-            h1.mb-4 Login 
+    .row.mt-4
+        .col-1
+        .col-3
+            .mb-4
+                h1 Login 
+                p.gray.italic * = required fields.
 
-            include ../includes/flash
+            .mb-4 
+                include ../includes/flash
 
             form(action="/login", method="post") 
-                input(type="hidden", name="_csrf", value=csrfToken)
                 .mb-4
-                    label(for="email") Email
-                        span.red *
+                    label(for="email") Email*
                     input(type="text", name="email", id="email", placeholder="kai@doe.com", autofocus=true)
     
                 .mb-4
-                    label(for="password") Password
-                        span.red *
+                    label(for="password") Password*
                     input(type="password", id="password", name="password", placeholder="******")
     
-                .mb-4.pt-2
+                .mb-4
                     button(type="submit") Login
-        .col-8.mt-4
+        .col-8

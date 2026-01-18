@@ -10,24 +10,10 @@ module.exports = {
     session: async (req, res, next) => {
         const { email, password } = req.body;
 
-        let validationFailed = false;
-        let errors = [];
-
-        if (!email) {
-            errors.push("Email is required.");
-            validationFailed = true;
-        }
-
-        if (!password) {
-            errors.push("Password is required.");
-            validationFailed = true;
-        }
-
-        if (validationFailed) {
-            res.locals.errors = errors;
-            return res.render(views.loginPath, {
-                email,
-            });
+        // Validations.
+        if (!email || !password) {
+            req.flash("error", "Email and Password are required.");
+            return res.redirect("/login");
         }
 
         try {
