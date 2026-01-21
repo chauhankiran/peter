@@ -2,7 +2,7 @@ const sql = require("../db/sql");
 
 module.exports = {
     index: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
 
         try {
             const org = await sql`
@@ -73,7 +73,7 @@ module.exports = {
     },
 
     updateOrg: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const { name } = req.body;
 
@@ -121,7 +121,7 @@ module.exports = {
 
     // Org Permissions
     orgPermissions: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
 
         try {
             let orgPermissions = await sql`
@@ -157,7 +157,7 @@ module.exports = {
     },
 
     updateOrgPermissions: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const {
             projectsEnabled,
@@ -222,7 +222,7 @@ module.exports = {
 
     // User Permissions
     userPermissions: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const targetUserId = req.params.userId;
 
         try {
@@ -305,7 +305,7 @@ module.exports = {
     },
 
     updateUserPermissions: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const currentUserId = req.session.userId;
         const targetUserId = req.params.userId;
         const {

@@ -4,14 +4,13 @@ block content
     .row.mt-4
         .col-1
         .col-3
-            .mb-4
-                h1 Register 
-                p.gray.italic * = required fields.
+            h1 Register 
+            p.gray.italic * = required fields.
 
-            .mb-4
+            .mt-4
                 include ../includes/flash
             
-            form(action="/register", method="post") 
+            form(action="/register", method="post", class="mt-4") 
                 input(type="hidden", name="inviteToken", value=inviteToken)
                 input(type="hidden", name="inviteEmail", value=inviteEmail)
 
@@ -33,4 +32,7 @@ block content
     
                 .mb-4
                     button(type="submit") Register
+
+                p Already have an account? 
+                    a(href="/login") Login.
         .col-8

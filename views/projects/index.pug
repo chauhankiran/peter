@@ -9,8 +9,7 @@ block content
                 .col-8 
                     h1 Projects (#{count})
                 .col-4.text-end 
-                    if permissions && permissions.projects && permissions.projects.create
-                        a(href=`/projects/new`).btn New project
+                    a(href=`/projects/new`).btn New project
 
             include ../includes/flash
 

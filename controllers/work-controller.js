@@ -4,7 +4,7 @@ const generatePaginationLinks = require("../helpers/generate-pagination-links");
 
 module.exports = {
     index: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
 
         const search = req.query.search || null;
@@ -145,7 +145,7 @@ module.exports = {
                     pm."userId" = ${req.session.userId}
                 WHERE
                     p.id = ${projectId} AND
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -164,7 +164,7 @@ module.exports = {
                 FROM
                     "priorities" pr
                 WHERE
-                    pr."orgId" = ${req.session.orgId} AND
+                    pr."orgId" = ${req.session.userOrgId} AND
                     pr."projectId" = ${projectId}
                 ORDER BY
                     pr.sequence DESC
@@ -203,7 +203,7 @@ module.exports = {
                     pm."userId" = ${req.session.userId}
                 WHERE
                     p.id = ${projectId} AND
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -223,7 +223,7 @@ module.exports = {
                 FROM
                     "statuses" s
                 WHERE
-                    s."orgId" = ${req.session.orgId} AND
+                    s."orgId" = ${req.session.userOrgId} AND
                     s."projectId" = ${projectId}
                 ORDER BY
                     s.sequence DESC
@@ -262,7 +262,7 @@ module.exports = {
                     pm."userId" = ${req.session.userId}
                 WHERE
                     p.id = ${projectId} AND
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -315,7 +315,7 @@ module.exports = {
                     pm."projectId" = p.id AND
                     pm."userId" = ${req.session.userId}
                 WHERE
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
                 ORDER BY
                     p.name ASC
@@ -357,7 +357,7 @@ module.exports = {
                       ON
                           u.id = uo."userId"
                       WHERE
-                          uo."orgId" = ${req.session.orgId} AND
+                          uo."orgId" = ${req.session.userOrgId} AND
                           uo."isActive" = true
                       ORDER BY
                           u.name ASC
@@ -373,7 +373,7 @@ module.exports = {
                       FROM
                           "statuses" s
                       WHERE
-                          s."orgId" = ${req.session.orgId} AND
+                          s."orgId" = ${req.session.userOrgId} AND
                           s."projectId" = ${selectedProjectId}
                       ORDER BY
                           s.sequence ASC
@@ -391,7 +391,7 @@ module.exports = {
                       FROM
                           "priorities" pr
                       WHERE
-                          pr."orgId" = ${req.session.orgId} AND
+                          pr."orgId" = ${req.session.userOrgId} AND
                           pr."projectId" = ${selectedProjectId}
                       ORDER BY
                           pr.sequence ASC
@@ -414,7 +414,7 @@ module.exports = {
                       ON
                           p.id = m."projectId"
                       WHERE
-                          m."orgId" = ${req.session.orgId} AND
+                          m."orgId" = ${req.session.userOrgId} AND
                           m."projectId" = ${selectedProjectId} AND
                           m."status" = 'active' AND
                           p."milestonesEnabled" = true
@@ -487,7 +487,7 @@ module.exports = {
                     pm."projectId" = p.id AND
                     pm."userId" = ${req.session.userId}
                 WHERE
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
                 ORDER BY
                     p.name ASC
@@ -505,7 +505,7 @@ module.exports = {
                 ON
                     u.id = uo."userId"
                 WHERE
-                    uo."orgId" = ${req.session.orgId} AND
+                    uo."orgId" = ${req.session.userOrgId} AND
                     uo."isActive" = true
                 ORDER BY
                     u.name ASC
@@ -531,7 +531,7 @@ module.exports = {
                       FROM
                           "statuses" s
                       WHERE
-                          s."orgId" = ${req.session.orgId} AND
+                          s."orgId" = ${req.session.userOrgId} AND
                           s."projectId" = ${projectId}
                       ORDER BY
                           s.sequence ASC
@@ -552,7 +552,7 @@ module.exports = {
                       FROM
                           "priorities" pr
                       WHERE
-                          pr."orgId" = ${req.session.orgId} AND
+                          pr."orgId" = ${req.session.userOrgId} AND
                           pr."projectId" = ${projectId}
                       ORDER BY
                           pr.sequence ASC
@@ -588,7 +588,7 @@ module.exports = {
                     pm."userId" = ${req.session.userId}
                 WHERE
                     p.id = ${projectId} AND
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -611,7 +611,7 @@ module.exports = {
                     "statuses" s
                 WHERE
                     s.id = ${effectiveStatusId} AND
-                    s."orgId" = ${req.session.orgId} AND
+                    s."orgId" = ${req.session.userOrgId} AND
                     s."projectId" = ${projectId}
             `.then(([x]) => x);
 
@@ -634,7 +634,7 @@ module.exports = {
                     "priorities" pr
                 WHERE
                     pr.id = ${effectivePriorityId} AND
-                    pr."orgId" = ${req.session.orgId} AND
+                    pr."orgId" = ${req.session.userOrgId} AND
                     pr."projectId" = ${projectId}
             `.then(([x]) => x);
 
@@ -667,7 +667,7 @@ module.exports = {
                     "dueDate",
                     "createdBy"
                 ) VALUES (
-                    ${req.session.orgId},
+                    ${req.session.userOrgId},
                     ${projectId},
                     ${title},
                     ${description || ""},
@@ -690,7 +690,7 @@ module.exports = {
     },
 
     show: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const workId = req.params.id;
 
@@ -815,7 +815,7 @@ module.exports = {
     },
 
     edit: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const workId = req.params.id;
 
@@ -975,7 +975,7 @@ module.exports = {
     },
 
     update: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const workId = req.params.id;
 
@@ -1177,7 +1177,7 @@ module.exports = {
     },
 
     destroy: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const workId = req.params.id;
 
@@ -1254,7 +1254,7 @@ module.exports = {
                     pm."userId" = ${req.session.userId}
                 WHERE
                     p.id = ${projectId} AND
-                    p."orgId" = ${req.session.orgId} AND
+                    p."orgId" = ${req.session.userOrgId} AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -1273,7 +1273,7 @@ module.exports = {
                 FROM
                     milestones m
                 WHERE
-                    m."orgId" = ${req.session.orgId} AND
+                    m."orgId" = ${req.session.userOrgId} AND
                     m."projectId" = ${projectId}
                 ORDER BY
                     m."dueDate" ASC

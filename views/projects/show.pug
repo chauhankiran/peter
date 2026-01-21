@@ -13,23 +13,20 @@ block content
             include ./details
             
 
-            if project.milestonesEnabled && permissions && permissions.milestones && permissions.milestones.read
-                .mb-4
-                    a(href=`/projects/${project.id}/milestones`) View milestones
+            .mb-4
+                a(href=`/projects/${project.id}/milestones`) View milestones
 
-            if project.targetsEnabled && permissions && permissions.targets && permissions.targets.read
-                .mb-4
-                    a(href=`/projects/${project.id}/targets`) View targets
+
+            .mb-4
+                a(href=`/projects/${project.id}/targets`) View targets
 
             .mb-4.pt-2
                 a(href="/projects").btn.is-muted.mr-2 &larr; Back
-                if permissions && permissions.projects && permissions.projects.update
-                    a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project
+                a(href=`/projects/${project.id}/manage`).btn.mr-4 Manage project
         .col-4.mt-4
             .mb-4 
                 .d-block.mb-4
                     strong Work (#{workCount})
-                    if permissions && permissions.work && permissions.work.create
                         |  &middot; 
                         a(href=`/work/new?projectId=${project.id}`) New work
 
@@ -57,29 +54,8 @@ block content
                     p.gray No work yet.
                 
                 hr
-        .col-3.mt-4
-            .mb-4
-                strong Members
 
-                //- Invite form.
-                form(action=`/projects/${project.id}/invite`, method="post") 
-                    input(type="hidden", name="_csrf", value=csrfToken)
-                    .mb-1.mt-4
-                        label(for="email") Email
-                            span.red *
-                        input(type="text", name="email", id="email", placeholder="kai@doe.com")
 
-                    .mb-4
-                        button(type="submit") Invite
-                //- END: Invite form.
-
-                if projectMembers.length > 0
-                    each member in projectMembers
-                        p= member.name + " <" + member.email + "> " 
-                            span.gray= "(" + member.role + ")"
-                else
-                    p No members yet.
-
-        .col-1.mt-4
+        .col-4.mt-4
 
     

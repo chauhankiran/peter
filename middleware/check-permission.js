@@ -7,7 +7,7 @@ const sql = require("../db/sql");
  */
 const checkPermission = (module, action) => {
     return async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
         const role = req.session.role;
 
@@ -138,11 +138,11 @@ const checkPermission = (module, action) => {
  * Load permissions into session for use in views
  */
 const loadPermissions = async (req, res, next) => {
-    if (!req.session.userId || !req.session.orgId) {
+    if (!req.session.userId || !req.session.userOrgId) {
         return next();
     }
 
-    const orgId = req.session.orgId;
+    const orgId = req.session.userOrgId;
     const userId = req.session.userId;
     const role = req.session.role;
 

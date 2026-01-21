@@ -4,14 +4,13 @@ block content
     .row.mt-4
         .col-1
         .col-3
-            .mb-4
-                h1 Login 
-                p.gray.italic * = required fields.
+            h1 Login 
+            p.gray.italic * = required fields.
 
-            .mb-4 
+            .mt-4 
                 include ../includes/flash
 
-            form(action="/login", method="post") 
+            form(action="/login", method="post", class="mt-4") 
                 .mb-4
                     label(for="email") Email*
                     input(type="text", name="email", id="email", placeholder="kai@doe.com", autofocus=true)
@@ -22,4 +21,7 @@ block content
     
                 .mb-4
                     button(type="submit") Login
+
+                p Don't have an account? 
+                    a(href="/register") Register.
         .col-8

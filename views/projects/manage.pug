@@ -22,15 +22,15 @@ block content
 
                 .mb-4
                     label
-                        input(type="checkbox", name="milestonesEnabled", value="true", checked=project.milestonesEnabled)
+                        input(type="checkbox", name="isMilestonesEnabled", value="true", checked=project.isMilestonesEnabled)
                         span.ml-2 Enable milestones
 
                 .mb-4
                     label
-                        input(type="checkbox", name="targetsEnabled", value="true", checked=project.targetsEnabled)
+                        input(type="checkbox", name="isTargetsEnabled", value="true", checked=project.isTargetsEnabled)
                         span.ml-2 Enable targets
 
-                input(type="hidden", name="completedDetails", id="completedDetails", value=project.completedDetails || '')
+
 
                 .mb-4.pt-2
                     a(href=`/projects/${project.id}`).btn.is-muted.mr-2 &larr; Back
@@ -39,24 +39,27 @@ block content
 
             include ./delete-project-modal
 
-            //- Completed details modal.
-            .modal.complete-project-modal
-                .modal-content
-                    h3.mb-4 Mark project as completed
+        .col-3.mt-4
+            .mb-4
+                strong Members
 
-                    form(action=`/projects/${project.id}/manage?_method=put`, method="post", id="complete-project-form")
-                        input(type="hidden", name="_csrf", value=csrfToken)
-                        input(type="hidden", name="name", value=project.name)
-                        input(type="hidden", name="dueDate", value=project.dueDate)
-                        input(type="hidden", name="description", value=project.description)
-                        input(type="hidden", name="status", value="completed")
+                //- Invite form.
+                form(action=`/projects/${project.id}/invite`, method="post") 
+                    input(type="hidden", name="_csrf", value=csrfToken)
+                    .mb-1.mt-4
+                        label(for="email") Email
+                            span.red *
+                        input(type="text", name="email", id="email", placeholder="kai@doe.com")
 
-                        .mb-4
-                            label(for="completedDetailsModal") Completion details
-                                span.red *
-                            textarea(name="completedDetails", id="completedDetailsModal", rows="5", placeholder="What was delivered? Anything important to note?")
+                    .mb-4
+                        button(type="submit") Invite
+                //- END: Invite form.
 
-                        .text-end.pt-4
-                            button.complete-project-close.is-muted.mr-4(type="button") Cancel
-                            button(type="submit") Mark completed
-        .col-8.mt-4
+                if projectMembers.length > 0
+                    each member in projectMembers
+                        p= member.name + " <" + member.email + "> " 
+                            span.gray= "(" + member.role + ")"
+                else
+                    p No members yet.
+
+        .col-5.mt-4

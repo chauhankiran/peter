@@ -22,30 +22,23 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(methodOverride("_method"));
 
-const sessionOptions = {
-    secret: process.env.SEC_SESSION,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: app.get("env") === "production",
-    },
-};
-
-// Use a MemoryStore in test environment to avoid a real Redis dependency during tests
-if (app.get("env") === "test") {
-    sessionOptions.store = new session.MemoryStore();
-} else {
-    sessionOptions.store = new RedisStore({ client: redisClient });
-}
-
-app.use(session(sessionOptions));
+app.use(
+    session({
+        secret: process.env.SEC_SESSION,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: app.get("env") === "production",
+        },
+        store: new RedisStore({ client: redisClient }),
+    }),
+);
 app.use(flash());
 
 if (app.get("env") === "development") {
     app.use(morgan("tiny"));
 }
 
-// Flash locals.
 app.use((req, res, next) => {
     res.locals.info = req.flash("info");
     res.locals.error = req.flash("error");
@@ -54,19 +47,14 @@ app.use((req, res, next) => {
     res.locals.errors = [];
 
     res.locals.userId = req.session.userId || null;
-    res.locals.email = req.session.email || null;
     res.locals.userName = req.session.userName || null;
-    res.locals.orgId = req.session.orgId || null;
-    res.locals.role = req.session.role || null;
+    res.locals.userOrgId = req.session.userOrgId || null;
+    res.locals.userRole = req.session.userRole || null;
 
     res.locals.isLoggedIn = Boolean(req.session.userId) || false;
 
     next();
 });
-
-// Load permissions into res.locals for views
-const { loadPermissions } = require("./middleware/check-permission");
-app.use(loadPermissions);
 
 app.use("/", require("./routes"));
 
@@ -90,6 +78,7 @@ app.use((err, req, res, next) => {
     return res.status(500).render("error", { err });
 });
 
+// RUN.
 const main = async () => {
     await redisClient.connect().catch(console.error);
 

@@ -11,8 +11,7 @@ block content
                             a(href=`/projects/${project.id}`)= project.name
                             span.gray  / Milestones
                     .col-4.text-end 
-                        if permissions && permissions.milestones && permissions.milestones.create
-                            a(href=`/projects/${project.id}/milestones/new`).btn New milestone
+                        a(href=`/projects/${project.id}/milestones/new`).btn New milestone
 
                 include ../includes/flash
 

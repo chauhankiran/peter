@@ -3,7 +3,7 @@ const { views } = require("../constants/app");
 
 module.exports = {
     index: async (req, res, next) => {
-        const orgId = req.session.orgId;
+        const orgId = req.session.userOrgId;
         const userId = req.session.userId;
 
         try {
@@ -38,7 +38,7 @@ module.exports = {
                     s.name as "statusName",
                     pr.name as "priorityName"
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -58,7 +58,7 @@ module.exports = {
                     pr.id = w."priorityId"
                 WHERE
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active' AND
                     w."assigneeId" = ${userId}
                 ORDER BY

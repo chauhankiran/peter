@@ -7,8 +7,7 @@ block content
             .col-10.mt-4 
                 .d-flex.justify-content-between.align-items-center.mb-4
                     h1 Targets
-                    if permissions && permissions.targets && permissions.targets.create
-                        a(href=`/projects/${project.id}/targets/new`).btn New target
+                    a(href=`/projects/${project.id}/targets/new`).btn New target
 
                 include ../includes/flash
 
@@ -36,8 +35,5 @@ block content
                                             .progress-fill(style=`width: ${target.progress}%; height: 100%; background: ${target.progress === 100 ? '#28a745' : '#007bff'}; border-radius: 4px;`)
                 else
                     p.gray No targets yet.
-
-                .mb-4.pt-2
-                    a(href=`/projects/${project.id}`).btn.is-muted &larr; Back to project
 
             .col-1.mt-4

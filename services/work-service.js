@@ -8,11 +8,11 @@ module.exports = {
             SELECT
                 COUNT(w.id)
             FROM
-                work w
+                works w
             WHERE
                 w."orgId" = ${orgId} AND
                 w."projectId" = ${projectId} AND
-                w."isActive" = true
+                w."status" = 'active'
         `.then(([x]) => x);
     },
-}
+};

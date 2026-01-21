@@ -6,9 +6,9 @@ const sql = postgres({
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    debug: console.log,
+    debug: process.env.NODE_ENV === "dev" ? console.log : false,
     transform: {
-        undefined: null
+        undefined: null,
     },
     types: {
         date: {
@@ -19,8 +19,8 @@ const sql = postgres({
                 if (x) {
                     const d = new Date(x);
                     const year = d.getFullYear();
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, "0");
+                    const day = String(d.getDate()).padStart(2, "0");
 
                     return `${year}-${month}-${day}`;
                 }

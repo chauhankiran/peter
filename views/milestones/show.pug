@@ -24,7 +24,7 @@ block content
                                 if milestone.description
                                     .mb-3
                                         strong Description
-                                        p= milestone.description
+                                        p.italic= milestone.description
                                 else
                                     .mb-3
                                         strong Description
@@ -70,8 +70,5 @@ block content
                                     td= item.priorityName
                 else
                     p.gray No work items assigned to this milestone.
-
-                .mb-4.pt-4
-                    a(href=`/projects/${project.id}/milestones`).btn.is-muted &larr; Back to milestones
 
             .col-1.mt-4
