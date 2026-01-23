@@ -20,7 +20,7 @@ block content
                 .mb-4
                     label(for="email") Email*
                     if inviteEmail
-                        input(type="email", name="email", id="email", placeholder="kai@doe.com", value=inviteEmail, disabled=true)
+                        input(type="email", name="email", id="email", placeholder="kai@doe.com", value=inviteEmail, readonly=true)
                     else
                         input(type="email", name="email", id="email", placeholder="kai@doe.com", value=email)
                 .mb-4

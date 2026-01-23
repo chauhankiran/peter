@@ -79,16 +79,12 @@ module.exports = {
                         INSERT INTO users (
                             name,
                             "email",
-                            "passwordHash",
-                            "isEmailVerified",
-                            "verifiedAt",
+                            "password",
                             "status"
                         ) VALUES (
                             ${name},
                             ${email},
-                            ${passwordHash},
-                            true,
-                            ${sql`now()`},
+                            ${password},
                             'active'
                         ) returning id;
                     `.then(([x]) => x);
@@ -97,7 +93,7 @@ module.exports = {
                         SELECT
                             id
                         FROM
-                            "userOrgs"
+                            "orgUsers"
                         WHERE
                             "userId" = ${user.id} AND
                             "orgId" = ${invite.orgId}
@@ -105,7 +101,7 @@ module.exports = {
 
                     if (!orgMembership) {
                         await sql`
-                            INSERT INTO "userOrgs" (
+                            INSERT INTO "orgUsers" (
                                 "userId",
                                 "orgId",
                                 role,

@@ -2,42 +2,33 @@ extend ../layout
 
 block content
     .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-10.mt-4 
-                .d-flex.justify-content-between.align-items-center.mb-4
-                    h1= target.name
-                    a(href=`/projects/${project.id}/targets/${target.id}/edit`).btn.is-muted Edit
+        .row.mt-4
+            .col-1
+            .col-10
+                .row.mb-4.align-items-center 
+                    .col-8 
+                        h1 
+                            a(href=`/projects/${project.id}`)= project.name
+                            span.gray  / 
+                            a(href=`/projects/${project.id}/targets`) Targets
+                            span.gray  / #{target.name}
+                    .col-4.text-end
+                        a(href=`/projects/${project.id}/targets/${target.id}/edit`).btn.is-muted Edit
 
                 include ../includes/flash
-
-                p.mb-4
-                    a(href=`/projects/${project.id}`)= project.name
-                    span.gray  / 
-                    a(href=`/projects/${project.id}/targets`) Targets
-                    span.gray  / #{target.name}
 
                 .card.mb-4
                     .card-body
                         .row
                             .col-6
-                                if target.description
-                                    .mb-3
-                                        strong Description
-                                        p= target.description
-                                else
-                                    .mb-3
-                                        strong Description
-                                        p.gray No description.
 
-                                if target.dueDate
-                                    .mb-3
-                                        strong Due date
-                                        p= new Date(target.dueDate).toLocaleDateString('sv-SE')
-                                else
-                                    .mb-3
-                                        strong Due date
-                                        p.gray Not set
+                                .mb-3
+                                    strong Due date
+                                    p= target.dueDate || 'N/A'
+                                
+                                .mb-3
+                                    strong Description
+                                    p.italic= target.description || 'N/A'
 
                             .col-6.text-end
                                 .mb-3
@@ -55,15 +46,11 @@ block content
                                 .d-flex.justify-content-between.align-items-center
                                     div
                                         a(href=`/projects/${project.id}/milestones/${milestone.id}`)= milestone.name
-                                        if milestone.dueDate
-                                            span.gray.ml-2 Due: #{new Date(milestone.dueDate).toLocaleDateString('sv-SE')}
+                                        span.gray.ml-2 Due: #{milestone.dueDate}
                                     div
                                         span #{milestone.progress}%
                                         span.gray.ml-2 (#{milestone.completedWork}/#{milestone.totalWork})
                 else
-                    p.gray No milestones assigned to this target.
+                    p.gray No milestones found.
 
-                .mb-4.pt-4
-                    a(href=`/projects/${project.id}/targets`).btn.is-muted &larr; Back to targets
-
-            .col-1.mt-4
+            .col-1

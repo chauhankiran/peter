@@ -167,7 +167,7 @@ module.exports = {
                     id,
                     name,
                     email,
-                    "passwordHash"
+                    "password"
                 FROM
                     users
                 WHERE
@@ -205,7 +205,7 @@ module.exports = {
                 UPDATE
                     users
                 SET
-                    "passwordHash" = ${passwordHash},
+                    "password" = ${passwordHash},
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
                 WHERE

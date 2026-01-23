@@ -2,18 +2,18 @@ extend ../layout
 
 block content
     .container-fluid 
-        .row
-            .col-1.mt-4  
-            .col-10.mt-4 
-                .d-flex.justify-content-between.align-items-center.mb-4
-                    h1 Targets
-                    a(href=`/projects/${project.id}/targets/new`).btn New target
+        .row.mt-4  
+            .col-1
+            .col-10
+                .row.mb-4.align-items-center 
+                    .col-8
+                        h1
+                            a(href=`/projects/${project.id}`)= project.name
+                            span.gray  / Targets
+                    .col-4.text-end
+                        a(href=`/projects/${project.id}/targets/new`).btn New target
 
                 include ../includes/flash
-
-                p.mb-4
-                    a(href=`/projects/${project.id}`)= project.name
-                    span.gray  / Targets
 
                 if targets && targets.length > 0
                     each target in targets
@@ -23,10 +23,10 @@ block content
                                     div
                                         h3
                                             a(href=`/projects/${project.id}/targets/${target.id}`)= target.name
-                                        if target.description
-                                            p.gray= target.description
-                                        if target.dueDate
-                                            p.small.gray Due: #{new Date(target.dueDate).toLocaleDateString('sv-SE')}
+                                        
+                                        p.small.gray Due: #{target.dueDate || 'N/A'}
+                                        p.gray.italic= target.description || 'N/A'
+                                        
                                     div.text-end
                                         .mb-2
                                             strong #{target.progress}%
@@ -34,6 +34,6 @@ block content
                                         .progress-bar(style="width: 150px; height: 8px; background: #e0e0e0; border-radius: 4px;")
                                             .progress-fill(style=`width: ${target.progress}%; height: 100%; background: ${target.progress === 100 ? '#28a745' : '#007bff'}; border-radius: 4px;`)
                 else
-                    p.gray No targets yet.
+                    p.gray No targets found.
 
-            .col-1.mt-4
+            .col-1

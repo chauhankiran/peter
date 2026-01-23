@@ -107,7 +107,7 @@ module.exports = {
                 const err = {
                     code: 404,
                     message:
-                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                        "Either you don't have permission to view this page, or this page doesn't exist.",
                 };
                 return res.status(err.code).render("error", { err });
             }
@@ -236,24 +236,9 @@ module.exports = {
     create: async (req, res, next) => {
         let { name, dueDate, description } = req.body;
 
-        let validationFailed = false;
-        let errors = [];
-
         if (!name) {
-            errors.push("Name is required.");
-            validationFailed = true;
-        }
-
-        if (validationFailed) {
-            res.locals.errors = errors;
-
-            const project = {
-                name,
-                dueDate,
-                description,
-            };
-            res.render(views.newProjectPath, { project, title: "New project" });
-            return;
+            req.flash('error', 'Name is required.')
+            return res.redirect('/projects/new')
         }
 
         try {

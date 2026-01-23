@@ -37,7 +37,7 @@ module.exports = {
                     p.name as "projectName",
                     u.name as "assigneeName"
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -62,7 +62,7 @@ module.exports = {
                 WHERE
                     ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active'
                 ORDER BY
                     ${sql(orderBy)}
@@ -77,7 +77,7 @@ module.exports = {
                 SELECT
                     count(DISTINCT w.id)
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -90,7 +90,7 @@ module.exports = {
                 WHERE
                     ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -417,7 +417,7 @@ module.exports = {
                           m."orgId" = ${req.session.userOrgId} AND
                           m."projectId" = ${selectedProjectId} AND
                           m."status" = 'active' AND
-                          p."milestonesEnabled" = true
+                          p."isMilestonesEnabled" = true
                       ORDER BY
                           m.name ASC
                   `
@@ -714,7 +714,7 @@ module.exports = {
                     w."createdAt",
                     w."updatedAt"
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -751,7 +751,7 @@ module.exports = {
                 WHERE
                     w.id = ${workId} AND
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -825,7 +825,7 @@ module.exports = {
                     w.id,
                     w."projectId",
                     p.name as "projectName",
-                    p."milestonesEnabled",
+                    p."isMilestonesEnabled",
                     w.title,
                     w.description,
                     w."assigneeId",
@@ -834,7 +834,7 @@ module.exports = {
                     w."statusId",
                     w."milestoneId"
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -847,7 +847,7 @@ module.exports = {
                 WHERE
                     w.id = ${workId} AND
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -893,12 +893,6 @@ module.exports = {
                 ORDER BY
                     u.name ASC
             `;
-
-            const priorityReverseMap = {
-                1: "low",
-                2: "medium",
-                3: "high",
-            };
 
             const statuses = await sql`
                 SELECT
@@ -1005,7 +999,7 @@ module.exports = {
                     w."priorityId",
                     w."statusId"
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -1018,7 +1012,7 @@ module.exports = {
                 WHERE
                     w.id = ${workId} AND
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
@@ -1186,7 +1180,7 @@ module.exports = {
                 SELECT
                     w.id
                 FROM
-                    "work" w
+                    "works" w
                 JOIN
                     projects p
                 ON
@@ -1199,7 +1193,7 @@ module.exports = {
                 WHERE
                     w.id = ${workId} AND
                     w."orgId" = ${orgId} AND
-                    w."isActive" = true AND
+                    w."status" = 'active' AND
                     p."status" = 'active'
             `.then(([x]) => x);
 
