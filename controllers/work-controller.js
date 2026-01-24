@@ -351,7 +351,7 @@ module.exports = {
                           u.name,
                           u.email
                       FROM
-                          "userOrgs" uo
+                          "orgUsers" uo
                       JOIN
                           users u
                       ON
@@ -499,14 +499,14 @@ module.exports = {
                     u.name,
                     u.email
                 FROM
-                    "userOrgs" uo
+                    "orgUsers" uo
                 JOIN
                     users u
                 ON
                     u.id = uo."userId"
                 WHERE
                     uo."orgId" = ${req.session.userOrgId} AND
-                    uo."isActive" = true
+                    uo."status" = 'active'
                 ORDER BY
                     u.name ASC
             `;
@@ -653,7 +653,7 @@ module.exports = {
             const assignedTo = assigneeId || req.session.userId;
 
             await sql`
-                INSERT INTO "work" (
+                INSERT INTO "works" (
                     "orgId",
                     "projectId",
                     title,
@@ -780,7 +780,7 @@ module.exports = {
                 WHERE
                     c."workId" = ${workId} AND
                     c."orgId" = ${orgId} AND
-                    c."isActive" = true
+                    c."status" = 'active'
                 ORDER BY
                     c."createdAt" ASC
             `;
@@ -1147,7 +1147,7 @@ module.exports = {
 
             await sql`
                 UPDATE
-                    "work"
+                    "works"
                 SET
                     title = ${title},
                     description = ${description || ""},
@@ -1207,9 +1207,9 @@ module.exports = {
 
             await sql`
                 UPDATE
-                    "work"
+                    "works"
                 SET
-                    "isActive" = false,
+                    "status" = 'inactive',
                     "updatedBy" = ${userId},
                     "updatedAt" = now()
                 WHERE

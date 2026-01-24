@@ -20,35 +20,19 @@ block content
                     input(type="hidden", name="orderDir", value=orderDir)
                     input(type="text", name="search", value=search, autofocus=true, placeholder="Enter title or project and press Enter")
 
-            table.mb-0 
-                thead 
-                    tr.antiqueWhite 
-                        th Id
-                        th Title
-                        th Project
-                        th Assignee
-                        th Status
-                        th Priority
-                tbody
-                    if workItems.length > 0
-                        each item in workItems
-                            tr
-                                td 
-                                    a(href=`/work/${item.id}`) #{item.id}
-                                td
-                                    a(href=`/work/${item.id}`) #{item.title}
-                                td
-                                    a(href=`/projects/${item.projectId}`) #{item.projectName}
-                                td
-                                    if item.assigneeName
-                                        = item.assigneeName
-                                    else
-                                        span.gray Unassigned
-                                td= item.statusName
-                                td= item.priorityName
-                    else
-                        tr
-                            td(colspan="6").text-center.gray No work found.
+            if workItems.length > 0
+                each item in workItems
+                    .mb-2 
+                        h3 #{"#" + item.id + ". " + item.title}
+                        p.gray
+                            a(href=`/projects/${item.projectId}`) #{item.projectName} / 
+                            span.gray #{item.assigneeName} / 
+                            span.gray #{item.statusName} / 
+                            span.gray #{item.priorityName} / 
+                            span.gray #{item.dueDate}
+                        hr
+            else 
+                p.gray No work found.
 
             +pagination(paginationLinks.first, paginationLinks.prev, paginationLinks.next, paginationLinks.last)
 
