@@ -20,7 +20,9 @@ module.exports = {
                 p.name, 
                 p."dueDate", 
                 p."createdAt",
-                u.name as "createdByName"
+                u.name as "createdByName",
+                COALESCE(w."totalWork", 0)::int as "totalWork",
+                COALESCE(w."doneWork", 0)::int as "doneWork"
             FROM 
                 projects p
             JOIN
@@ -32,6 +34,18 @@ module.exports = {
                 users u
             ON
                 p."createdBy" = u.id
+            LEFT JOIN (
+                SELECT
+                    "projectId",
+                    COUNT(*) as "totalWork",
+                    COUNT("completedAt") as "doneWork"
+                FROM
+                    works
+                WHERE
+                    status = 'active'
+                GROUP BY
+                    "projectId"
+            ) w ON w."projectId" = p.id
             WHERE 
                 ${whereClause.length > 0 ? sql`${whereClause} AND` : sql``}
                 p."orgId" = ${orgId} AND 

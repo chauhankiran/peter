@@ -6,6 +6,8 @@ const projectService = require("../services/project-service");
 const workService = require("../services/work-service");
 
 module.exports = {
+    // Return the list of projects.
+    // GET /projects
     index: async (req, res, next) => {
         const orgId = req.session.userOrgId;
         const userId = req.session.userId;
@@ -59,172 +61,8 @@ module.exports = {
         }
     },
 
-    manage: async (req, res, next) => {
-        const id = req.params.id;
-
-        try {
-            const project = await sql`
-                SELECT
-                    p.id,
-                    p.name,
-                    p."dueDate",
-                    p.description,
-                    p."status",
-                    p."isMilestonesEnabled",
-                    p."isTargetsEnabled"
-                FROM
-                    projects p
-                JOIN
-                    "projectMembers" pm
-                ON
-                    pm."projectId" = p.id AND
-                    pm."userId" = ${req.session.userId}
-                WHERE
-                    p.id = ${id} AND
-                    p."orgId" = ${req.session.userOrgId}
-            `.then(([x]) => x);
-
-            if (!project) {
-                req.flash("error", "Project not found.");
-                return res.redirect("/projects");
-            }
-
-            const membership = await sql`
-                SELECT
-                    pm.role
-                FROM
-                    "projectMembers" pm
-                WHERE
-                    pm."projectId" = ${id} AND
-                    pm."userId" = ${req.session.userId}
-            `.then(([x]) => x);
-
-            const isOrgAdmin =
-                req.session.role === "admin" || req.session.role === "owner";
-            const isProjectAdmin = membership && membership.role === "admin";
-
-            if (!isOrgAdmin && !isProjectAdmin) {
-                const err = {
-                    code: 404,
-                    message:
-                        "Either you don't have permission to view this page, or this page doesn't exist.",
-                };
-                return res.status(err.code).render("error", { err });
-            }
-
-            // Get all project members.
-            const projectMembers = await projectService.getMembers({
-                projectId: id,
-                orgId: req.session.userOrgId,
-            });
-
-            return res.render("projects/manage", { project, projectMembers });
-        } catch (err) {
-            next(err);
-        }
-    },
-
-    updateManage: async (req, res, next) => {
-        const id = req.params.id;
-        const {
-            name,
-            dueDate,
-            description,
-            status,
-            isMilestonesEnabled,
-            isTargetsEnabled,
-        } = req.body;
-
-        let validationFailed = false;
-        let errors = [];
-
-        if (!name) {
-            errors.push("Name is required.");
-            validationFailed = true;
-        }
-
-        const allowedStatuses = ["active", "archived", "completed"];
-        if (status && !allowedStatuses.includes(status)) {
-            errors.push("Status is invalid.");
-            validationFailed = true;
-        }
-
-        try {
-            const membership = await sql`
-                SELECT
-                    pm.role
-                FROM
-                    "projectMembers" pm
-                JOIN
-                    projects p
-                ON
-                    p.id = pm."projectId"
-                WHERE
-                    pm."projectId" = ${id} AND
-                    pm."userId" = ${req.session.userId} AND
-                    p."orgId" = ${req.session.userOrgId}
-            `.then(([x]) => x);
-
-            const isOrgAdmin =
-                req.session.role === "admin" || req.session.role === "owner";
-            const isProjectAdmin = membership && membership.role === "admin";
-
-            if (!isOrgAdmin && !isProjectAdmin) {
-                const err = {
-                    code: 404,
-                    message:
-                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
-                };
-                return res.status(err.code).render("error", { err });
-            }
-
-            const project = {
-                id,
-                name: name || "",
-                dueDate: dueDate || "",
-                description: description || "",
-                status: status || "active",
-                isMilestonesEnabled: isMilestonesEnabled === "true",
-                isTargetsEnabled: isTargetsEnabled === "true",
-            };
-
-            if (validationFailed) {
-                res.locals.errors = errors;
-                return res.render("projects/manage", { project });
-            }
-
-            console.log("isMilestonesEnabled: ", isMilestonesEnabled);
-
-            const updated = await sql`
-                UPDATE
-                    projects
-                SET
-                    name = ${name},
-                    "dueDate" = ${dueDate || null},
-                    description = ${description || null},
-                    "status" = ${status || "active"},
-                    "isMilestonesEnabled" = ${isMilestonesEnabled === "true"},
-                    "isTargetsEnabled" = ${isTargetsEnabled === "true"},
-                    "updatedAt" = ${sql`now()`},
-                    "updatedBy" = ${req.session.userId}
-                WHERE
-                    id = ${id} AND
-                    "orgId" = ${req.session.userOrgId}
-                RETURNING id
-            `.then(([x]) => x);
-
-            if (!updated) {
-                req.flash("error", "Project not found.");
-                return res.redirect("/projects");
-            }
-
-            req.flash("info", "Project updated successfully.");
-            return res.redirect(`/projects/${id}`);
-        } catch (err) {
-            next(err);
-        }
-    },
-
+    // Return the new project form.
+    // GET /projects/new
     new: (req, res) => {
         const project = {}; // Needed for form.pug to work.
         return res.render(views.newProjectPath, {
@@ -233,6 +71,8 @@ module.exports = {
         });
     },
 
+    // Create a new project.
+    // POST /projects
     create: async (req, res, next) => {
         let { name, dueDate, description } = req.body;
 
@@ -276,17 +116,30 @@ module.exports = {
                     )
                 `.then(([x]) => x);
 
+                // Create default statuses.
                 await sql`
-                    INSERT INTO "statuses" ("orgId", "projectId", name, sequence, "isDone", "createdBy")
-                    VALUES
+                    INSERT INTO "statuses" (
+                        "orgId", 
+                        "projectId", 
+                        name, 
+                        sequence, 
+                        "isDone", 
+                        "createdBy"
+                    ) VALUES
                         (${req.session.userOrgId}, ${project.id}, 'To do', 10, false, ${req.session.userId}),
                         (${req.session.userOrgId}, ${project.id}, 'In progress', 20, false, ${req.session.userId}),
                         (${req.session.userOrgId}, ${project.id}, 'Done', 30, true, ${req.session.userId})
                 `;
 
+                // Create default priorities.
                 await sql`
-                    INSERT INTO "priorities" ("orgId", "projectId", name, sequence, "createdBy")
-                    VALUES
+                    INSERT INTO "priorities" (
+                        "orgId", 
+                        "projectId", 
+                        name, 
+                        sequence, 
+                        "createdBy"
+                    ) VALUES
                         (${req.session.userOrgId}, ${project.id}, 'Low', 10, ${req.session.userId}),
                         (${req.session.userOrgId}, ${project.id}, 'Normal', 20, ${req.session.userId}),
                         (${req.session.userOrgId}, ${project.id}, 'High', 30, ${req.session.userId}),
@@ -315,7 +168,7 @@ module.exports = {
                     p."updatedAt",
                     p."isMilestonesEnabled",
                     p."isTargetsEnabled",
-                    u.name,
+                    u.name as "createdByName",
                     uu.name as "updatedByName"
                 FROM 
                     projects p
@@ -734,6 +587,172 @@ module.exports = {
 
             console.log(url);
             req.flash("info", "Invite created successfully.");
+            return res.redirect(`/projects/${id}`);
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    manage: async (req, res, next) => {
+        const id = req.params.id;
+
+        try {
+            const project = await sql`
+                SELECT
+                    p.id,
+                    p.name,
+                    p."dueDate",
+                    p.description,
+                    p."status",
+                    p."isMilestonesEnabled",
+                    p."isTargetsEnabled"
+                FROM
+                    projects p
+                JOIN
+                    "projectMembers" pm
+                ON
+                    pm."projectId" = p.id AND
+                    pm."userId" = ${req.session.userId}
+                WHERE
+                    p.id = ${id} AND
+                    p."orgId" = ${req.session.userOrgId}
+            `.then(([x]) => x);
+
+            if (!project) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don't have permission to view this page, or this page doesn't exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
+            // Get all project members.
+            const projectMembers = await projectService.getMembers({
+                projectId: id,
+                orgId: req.session.userOrgId,
+            });
+
+            return res.render("projects/manage", { project, projectMembers });
+        } catch (err) {
+            next(err);
+        }
+    },
+
+    updateManage: async (req, res, next) => {
+        const id = req.params.id;
+        const {
+            name,
+            dueDate,
+            description,
+            status,
+            isMilestonesEnabled,
+            isTargetsEnabled,
+        } = req.body;
+
+        let validationFailed = false;
+        let errors = [];
+
+        if (!name) {
+            errors.push("Name is required.");
+            validationFailed = true;
+        }
+
+        const allowedStatuses = ["active", "archived", "completed"];
+        if (status && !allowedStatuses.includes(status)) {
+            errors.push("Status is invalid.");
+            validationFailed = true;
+        }
+
+        try {
+            const membership = await sql`
+                SELECT
+                    pm.role
+                FROM
+                    "projectMembers" pm
+                JOIN
+                    projects p
+                ON
+                    p.id = pm."projectId"
+                WHERE
+                    pm."projectId" = ${id} AND
+                    pm."userId" = ${req.session.userId} AND
+                    p."orgId" = ${req.session.userOrgId}
+            `.then(([x]) => x);
+
+            const isOrgAdmin =
+                req.session.role === "admin" || req.session.role === "owner";
+            const isProjectAdmin = membership && membership.role === "admin";
+
+            if (!isOrgAdmin && !isProjectAdmin) {
+                const err = {
+                    code: 404,
+                    message:
+                        "Either you don’t have permission to view this page, or this page doesn’t exist.",
+                };
+                return res.status(err.code).render("error", { err });
+            }
+
+            const project = {
+                id,
+                name: name || "",
+                dueDate: dueDate || "",
+                description: description || "",
+                status: status || "active",
+                isMilestonesEnabled: isMilestonesEnabled === "true",
+                isTargetsEnabled: isTargetsEnabled === "true",
+            };
+
+            if (validationFailed) {
+                res.locals.errors = errors;
+                return res.render("projects/manage", { project });
+            }
+
+            console.log("isMilestonesEnabled: ", isMilestonesEnabled);
+
+            const updated = await sql`
+                UPDATE
+                    projects
+                SET
+                    name = ${name},
+                    "dueDate" = ${dueDate || null},
+                    description = ${description || null},
+                    "status" = ${status || "active"},
+                    "isMilestonesEnabled" = ${isMilestonesEnabled === "true"},
+                    "isTargetsEnabled" = ${isTargetsEnabled === "true"},
+                    "updatedAt" = ${sql`now()`},
+                    "updatedBy" = ${req.session.userId}
+                WHERE
+                    id = ${id} AND
+                    "orgId" = ${req.session.userOrgId}
+                RETURNING id
+            `.then(([x]) => x);
+
+            if (!updated) {
+                req.flash("error", "Project not found.");
+                return res.redirect("/projects");
+            }
+
+            req.flash("info", "Project updated successfully.");
             return res.redirect(`/projects/${id}`);
         } catch (err) {
             next(err);

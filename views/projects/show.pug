@@ -1,15 +1,15 @@
 extend ../layout
 
 block content 
-    .row 
-        .col-1.mt-4 
-        .col-11.mt-4 
+    .row.mt-4 
+        .col-1
+        .col-11
             h1 Project details
 
             include ../includes/flash
-    .row
-        .col-1.mt-4  
-        .col-3.mt-4 
+    .row.mt-4  
+        .col-1
+        .col-3 
             include ./details            
 
             .mb-4
@@ -50,11 +50,9 @@ block content
                         p 
                             a(href=`/work?search=${encodeURIComponent(project.name)}`).italic More... 
                 else
-                    p.gray No work yet.
+                    p.gray No work found.
                 
                 hr
 
 
         .col-4.mt-4
-
-    

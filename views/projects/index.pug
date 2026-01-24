@@ -27,7 +27,9 @@ block content
                         p.gray
                             span.gray #{project.createdByName} / 
                             span.gray #{project.createdAt} / 
-                            span.gray.red #{project.dueDate}
+                            span.gray.red #{project.dueDate} / 
+                            span.gray #{project.totalWork} / 
+                            span.gray #{project.doneWork}
                         hr
             else 
                 p.gray.text-center.italic No work found.

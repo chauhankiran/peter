@@ -606,7 +606,8 @@ module.exports = {
 
             const statusAccess = await sql`
                 SELECT
-                    s.id
+                    s.id,
+                    s."isDone"
                 FROM
                     "statuses" s
                 WHERE
@@ -665,6 +666,7 @@ module.exports = {
                     "assigneeId",
                     "reporterId",
                     "dueDate",
+                    "completedAt",
                     "createdBy"
                 ) VALUES (
                     ${req.session.userOrgId},
@@ -678,6 +680,7 @@ module.exports = {
                     ${assignedTo},
                     ${req.session.userId},
                     ${dueDate ? dueDate : null},
+                    ${statusAccess.isDone ? sql`NOW()` : null},
                     ${req.session.userId}
                 )
             `;
