@@ -1,18 +1,12 @@
 nav.nav 
-    if isLoggedIn
+    if userId 
         .nav-start 
-            a(href="/").nav-brand Peter
-            a(href="/dashboard").nav-item Dashboard
-            a(href="/projects").nav-item Projects
-            a(href="/work").nav-item Works
+            a(href="/dashboard").nav-brand Peter
         .nav-end 
-            if role === 'admin' || role === 'owner'
-                a(href="/admin").nav-item.red Admin
-            a(href="/settings").nav-item Settings
-            a(href="/logout").nav-item Logout
-    else
+            a(href="/logout").nav-item Logout 
+    else 
         .nav-start 
-            a(href="/").nav-brand Peter
+            a(href="/").nav-brand Peter 
         .nav-end 
             a(href="/login").nav-item Login 
-            a(href="/register").nav-item Register
+            a(href="/register").nav-item Register 

@@ -1,26 +1,21 @@
-require("dotenv").config({ quiet: true });
-const path = require("path");
-const express = require("express");
-const favicon = require("serve-favicon");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const methodOverride = require("method-override");
-const session = require("express-session");
-const flash = require("connect-flash");
-const redisClient = require("./db/redis-client");
-const { RedisStore } = require("connect-redis");
+require('dotenv').config({ quiet: true });
+const express = require('express');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const session = require('express-session');
+const flash = require('connect-flash');
+const redis = require('./db/redis');
+const sql = require('./db/sql');
+const { RedisStore } = require('connect-redis');
+const cipher = require('./helpers/cipher');
 const app = express();
 
-app.set("view engine", "pug");
+app.set('view engine', 'pug');
 
 app.use(helmet());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
-
-app.use(express.json());
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
-
-app.use(methodOverride("_method"));
+app.use(morgan('tiny'));
 
 app.use(
     session({
@@ -28,65 +23,154 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: app.get("env") === "production",
+            secure: app.get('env') === 'production',
         },
-        store: new RedisStore({ client: redisClient }),
+        store: new RedisStore({ client: redis }),
     }),
 );
 app.use(flash());
 
-if (app.get("env") === "development") {
-    app.use(morgan("tiny"));
-}
-
 app.use((req, res, next) => {
-    res.locals.info = req.flash("info");
-    res.locals.error = req.flash("error");
-
-    // global locals to make sure to don't cause error.
-    res.locals.errors = [];
+    // flash
+    res.locals.error = req.flash('error');
+    res.locals.info = req.flash('info');
 
     res.locals.userId = req.session.userId || null;
     res.locals.userName = req.session.userName || null;
-    res.locals.userOrgId = req.session.userOrgId || null;
-    res.locals.userRole = req.session.userRole || null;
-
-    res.locals.isLoggedIn = Boolean(req.session.userId) || false;
 
     next();
 });
 
-app.use("/", require("./routes"));
-
-// 404 error
-app.use((req, res, next) => {
-    const err = {
-        code: 404,
-        message: "Not Found",
-    };
-
-    return res.status(404).render("error", { err });
+// Home
+app.get('/', (req, res, next) => {
+    return res.render('index', {
+        title: 'Peter',
+    });
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-    console.log(err);
+// Login
+app.get('/login', (req, res, next) => {
+    return res.render('auth/login', {
+        title: 'Login',
+    });
+});
+app.post('/login', async (req, res, next) => {
+    const { email, password } = req.body;
 
-    err.code = 500;
-    err.message = "Internal Server Error";
+    if (!email || !password) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/login');
+    }
 
-    return res.status(500).render("error", { err });
+    // All good. We can proceed with login.
+
+    try {
+        const user = await sql`
+            SELECT
+                id,
+                name,
+                email,
+                password
+            FROM
+                "users"
+            WHERE
+                email = ${email}
+        `.then(([x]) => x);
+
+        if (!user) {
+            req.flash('error', 'User with given email not found.');
+            return res.redirect('/login');
+        }
+
+        const ok = cipher.compare(password, user.password);
+
+        if (!ok) {
+            req.flash('error', 'Email or password is incorrect.');
+            return res.redirect('/login');
+        }
+
+        req.session.userId = user.id;
+        req.session.userName = user.name;
+
+        return res.redirect('/dashboard');
+    } catch (err) {
+        next(err);
+    }
 });
 
-// RUN.
+// Register
+app.get('/register', (req, res, next) => {
+    return res.render('auth/register', {
+        title: 'Register',
+    });
+});
+app.post('/register', async (req, res, next) => {
+    const { name, email, password, confirmPassword } = req.body;
+
+    if (!name || !email || !password || !confirmPassword) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/register');
+    }
+
+    if (password.length < 8) {
+        req.flash('error', 'Password must be at least 8 characters long.');
+        return res.redirect('/register');
+    }
+
+    if (password !== confirmPassword) {
+        req.flash('error', "Entered password doesn't match.");
+        return res.redirect('/register');
+    }
+
+    // All good. We can proceed with user creation now.
+    const passwordHash = cipher.hash(password);
+
+    try {
+        await sql`
+            INSERT INTO "users" (
+                name,
+                email,
+                password
+            ) VALUES (
+                ${name},
+                ${email},
+                ${passwordHash}
+            )
+        `;
+
+        req.flash('info', 'Account is created successfully.');
+        return res.redirect('/login');
+    } catch (err) {
+        next(err);
+    }
+});
+
+// Dashboard
+app.get('/dashboard', (req, res, next) => {
+    res.render('dashboard', {
+        title: 'Dashboard',
+    });
+});
+
 const main = async () => {
-    await redisClient.connect().catch(console.error);
+    await redis.connect().catch(console.log);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-        console.log(`Peter is up and running at http://localhost:${PORT}`);
+        console.log(`http://localhost:${PORT}`);
     });
 };
+
+// Logout
+app.get('/logout', (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) {
+            next(err);
+        }
+
+        return res.redirect('/');
+    });
+});
 
 if (require.main === module) {
     main();

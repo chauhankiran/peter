@@ -1,0 +1,645 @@
+@import url('../fonts/fonts.css');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: #fff;
+    color: #222;
+    font-family: "DejaVuSerifCondensed", "DejaVu Serif", serif;
+    font-size: 1rem;
+    line-height: 1.42;
+}
+
+a {
+    color: #477dca;
+    text-decoration: none;
+    transition: color 0.1s linear;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:active,
+a:focus {
+    outline: none;
+}
+a:active,
+a:focus,
+a:hover {
+    color: #2c5999;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 1rem 0;
+    padding: 0;
+}
+
+.gray {
+    color: gray;
+}
+
+.red {
+    color: darkred;
+}
+
+.green {
+    color: darkgreen;
+}
+
+/*
+ * Nav.
+ * ============================================================================
+ */
+.nav,
+.nav-start,
+.nav-center,
+.nav-end,
+.nav-brand,
+.nav-item {
+    display: flex;
+}
+.nav {
+    min-height: 4rem;
+    border-bottom: 1px solid #ddd;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+.nav-start,
+.nav-center,
+.nav-end {
+    flex: 1;
+}
+.nav-start {
+    justify-content: start;
+}
+.nav-end {
+    justify-content: end;
+}
+.nav-brand,
+.nav-item {
+    padding: 0.5rem;
+    align-items: center;
+}
+.nav-brand {
+    padding-left: 0;
+    color: darkred;
+}
+.nav-brand:hover {
+    color: darkred;
+    text-decoration: none;
+}
+
+/*
+ * Table.
+ * ============================================================================
+ */
+table {
+    background-color: transparent;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+tbody tr:hover {
+    background-color: #efefef;
+}
+th,
+td {
+    border: 1px solid #767676;
+    padding: 8px;
+}
+th {
+    text-align: left;
+    vertical-align: bottom;
+    background-color: antiquewhite;
+}
+td {
+    vertical-align: top;
+}
+
+/*
+ * Grid. 
+ * ============================================================================
+ */
+.container {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+.container-fluid {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -1rem;
+    margin-left: -1rem;
+}
+
+.col-1,
+.col-2,
+.col-3,
+.col-4,
+.col-5,
+.col-6,
+.col-7,
+.col-8,
+.col-9,
+.col-10,
+.col-11,
+.col-12,
+.col,
+.col-auto {
+    position: relative;
+    width: 100%;
+    min-height: 1px;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+
+.col {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+}
+
+.col-auto {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+}
+
+.col-1 {
+    flex: 0 0 8.333333%;
+    max-width: 8.333333%;
+}
+
+.col-2 {
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+}
+
+.col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.col-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+}
+
+.col-5 {
+    flex: 0 0 41.666667%;
+    max-width: 41.666667%;
+}
+
+.col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.col-7 {
+    flex: 0 0 58.333333%;
+    max-width: 58.333333%;
+}
+
+.col-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+}
+
+.col-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+
+.col-10 {
+    flex: 0 0 83.333333%;
+    max-width: 83.333333%;
+}
+
+.col-11 {
+    flex: 0 0 91.666667%;
+    max-width: 91.666667%;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+/*
+ * Helpers.
+ * ============================================================================
+ */
+.text-start {
+    text-align: left;
+}
+.text-center {
+    text-align: center;
+}
+.text-end {
+    text-align: right;
+}
+
+.italic {
+    font-style: italic;
+}
+.bold {
+    font-weight: bold;
+}
+
+.d-block {
+    display: block !important;
+}
+.d-inline {
+    display: inline !important;
+}
+
+.flex {
+    display: flex !important;
+}
+.flex-full {
+    flex: 1 1 auto !important;
+}
+
+.justify-content-start {
+    justify-content: flex-start !important;
+}
+.justify-content-end {
+    justify-content: flex-end !important;
+}
+.justify-content-center {
+    justify-content: center !important;
+}
+
+.align-items-start {
+    align-items: flex-start !important;
+}
+.align-items-end {
+    align-items: flex-end !important;
+}
+.align-items-center {
+    align-items: center !important;
+}
+
+.align-content-start {
+    align-content: flex-start !important;
+}
+.align-content-end {
+    align-content: flex-end !important;
+}
+.align-content-center {
+    align-content: center !important;
+}
+
+/*
+ * Spacing Utilities.
+ * ============================================================================
+ */
+.mt-0 {
+    margin-top: 0 !important;
+}
+.mt-1 {
+    margin-top: 4px !important;
+}
+.mt-2 {
+    margin-top: 8px !important;
+}
+.mt-3 {
+    margin-top: 12px !important;
+}
+.mt-4 {
+    margin-top: 16px !important;
+}
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+.mb-1 {
+    margin-bottom: 4px !important;
+}
+.mb-2 {
+    margin-bottom: 8px !important;
+}
+.mb-3 {
+    margin-bottom: 12px !important;
+}
+.mb-4 {
+    margin-bottom: 16px !important;
+}
+.mr-0 {
+    margin-right: 0 !important;
+}
+.mr-1 {
+    margin-right: 4px !important;
+}
+.mr-2 {
+    margin-right: 8px !important;
+}
+.mr-3 {
+    margin-right: 12px !important;
+}
+.mr-4 {
+    margin-right: 16px !important;
+}
+.ml-0 {
+    margin-left: 0 !important;
+}
+.ml-1 {
+    margin-left: 4px !important;
+}
+.ml-2 {
+    margin-left: 8px !important;
+}
+.ml-3 {
+    margin-left: 12px !important;
+}
+.ml-4 {
+    margin-left: 16px !important;
+}
+
+.pt-0 {
+    padding-top: 0 !important;
+}
+.pt-1 {
+    padding-top: 4px !important;
+}
+.pt-2 {
+    padding-top: 8px !important;
+}
+.pt-3 {
+    padding-top: 12px !important;
+}
+.pt-4 {
+    padding-top: 16px !important;
+}
+.pb-0 {
+    padding-bottom: 0 !important;
+}
+.pb-1 {
+    padding-bottom: 4px !important;
+}
+.pb-2 {
+    padding-bottom: 8px !important;
+}
+.pb-3 {
+    padding-bottom: 12px !important;
+}
+.pb-4 {
+    padding-bottom: 16px !important;
+}
+.pr-0 {
+    padding-right: 0 !important;
+}
+.pr-1 {
+    padding-right: 4px !important;
+}
+.pr-2 {
+    padding-right: 8px !important;
+}
+.pr-3 {
+    padding-right: 12px !important;
+}
+.pr-4 {
+    padding-right: 16px !important;
+}
+.pl-0 {
+    padding-left: 0 !important;
+}
+.pl-1 {
+    padding-left: 4px !important;
+}
+.pl-2 {
+    padding-left: 8px !important;
+}
+.pl-3 {
+    padding-left: 12px !important;
+}
+.pl-4 {
+    padding-left: 16px !important;
+}
+
+/*
+ * Buttons.
+ * ============================================================================
+ */
+::file-selector-button,
+input[type="submit"],
+input[type="button"],
+.btn,
+button {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+
+    cursor: pointer;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+
+    border-radius: 0;
+    border: 1px solid #767676;
+    background-color: #efefef;
+}
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.btn:hover,
+button:hover {
+    text-decoration: none;
+    color: inherit;
+
+    background-color: #dbdbdb;
+}
+input[type="submit"]:disabled,
+input[type="button"]:disabled,
+.btn:disabled,
+button:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* secondary button */
+input[type="submit"].is-muted,
+input[type="button"].is-muted,
+.btn.is-muted,
+button.is-muted {
+    background-color: transparent;
+}
+input[type="submit"].is-muted:hover,
+input[type="button"].is-muted:hover,
+.btn.is-muted:hover,
+button.is-muted:hover {
+    background-color: #efefef;
+}
+
+/* danger button */
+input[type="submit"].is-danger,
+input[type="button"].is-danger,
+.btn.is-danger,
+button.is-danger {
+    background-color: #ffeaed;
+}
+input[type="submit"].is-danger:hover,
+input[type="button"].is-danger:hover,
+.btn.is-danger:hover,
+button.is-danger:hover {
+    background-color: #fcdce1;
+}
+
+.btn-link {
+    background-color: unset;
+    border: none;
+    margin: 0;
+    padding: 0.25rem;
+    color: #477dca;
+    text-decoration: none;
+    transition: color 0.1s linear;
+}
+.btn-link:hover {
+    text-decoration: underline;
+    background-color: unset;
+    color: #2c5999;
+}
+
+/*
+ * Form.
+ * ============================================================================
+ */
+label {
+    cursor: pointer;
+}
+label + p {
+    padding: 0;
+    margin: 0;
+    font-size: 80%;
+    color: #666;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="password"],
+textarea,
+select {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+
+    display: block;
+    width: 100%;
+
+    border: 1px solid #767676;
+    padding: 8px 12px;
+}
+
+input[type="text"]:hover,
+input[type="text"]:active,
+input[type="text"]:focus-visible,
+input[type="email"]:hover,
+input[type="email"]:active,
+input[type="email"]:focus-visible,
+input[type="date"]:hover,
+input[type="date"]:active,
+input[type="date"]:focus-visible,
+input[type="password"]:hover,
+input[type="password"]:active,
+input[type="password"]:focus-visible,
+textarea:hover,
+textarea:active,
+textarea:focus-visible,
+select:hover,
+select:active,
+select:focus-visible {
+    outline: unset;
+    border: 1px solid #000;
+}
+
+input[type="file"] {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+
+    cursor: pointer;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+}
+
+/**
+ * Application wide styles.
+ * ============================================================================
+ */
+.gray {
+    color: gray;
+}
+
+.red {
+    color: darkred;
+}
+
+.due {
+    background-color: #fff2f4;
+}
+
+.antiqueWhite {
+    background-color: antiqueWhite;
+}

@@ -1,0 +1,36 @@
+extend ../layout 
+
+block content 
+    .row.mt-4  
+        .col-1 
+        .col-3
+            h1= title 
+            p.gray.italic * = required fields.
+
+            .mt-4 
+                include ../includes/flash 
+
+            form(action="/register", method="post", class="mt-4") 
+                .mb-4 
+                    label(for="name") Name*
+                    input(type="text", name="name", id="name", placeholder="Kai Doe")
+                
+                .mb-4 
+                    label(for="email") Email*
+                    input(type="text", name="email", id="email", placeholder="kai@doe.com")
+                
+                .mb-4 
+                    label(for="password") Password* #[small.gray.italic (must be at least 8 characters)]
+                    input(type="password", name="password", id="password", placeholder="********")
+                
+                .mb-4 
+                    label(for="confirmPassword") Confirm password* 
+                    input(type="password", name="confirmPassword", id="confirmPassword", placeholder="********")
+                
+                .mb-4 
+                    button(type="submit") Register  
+
+                p Already have an account? 
+                    a(href="/login") Login.
+        
+        .col-8

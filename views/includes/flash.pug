@@ -1,11 +1,7 @@
-if info.length > 0
-    each message in info 
-        p.mb-4.flash-info= message 
-
-if errors.length > 0
-    each error in errors
-        p.mb-4.flash-error= error
-
 if error.length > 0
-    each e in error
-        p.flash-error= e
+    each e in error 
+        p.red= e 
+
+if info.length > 0
+    each i in info 
+        p.green= i 
