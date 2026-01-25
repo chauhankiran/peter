@@ -1,0 +1,34 @@
+extend ../layout 
+
+block content 
+    .row.mt-4  
+        .col-1 
+        .col-3
+            h1 Project details
+
+            .mt-4 
+                include ../includes/flash 
+
+            .mt-4 
+                .mb-4 
+                    strong Name
+                    p= project.name 
+                
+                .mb-4 
+                    strong Due date
+                    p= project.dueDate || 'N/A'
+                
+                .mb-4 
+                    strong Description 
+                    p.gray.italic= project.description || 'N/A'
+
+                .mb-4 
+                    .row 
+                        .col-6 
+                            button.btn.is-danger.delete-project Delete project 
+                        .col-6.text-end 
+                            a(href=`/projects/${project.id}/edit`).btn Edit project
+
+        .col-8
+
+    include ./delete-project-modal 

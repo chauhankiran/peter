@@ -1,0 +1,11 @@
+.mb-4
+    label(for="name") Name*
+    input(type="text", name="name", id="name", value=project ? project.name : '' placeholder="House Renovation")
+
+.mb-4 
+    label(for="dueDate") Due date
+    input(type="text", name="dueDate", id="dueDate", value=project ? project.dueDate : '', placeholder="2026-12-31")
+
+.mb-4 
+    label(for="description") Description 
+    textarea(name="description", id="description", cols="30", rows="10", placeholder="This project is ... Maintained by ...") #{project ? project.description : ''}

@@ -15,7 +15,7 @@ body {
 body {
     background-color: #fff;
     color: #222;
-    font-family: "DejaVuSerifCondensed", "DejaVu Serif", serif;
+    font-family: 'DejaVuSerifCondensed', 'DejaVu Serif', serif;
     font-size: 1rem;
     line-height: 1.42;
 }
@@ -477,8 +477,8 @@ td {
  * ============================================================================
  */
 ::file-selector-button,
-input[type="submit"],
-input[type="button"],
+input[type='submit'],
+input[type='button'],
 .btn,
 button {
     font-family: inherit;
@@ -496,8 +496,8 @@ button {
     border: 1px solid #767676;
     background-color: #efefef;
 }
-input[type="submit"]:hover,
-input[type="button"]:hover,
+input[type='submit']:hover,
+input[type='button']:hover,
 .btn:hover,
 button:hover {
     text-decoration: none;
@@ -505,8 +505,8 @@ button:hover {
 
     background-color: #dbdbdb;
 }
-input[type="submit"]:disabled,
-input[type="button"]:disabled,
+input[type='submit']:disabled,
+input[type='button']:disabled,
 .btn:disabled,
 button:disabled {
     cursor: not-allowed;
@@ -515,28 +515,28 @@ button:disabled {
 }
 
 /* secondary button */
-input[type="submit"].is-muted,
-input[type="button"].is-muted,
+input[type='submit'].is-muted,
+input[type='button'].is-muted,
 .btn.is-muted,
 button.is-muted {
     background-color: transparent;
 }
-input[type="submit"].is-muted:hover,
-input[type="button"].is-muted:hover,
+input[type='submit'].is-muted:hover,
+input[type='button'].is-muted:hover,
 .btn.is-muted:hover,
 button.is-muted:hover {
     background-color: #efefef;
 }
 
 /* danger button */
-input[type="submit"].is-danger,
-input[type="button"].is-danger,
+input[type='submit'].is-danger,
+input[type='button'].is-danger,
 .btn.is-danger,
 button.is-danger {
     background-color: #ffeaed;
 }
-input[type="submit"].is-danger:hover,
-input[type="button"].is-danger:hover,
+input[type='submit'].is-danger:hover,
+input[type='button'].is-danger:hover,
 .btn.is-danger:hover,
 button.is-danger:hover {
     background-color: #fcdce1;
@@ -571,10 +571,10 @@ label + p {
     color: #666;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="date"],
-input[type="password"],
+input[type='text'],
+input[type='email'],
+input[type='date'],
+input[type='password'],
 textarea,
 select {
     font-family: inherit;
@@ -589,18 +589,18 @@ select {
     padding: 8px 12px;
 }
 
-input[type="text"]:hover,
-input[type="text"]:active,
-input[type="text"]:focus-visible,
-input[type="email"]:hover,
-input[type="email"]:active,
-input[type="email"]:focus-visible,
-input[type="date"]:hover,
-input[type="date"]:active,
-input[type="date"]:focus-visible,
-input[type="password"]:hover,
-input[type="password"]:active,
-input[type="password"]:focus-visible,
+input[type='text']:hover,
+input[type='text']:active,
+input[type='text']:focus-visible,
+input[type='email']:hover,
+input[type='email']:active,
+input[type='email']:focus-visible,
+input[type='date']:hover,
+input[type='date']:active,
+input[type='date']:focus-visible,
+input[type='password']:hover,
+input[type='password']:active,
+input[type='password']:focus-visible,
 textarea:hover,
 textarea:active,
 textarea:focus-visible,
@@ -611,7 +611,7 @@ select:focus-visible {
     border: 1px solid #000;
 }
 
-input[type="file"] {
+input[type='file'] {
     font-family: inherit;
     font-size: 100%;
     line-height: 1.15;
@@ -642,4 +642,47 @@ input[type="file"] {
 
 .antiqueWhite {
     background-color: antiqueWhite;
+}
+
+/**
+ * Modal.
+ * ============================================================================
+ */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.45);
+    animation: modal-fade-in 150ms ease;
+}
+
+@keyframes modal-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 1rem;
+    width: 480px;
+    animation: modal-pop-in 150ms ease;
+}
+
+@keyframes modal-pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }

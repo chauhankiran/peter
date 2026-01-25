@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const session = require('express-session');
 const flash = require('connect-flash');
+const methodOverride = require('method-override');
 const redis = require('./db/redis');
 const sql = require('./db/sql');
 const { RedisStore } = require('connect-redis');
@@ -13,6 +14,7 @@ const app = express();
 app.set('view engine', 'pug');
 
 app.use(helmet());
+app.use(methodOverride('_method'));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('tiny'));
@@ -152,14 +154,172 @@ app.get('/dashboard', (req, res, next) => {
     });
 });
 
-const main = async () => {
-    await redis.connect().catch(console.log);
+// Projects
+// GET /projects
+app.get('/projects', async (req, res, next) => {
+    try {
+        const projects = await sql`
+            SELECT
+                id,
+                name,
+                "dueDate",
+                "description"
+            FROM
+                projects
+            ORDER BY
+                id DESC
+        `;
 
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`http://localhost:${PORT}`);
+        const { count } = await sql`
+            SELECT
+                count(id)
+            FROM
+                projects
+        `.then(([x]) => x);
+
+        res.render('projects/index', {
+            title: 'Projects',
+            projects,
+            count,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+// GET /projects/new
+app.get('/projects/new', (req, res, next) => {
+    res.render('projects/new', {
+        title: 'New project',
     });
-};
+});
+// POST /projects
+app.post('/projects', async (req, res, next) => {
+    const { name, dueDate, description } = req.body;
+
+    if (!name) {
+        req.flash('error', 'Name is required.');
+        return res.redirect('/projects/new');
+    }
+
+    try {
+        await sql`
+            INSERT INTO "projects" (
+                name,
+                "dueDate",
+                description,
+                "createdBy"
+            ) VALUES (
+                ${name} ,
+                ${dueDate || null},
+                ${description || null},
+                ${req.session.userId}
+            );
+        `;
+
+        req.flash('info', 'Project is created.');
+        res.redirect('/projects');
+    } catch (err) {
+        next(err);
+    }
+});
+// GET /projects/:id
+app.get('/projects/:id', async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        const project = await sql`
+            SELECT
+                id,
+                name,
+                "dueDate",
+                description
+            FROM
+                "projects"
+            WHERE
+                id = ${id}
+        `.then(([x]) => x);
+
+        return res.render('projects/show', {
+            title: project.name,
+            project,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+// GET /projects/:id/edit
+app.get('/projects/:id/edit', async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        const project = await sql`
+            SELECT
+                id,
+                name,
+                "dueDate",
+                description
+            FROM
+                "projects"
+            WHERE
+                id = ${id}
+        `.then(([x]) => x);
+
+        return res.render('projects/edit', {
+            title: project.name,
+            project,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+// PUT /projects/:id
+app.put('/projects/:id', async (req, res, next) => {
+    const id = req.params.id;
+    const { name, dueDate, description } = req.body;
+
+    if (!name) {
+        req.flash('error', 'Name is required.');
+        return res.redirect('/projects/new');
+    }
+
+    try {
+        await sql`
+            UPDATE
+                "projects"
+            SET
+                name = ${name},
+                "dueDate" = ${dueDate || null},
+                description = ${description || null},
+                "updatedAt" = ${sql`NOW()`},
+                "updatedBy" = ${req.session.userId}
+            WHERE
+                id = ${id}
+        `;
+
+        req.flash('info', 'Project is updated.');
+        return res.redirect(`/projects/${id}`);
+    } catch (err) {
+        next(err);
+    }
+});
+// DELETE /projects/:id
+app.delete('/projects/:id', async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        await sql`
+            DELETE FROM
+                "projects"
+            WHERE
+                id = ${id}
+        `;
+
+        req.flash('info', 'Project is deleted.');
+        res.redirect('/projects');
+    } catch (err) {
+        next(err);
+    }
+});
 
 // Logout
 app.get('/logout', (req, res, next) => {
@@ -172,6 +332,14 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
+const main = async () => {
+    await redis.connect().catch(console.log);
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`http://localhost:${PORT}`);
+    });
+};
 if (require.main === module) {
     main();
 }

@@ -1,0 +1,23 @@
+extend ../layout 
+
+block content 
+    .row.mt-4  
+        .col-1 
+        .col-3
+            h1= title 
+            p.gray.italic * = required fields.
+
+            .mt-4 
+                include ../includes/flash 
+
+            form(action=`/projects/${project.id}?_method=PUT`, method="post", class="mt-4") 
+                include ./form 
+
+                .mb-4 
+                    .row 
+                        .col-6 
+                            a(href=`/projects/${project.id}`).btn.is-muted Cancel
+                        .col-6.text-end 
+                            button(type="submit") Update project 
+
+        .col-8

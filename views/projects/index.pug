@@ -1,0 +1,26 @@
+extend ../layout 
+
+block content 
+    .row.mt-4  
+        .col-1 
+        .col-10 
+            .row.align-items-center 
+                .col-8 
+                    h1 #{title} (#{count})
+                .col-4.text-end 
+                    a(href="/projects/new").btn New project 
+            
+            .mt-4 
+                include ../includes/flash 
+
+            .mt-4
+                if projects.length > 0
+                    each project in projects 
+                        .mb-4 
+                            h3 
+                                a(href=`/projects/${project.id}`) ##{project.id}. #{project.name}
+                            p Due on #{project.dueDate || 'N/A'}
+                            p.italic.gray= project.description || 'N/A'
+
+                            hr 
+        .col-1 
