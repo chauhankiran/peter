@@ -33,7 +33,13 @@
         input(type="text", name="statusId", id="statusId", value=work ? work.statusId : '' placeholder="Todo")
     .mb-4
         label(for="typeId") Type  
-        input(type="text", name="typeId", id="typeId", value=work ? work.typeId : '' placeholder="Task")
+        select(name="typeId", id="typeId")
+            option(value="") None
+            each type in types
+                if work && work.typeId === type.id
+                    option(value=type.id, selected=true)= type.name
+                else
+                    option(value=type.id)= type.name
     .mb-4
         label(for="priorityId") Priority  
         input(type="text", name="priorityId", id="priorityId", value=work ? work.priorityId : '' placeholder="Normal")

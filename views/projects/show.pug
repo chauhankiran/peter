@@ -42,7 +42,7 @@ block content
                         each work in works 
                             strong
                                 a(href=`/works/${work.id}`) ##{work.id}. #{work.title}
-                            p #{work.assigneeName || 'Unassigned'} | #{work.statusId } | #{work.typeId} | #{work.priorityId} | #{work.dueDate || 'N/A'}
+                            p #{work.assigneeName || 'Unassigned'} | #{work.statusId } | #{work.typeName || 'None'} | #{work.priorityId} | #{work.dueDate || 'N/A'}
 
                             hr
                     else 

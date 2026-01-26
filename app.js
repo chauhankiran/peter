@@ -228,7 +228,7 @@ app.post('/projects', isAuth, async (req, res, next) => {
     }
 
     try {
-        await sql`
+        const project = await sql`
             INSERT INTO "projects" (
                 name,
                 "dueDate",
@@ -239,7 +239,21 @@ app.post('/projects', isAuth, async (req, res, next) => {
                 ${dueDate || null},
                 ${description || null},
                 ${req.session.userId}
-            );
+            ) returning id;
+        `.then(([x]) => x);
+
+        // Add types for the project.
+        await sql`
+            INSERT INTO "types" (
+                "projectId", 
+                name, 
+                sequence, 
+                "createdBy"
+            ) VALUES
+                (${project.id}, 'Task', 10, ${req.session.userId}),
+                (${project.id}, 'Bug', 20, ${req.session.userId}),
+                (${project.id}, 'Question', 30, ${req.session.userId}),
+                (${project.id}, 'Docs', 40, ${req.session.userId})
         `;
 
         req.flash('info', 'Project is created.');
@@ -276,6 +290,7 @@ app.get('/projects/:id', isAuth, isProject, async (req, res, next) => {
                 u.name AS "assigneeName",
                 w."statusId",
                 w."typeId",
+                t.name AS "typeName",
                 w."priorityId",
                 w."createdBy",
                 w."createdAt"
@@ -283,6 +298,8 @@ app.get('/projects/:id', isAuth, isProject, async (req, res, next) => {
                 works w
             LEFT JOIN
                 users u ON w."assigneeId" = u.id
+            LEFT JOIN
+                types t ON w."typeId" = t.id
             WHERE
                 w."projectId" = ${id}
         `;
@@ -414,11 +431,24 @@ app.get('/works/new', isAuth, async (req, res, next) => {
                 name
         `;
 
+        const types = await sql`
+            SELECT
+                id,
+                name
+            FROM
+                "types"
+            WHERE
+                "projectId" = ${projectId}
+            ORDER BY
+                sequence
+        `;
+
         return res.render('works/new', {
             title: 'New work',
             projects,
             projectId,
             users,
+            types,
         });
     } catch (err) {
         next(err);
@@ -495,6 +525,7 @@ app.get('/works/:id', isAuth, async (req, res, next) => {
                 u.name AS "assigneeName",
                 w."statusId",
                 w."typeId",
+                t.name AS "typeName",
                 w."priorityId",
                 w."createdBy",
                 w."createdAt"
@@ -502,6 +533,8 @@ app.get('/works/:id', isAuth, async (req, res, next) => {
                 works w
             LEFT JOIN
                 users u ON w."assigneeId" = u.id
+            LEFT JOIN
+                types t ON w."typeId" = t.id
             WHERE
                 w.id = ${id}
         `.then(([x]) => x);
@@ -556,12 +589,25 @@ app.get('/works/:id/edit', isAuth, async (req, res, next) => {
                 id = ${id}
         `.then(([x]) => x);
 
+        const types = await sql`
+            SELECT
+                id,
+                name
+            FROM
+                "types"
+            WHERE
+                "projectId" = ${work.projectId}
+            ORDER BY
+                sequence
+        `;
+
         return res.render('works/edit', {
             title: work.title,
             projects,
             work,
             projectId: work.projectId,
             users,
+            types,
         });
     } catch (err) {
         next(err);
