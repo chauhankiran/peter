@@ -429,13 +429,8 @@ app.post('/works', isAuth, async (req, res, next) => {
     const { projectId, title, description, assigneeId, statusId, typeId, priorityId, dueDate } = req.body;
 
     if (!projectId) {
-        req.flash('error', 'Project is required.');
-        return res.redirect('/works/new');
-    }
-
-    if (!title) {
-        req.flash('error', 'Title is required.');
-        return res.redirect('/works/new');
+        req.flash('error', 'Project must required.');
+        return res.redirect('/projects');
     }
 
     try {
@@ -451,7 +446,7 @@ app.post('/works', isAuth, async (req, res, next) => {
 
         if (!ok) {
             req.flash('error', 'Project does not exists.');
-            return res.redirect('/works/new');
+            return res.redirect('/projects');
         }
 
         const work = await sql`
