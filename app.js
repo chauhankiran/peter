@@ -46,11 +46,11 @@ app.use((req, res, next) => {
 // Middleware
 const isAuth = (req, res, next) => {
     if (req.session.userId) {
-        next();
+        return next();
     }
 
     req.flash('error', 'You must need to login in order to view the page.');
-    res.redirect('/login');
+    return res.redirect('/login');
 };
 
 // Home
@@ -165,6 +165,30 @@ app.get('/dashboard', isAuth, (req, res, next) => {
 });
 
 // Projects
+// Project middleware
+const isProject = async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        const ok = await sql`
+            SELECT
+                1
+            FROM
+                "projects"
+            WHERE
+                id = ${id}
+        `.then(([x]) => x);
+
+        if (ok) {
+            return next();
+        }
+
+        req.flash('error', 'Project does not exists.');
+        return res.redirect('/projects');
+    } catch (err) {
+        return next(err);
+    }
+};
 // GET /projects
 app.get('/projects', isAuth, async (req, res, next) => {
     try {
@@ -233,7 +257,7 @@ app.post('/projects', isAuth, async (req, res, next) => {
     }
 });
 // GET /projects/:id
-app.get('/projects/:id', isAuth, async (req, res, next) => {
+app.get('/projects/:id', isAuth, isProject, async (req, res, next) => {
     const id = req.params.id;
 
     try {
@@ -258,7 +282,7 @@ app.get('/projects/:id', isAuth, async (req, res, next) => {
     }
 });
 // GET /projects/:id/edit
-app.get('/projects/:id/edit', isAuth, async (req, res, next) => {
+app.get('/projects/:id/edit', isAuth, isProject, async (req, res, next) => {
     const id = req.params.id;
 
     try {
@@ -283,7 +307,7 @@ app.get('/projects/:id/edit', isAuth, async (req, res, next) => {
     }
 });
 // PUT /projects/:id
-app.put('/projects/:id', isAuth, async (req, res, next) => {
+app.put('/projects/:id', isAuth, isProject, async (req, res, next) => {
     const id = req.params.id;
     const { name, dueDate, description } = req.body;
 
@@ -313,7 +337,7 @@ app.put('/projects/:id', isAuth, async (req, res, next) => {
     }
 });
 // DELETE /projects/:id
-app.delete('/projects/:id', isAuth, async (req, res, next) => {
+app.delete('/projects/:id', isAuth, isProject, async (req, res, next) => {
     const id = req.params.id;
 
     try {
