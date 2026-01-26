@@ -1,0 +1,18 @@
+extend ../layout 
+
+block content 
+    form(action="/works", method="post", class="row mt-4") 
+        .col-1 
+        .col-11 
+            h1= title 
+            p.gray.italic * = required fields.
+
+            .mt-4 
+                include ../includes/flash 
+        
+        include ./form 
+
+        .col-1 
+        .col-11 
+            .mb-4 
+                button(type="submit") Create work 

@@ -17,10 +17,10 @@ block content
                 if projects.length > 0
                     each project in projects 
                         .mb-4 
-                            h3 
+                            strong 
                                 a(href=`/projects/${project.id}`) ##{project.id}. #{project.name}
-                            p Due on #{project.dueDate || 'N/A'}
-                            p.italic.gray= project.description || 'N/A'
+                            p #{project.dueDate || 'N/A'} /  
+                                span.italic.gray= project.description || 'N/A'
 
                             hr 
         .col-1 

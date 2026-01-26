@@ -1,0 +1,37 @@
+.col-1 
+.col-3
+    .mb-4
+        input(type="hidden", name="projectId", value=projectId)
+        label(for="projectId") Project*
+        select(name="projectId", id="projectId", disabled) 
+            option(value="") None 
+            each project in projects 
+                if project.id === projectId 
+                    option(value=project.id, selected=true)= project.name 
+                else 
+                    option(value=project.id)= project.name 
+    .mb-4
+        label(for="title") Title*
+        input(type="text", name="title", id="title", value=work ? work.title : '' placeholder="Upgrade electricity wiring")
+
+    .mb-4 
+        label(for="description") Description 
+        textarea(name="description", id="description", cols="30", rows="10", placeholder="This work is ... ") #{work ? work.description : ''}
+
+.col-2
+    .mb-4
+        label(for="assigneeId") Assignee
+        input(type="text", name="assigneeId", id="assigneeId", value=work ? work.assigneeId : '' placeholder="Kai Doe")
+    .mb-4
+        label(for="statusId") Status 
+        input(type="text", name="statusId", id="statusId", value=work ? work.statusId : '' placeholder="Todo")
+    .mb-4
+        label(for="typeId") Type  
+        input(type="text", name="typeId", id="typeId", value=work ? work.typeId : '' placeholder="Task")
+    .mb-4
+        label(for="priorityId") Priority  
+        input(type="text", name="priorityId", id="priorityId", value=work ? work.priorityId : '' placeholder="Normal")
+    .mb-4
+        label(for="dueDate") Due date 
+        input(type="text", name="dueDate", id="dueDate", value=work ? work.dueDate : '' placeholder="2026-12-31")
+.col-6

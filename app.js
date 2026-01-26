@@ -273,9 +273,29 @@ app.get('/projects/:id', isAuth, isProject, async (req, res, next) => {
                 id = ${id}
         `.then(([x]) => x);
 
+        const works = await sql`
+            SELECT
+                id,
+                title,
+                description,
+                "projectId",
+                "dueDate",
+                "assigneeId",
+                "statusId",
+                "typeId",
+                "priorityId",
+                "createdBy",
+                "createdAt"
+            FROM
+                works
+            WHERE
+                "projectId" = ${id}
+        `;
+
         return res.render('projects/show', {
             title: project.name,
             project,
+            works,
         });
     } catch (err) {
         next(err);
@@ -349,6 +369,247 @@ app.delete('/projects/:id', isAuth, isProject, async (req, res, next) => {
         `;
 
         req.flash('info', 'Project is deleted.');
+        res.redirect('/projects');
+    } catch (err) {
+        next(err);
+    }
+});
+
+// works
+// GET /works/new
+app.get('/works/new', isAuth, async (req, res, next) => {
+    const projectId = req.query.projectId;
+
+    if (!projectId) {
+        req.flash('error', 'Project must required.');
+        return res.redirect('/projects');
+    }
+
+    try {
+        // TODO:
+        const ok = await sql`
+            SELECT
+                1
+            FROM
+                "projects"
+            WHERE
+                id = ${projectId}
+        `.then(([x]) => x);
+
+        if (!ok) {
+            req.flash('error', 'Project does not exists.');
+            return res.redirect('/projects');
+        }
+
+        const projects = await sql`
+            SELECT
+                id,
+                name
+            FROM
+                "projects"
+        `;
+
+        return res.render('works/new', {
+            title: 'New work',
+            projects,
+            projectId,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+// POST /works
+app.post('/works', isAuth, async (req, res, next) => {
+    const { projectId, title, description, assigneeId, statusId, typeId, priorityId, dueDate } = req.body;
+
+    if (!projectId) {
+        req.flash('error', 'Project must required.');
+        return res.redirect('/projects');
+    }
+
+    try {
+        // TODO:
+        const ok = await sql`
+            SELECT
+                1
+            FROM
+                "projects"
+            WHERE
+                id = ${projectId}
+        `.then(([x]) => x);
+
+        if (!ok) {
+            req.flash('error', 'Project does not exists.');
+            return res.redirect('/projects');
+        }
+
+        const work = await sql`
+            INSERT INTO "works" (
+                title,
+                description,
+                "projectId",
+                "dueDate",
+                "assigneeId",
+                "statusId",
+                "typeId",
+                "priorityId",
+                "createdBy"
+            ) VALUES (
+                ${title},
+                ${description || null},
+                ${projectId || null},
+                ${dueDate || null},
+                ${assigneeId || null},
+                ${statusId || null},
+                ${typeId || null},
+                ${priorityId || null},
+                ${req.session.userId}
+            ) returning id
+        `.then(([x]) => x);
+
+        req.flash('info', 'Work is created');
+        return res.redirect(`/works/${work.id}`);
+    } catch (err) {
+        next(err);
+    }
+});
+// GET /works/:id
+app.get('/works/:id', isAuth, async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        const work = await sql`
+            SELECT
+                id,
+                title,
+                description,
+                "projectId",
+                "dueDate",
+                "assigneeId",
+                "statusId",
+                "typeId",
+                "priorityId",
+                "createdBy",
+                "createdAt"
+            FROM
+                works
+            WHERE
+                id = ${id}
+        `.then(([x]) => x);
+
+        return res.render('works/show', {
+            title: work.title,
+            work,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+// GET /works/:id/edit
+app.get('/works/:id/edit', isAuth, async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        const projects = await sql`
+            SELECT
+                id,
+                name
+            FROM
+                "projects"
+        `;
+
+        const work = await sql`
+            SELECT
+                id,
+                title,
+                description,
+                "projectId",
+                "dueDate",
+                "assigneeId",
+                "statusId",
+                "typeId",
+                "priorityId",
+                "createdBy",
+                "createdAt"
+            FROM
+                works
+            WHERE
+                id = ${id}
+        `.then(([x]) => x);
+
+        return res.render('works/edit', {
+            title: work.title,
+            projects,
+            work,
+            projectId: work.projectId,
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+// PUT /works/:id
+app.put('/works/:id', isAuth, async (req, res, next) => {
+    const id = req.params.id;
+    const { projectId, title, description, assigneeId, statusId, typeId, priorityId, dueDate } = req.body;
+
+    if (!projectId) {
+        req.flash('error', 'Project must required.');
+        return res.redirect('/projects');
+    }
+
+    try {
+        // TODO:
+        const ok = await sql`
+            SELECT
+                1
+            FROM
+                "projects"
+            WHERE
+                id = ${projectId}
+        `.then(([x]) => x);
+
+        if (!ok) {
+            req.flash('error', 'Project does not exists.');
+            return res.redirect('/projects');
+        }
+
+        await sql`
+            UPDATE
+                "works"
+            SET
+                title = ${title},
+                description = ${description || null},
+                "projectId" = ${projectId || null},
+                "dueDate" = ${dueDate || null},
+                "assigneeId" = ${assigneeId || null},
+                "statusId" = ${statusId || null},
+                "typeId" = ${typeId || null},
+                "priorityId" = ${priorityId || null},
+                "updatedBy" = ${req.session.userId},
+                "updatedAt" = ${sql`NOW()`}
+            WHERE
+                id = ${id}
+        `.then(([x]) => x);
+
+        req.flash('info', 'Work is updated.');
+        return res.redirect(`/works/${id}`);
+    } catch (err) {
+        next(err);
+    }
+});
+// DELETE /works/:id
+app.delete('/works/:id', isAuth, async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+        await sql`
+            DELETE FROM
+                "works"
+            WHERE
+                id = ${id}
+        `;
+
+        req.flash('info', 'Work is deleted.');
         res.redirect('/projects');
     } catch (err) {
         next(err);

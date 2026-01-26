@@ -3,12 +3,14 @@ extend ../layout
 block content 
     .row.mt-4  
         .col-1 
-        .col-3
+        .col-11 
             h1 Project details
 
             .mt-4 
                 include ../includes/flash 
 
+        .col-1 
+        .col-3
             .mt-4 
                 .mb-4 
                     strong Name
@@ -29,6 +31,21 @@ block content
                         .col-6.text-end 
                             a(href=`/projects/${project.id}/edit`).btn Edit project
 
-        .col-8
+        .col-7
+            .mt-4 
+                .mb-4 
+                    strong Works (0) &middot; 
+                        a(href=`/works/new?projectId=${project.id}`) Add work 
 
+                .mb-4 
+                    if works.length > 0
+                        each work in works 
+                            strong
+                                a(href=`/works/${work.id}`) ##{work.id}. #{work.title}
+                            p #{work.assignedId || 'Unassigned'} | #{work.statusId } | #{work.typeId} | #{work.priorityId} | #{work.dueDate || 'N/A'}
+
+                            hr
+                    else 
+                        p.italic.gray No work found.
+        .col-1 
     include ./delete-project-modal 

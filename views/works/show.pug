@@ -1,0 +1,54 @@
+extend ../layout 
+
+block content 
+    .row.mt-4  
+        .col-1 
+        .col-11 
+            h1 Work details  
+            p.gray.italic * = required fields.
+
+            .mt-4 
+                include ../includes/flash
+
+    form(action="/works", method="post", class="row mt-4")  
+        .col-1 
+        .col-3
+            .mb-4
+                strong Project
+                p= work.projectId 
+            .mb-4
+                strong Title
+                p= work.title 
+
+            .mb-4 
+                strong Description 
+                p.italic.gray= work.description || 'N/A'
+
+        .col-2
+            .mb-4
+                strong Assignee
+                p= work.assigneeId || "Unassigned"
+            .mb-4
+                strong Status 
+                p= work.statusId
+            .mb-4
+                strong Type  
+                p= work.typeId
+            .mb-4
+                strong Priority  
+                p= work.priorityId
+            .mb-4
+                strong Due date 
+                p= work.dueDate || 'N/A'
+
+        .col-6
+    .row 
+        .col-1 
+        .col-3 
+            .row 
+                .col-6 
+                    button.btn.is-danger.delete-work Delete work 
+                .col-6.text-end 
+                    a(href=`/works/${work.id}/edit`).btn Edit work 
+        .col-8 
+    include ./delete-work-modal 
