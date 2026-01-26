@@ -43,6 +43,16 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware
+const isAuth = (req, res, next) => {
+    if (req.session.userId) {
+        next();
+    }
+
+    req.flash('error', 'You must need to login in order to view the page.');
+    res.redirect('/login');
+};
+
 // Home
 app.get('/', (req, res, next) => {
     return res.render('index', {
@@ -148,7 +158,7 @@ app.post('/register', async (req, res, next) => {
 });
 
 // Dashboard
-app.get('/dashboard', (req, res, next) => {
+app.get('/dashboard', isAuth, (req, res, next) => {
     res.render('dashboard', {
         title: 'Dashboard',
     });
@@ -156,7 +166,7 @@ app.get('/dashboard', (req, res, next) => {
 
 // Projects
 // GET /projects
-app.get('/projects', async (req, res, next) => {
+app.get('/projects', isAuth, async (req, res, next) => {
     try {
         const projects = await sql`
             SELECT
@@ -187,13 +197,13 @@ app.get('/projects', async (req, res, next) => {
     }
 });
 // GET /projects/new
-app.get('/projects/new', (req, res, next) => {
+app.get('/projects/new', isAuth, (req, res, next) => {
     res.render('projects/new', {
         title: 'New project',
     });
 });
 // POST /projects
-app.post('/projects', async (req, res, next) => {
+app.post('/projects', isAuth, async (req, res, next) => {
     const { name, dueDate, description } = req.body;
 
     if (!name) {
@@ -223,7 +233,7 @@ app.post('/projects', async (req, res, next) => {
     }
 });
 // GET /projects/:id
-app.get('/projects/:id', async (req, res, next) => {
+app.get('/projects/:id', isAuth, async (req, res, next) => {
     const id = req.params.id;
 
     try {
@@ -248,7 +258,7 @@ app.get('/projects/:id', async (req, res, next) => {
     }
 });
 // GET /projects/:id/edit
-app.get('/projects/:id/edit', async (req, res, next) => {
+app.get('/projects/:id/edit', isAuth, async (req, res, next) => {
     const id = req.params.id;
 
     try {
@@ -273,7 +283,7 @@ app.get('/projects/:id/edit', async (req, res, next) => {
     }
 });
 // PUT /projects/:id
-app.put('/projects/:id', async (req, res, next) => {
+app.put('/projects/:id', isAuth, async (req, res, next) => {
     const id = req.params.id;
     const { name, dueDate, description } = req.body;
 
@@ -303,7 +313,7 @@ app.put('/projects/:id', async (req, res, next) => {
     }
 });
 // DELETE /projects/:id
-app.delete('/projects/:id', async (req, res, next) => {
+app.delete('/projects/:id', isAuth, async (req, res, next) => {
     const id = req.params.id;
 
     try {
@@ -322,7 +332,7 @@ app.delete('/projects/:id', async (req, res, next) => {
 });
 
 // Logout
-app.get('/logout', (req, res, next) => {
+app.get('/logout', isAuth, (req, res, next) => {
     req.session.destroy((err) => {
         if (err) {
             next(err);
