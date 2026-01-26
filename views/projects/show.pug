@@ -34,7 +34,7 @@ block content
         .col-7
             .mt-4 
                 .mb-4 
-                    strong Works (0) &middot; 
+                    strong Works (#{works.length}) &middot; 
                         a(href=`/works/new?projectId=${project.id}`) Add work 
 
                 .mb-4 
@@ -42,7 +42,7 @@ block content
                         each work in works 
                             strong
                                 a(href=`/works/${work.id}`) ##{work.id}. #{work.title}
-                            p #{work.assignedId || 'Unassigned'} | #{work.statusId } | #{work.typeId} | #{work.priorityId} | #{work.dueDate || 'N/A'}
+                            p #{work.assigneeName || 'Unassigned'} | #{work.statusId } | #{work.typeId} | #{work.priorityId} | #{work.dueDate || 'N/A'}
 
                             hr
                     else 

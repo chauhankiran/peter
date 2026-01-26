@@ -204,17 +204,9 @@ app.get('/projects', isAuth, async (req, res, next) => {
                 id DESC
         `;
 
-        const { count } = await sql`
-            SELECT
-                count(id)
-            FROM
-                projects
-        `.then(([x]) => x);
-
         res.render('projects/index', {
             title: 'Projects',
             projects,
-            count,
         });
     } catch (err) {
         next(err);
@@ -275,21 +267,24 @@ app.get('/projects/:id', isAuth, isProject, async (req, res, next) => {
 
         const works = await sql`
             SELECT
-                id,
-                title,
-                description,
-                "projectId",
-                "dueDate",
-                "assigneeId",
-                "statusId",
-                "typeId",
-                "priorityId",
-                "createdBy",
-                "createdAt"
+                w.id,
+                w.title,
+                w.description,
+                w."projectId",
+                w."dueDate",
+                w."assigneeId",
+                u.name AS "assigneeName",
+                w."statusId",
+                w."typeId",
+                w."priorityId",
+                w."createdBy",
+                w."createdAt"
             FROM
-                works
+                works w
+            LEFT JOIN
+                users u ON w."assigneeId" = u.id
             WHERE
-                "projectId" = ${id}
+                w."projectId" = ${id}
         `;
 
         return res.render('projects/show', {
@@ -381,7 +376,7 @@ app.get('/works/new', isAuth, async (req, res, next) => {
     const projectId = req.query.projectId;
 
     if (!projectId) {
-        req.flash('error', 'Project must required.');
+        req.flash('error', 'Project is required.');
         return res.redirect('/projects');
     }
 
@@ -409,10 +404,21 @@ app.get('/works/new', isAuth, async (req, res, next) => {
                 "projects"
         `;
 
+        const users = await sql`
+            SELECT
+                id,
+                name
+            FROM
+                "users"
+            ORDER BY
+                name
+        `;
+
         return res.render('works/new', {
             title: 'New work',
             projects,
             projectId,
+            users,
         });
     } catch (err) {
         next(err);
@@ -423,8 +429,13 @@ app.post('/works', isAuth, async (req, res, next) => {
     const { projectId, title, description, assigneeId, statusId, typeId, priorityId, dueDate } = req.body;
 
     if (!projectId) {
-        req.flash('error', 'Project must required.');
-        return res.redirect('/projects');
+        req.flash('error', 'Project is required.');
+        return res.redirect('/works/new');
+    }
+
+    if (!title) {
+        req.flash('error', 'Title is required.');
+        return res.redirect('/works/new');
     }
 
     try {
@@ -440,7 +451,7 @@ app.post('/works', isAuth, async (req, res, next) => {
 
         if (!ok) {
             req.flash('error', 'Project does not exists.');
-            return res.redirect('/projects');
+            return res.redirect('/works/new');
         }
 
         const work = await sql`
@@ -480,21 +491,24 @@ app.get('/works/:id', isAuth, async (req, res, next) => {
     try {
         const work = await sql`
             SELECT
-                id,
-                title,
-                description,
-                "projectId",
-                "dueDate",
-                "assigneeId",
-                "statusId",
-                "typeId",
-                "priorityId",
-                "createdBy",
-                "createdAt"
+                w.id,
+                w.title,
+                w.description,
+                w."projectId",
+                w."dueDate",
+                w."assigneeId",
+                u.name AS "assigneeName",
+                w."statusId",
+                w."typeId",
+                w."priorityId",
+                w."createdBy",
+                w."createdAt"
             FROM
-                works
+                works w
+            LEFT JOIN
+                users u ON w."assigneeId" = u.id
             WHERE
-                id = ${id}
+                w.id = ${id}
         `.then(([x]) => x);
 
         return res.render('works/show', {
@@ -516,6 +530,16 @@ app.get('/works/:id/edit', isAuth, async (req, res, next) => {
                 name
             FROM
                 "projects"
+        `;
+
+        const users = await sql`
+            SELECT
+                id,
+                name
+            FROM
+                "users"
+            ORDER BY
+                name
         `;
 
         const work = await sql`
@@ -542,6 +566,7 @@ app.get('/works/:id/edit', isAuth, async (req, res, next) => {
             projects,
             work,
             projectId: work.projectId,
+            users,
         });
     } catch (err) {
         next(err);

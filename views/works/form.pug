@@ -21,7 +21,13 @@
 .col-2
     .mb-4
         label(for="assigneeId") Assignee
-        input(type="text", name="assigneeId", id="assigneeId", value=work ? work.assigneeId : '' placeholder="Kai Doe")
+        select(name="assigneeId", id="assigneeId")
+            option(value="") Unassigned
+            each user in users
+                if work && work.assigneeId === user.id
+                    option(value=user.id, selected=true)= user.name
+                else
+                    option(value=user.id)= user.name
     .mb-4
         label(for="statusId") Status 
         input(type="text", name="statusId", id="statusId", value=work ? work.statusId : '' placeholder="Todo")
