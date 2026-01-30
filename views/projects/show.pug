@@ -25,24 +25,21 @@ block content
                     p.gray.italic= project.description || 'N/A'
 
                 .mb-4 
-                    .row 
-                        .col-6 
-                            button.btn.is-danger.delete-project Delete project 
-                        .col-6.text-end 
-                            a(href=`/projects/${project.id}/edit`).btn Edit project
+                    button.btn.is-danger.delete-project.mr-2 Delete project 
+                    a(href=`/projects/${project.id}/edit`).btn Edit project
 
         .col-7
             .mt-4 
                 .mb-4 
                     strong Works (#{works.length}) &middot; 
-                        a(href=`/works/new?projectId=${project.id}`) Add work 
+                        a(href=`/projects/${project.id}/works/new`) Add work 
 
                 .mb-4 
                     if works.length > 0
                         each work in works 
                             strong
-                                a(href=`/works/${work.id}`) ##{work.id}. #{work.title}
-                            p #{work.assigneeName || 'Unassigned'} | #{work.statusId } | #{work.typeName || 'None'} | #{work.priorityId} | #{work.dueDate || 'N/A'}
+                                a(href=`/projects/${work.projectId}/works/${work.id}`) ##{work.id}. #{work.title}
+                            p #{work.assigneeName || 'Unassigned'} | #{work.statusId || 'None' } | #{work.typeName || 'None'} | #{work.priorityName || 'None'} | #{work.dueDate || 'N/A'}
 
                             hr
                     else 

@@ -28,9 +28,17 @@
                     option(value=user.id, selected=true)= user.name
                 else
                     option(value=user.id)= user.name
+
     .mb-4
         label(for="statusId") Status 
-        input(type="text", name="statusId", id="statusId", value=work ? work.statusId : '' placeholder="Todo")
+        select(name="statusId", id="statusId") 
+            option(value="") None 
+            each status in statuses 
+                if work && work.statusId === status.id 
+                    option(value=status.id, selected=true)= status.name
+                else 
+                    option(value=status.id)= status.name
+        
     .mb-4
         label(for="typeId") Type  
         select(name="typeId", id="typeId")
@@ -40,9 +48,17 @@
                     option(value=type.id, selected=true)= type.name
                 else
                     option(value=type.id)= type.name
+
     .mb-4
         label(for="priorityId") Priority  
-        input(type="text", name="priorityId", id="priorityId", value=work ? work.priorityId : '' placeholder="Normal")
+        select(name="priorityId", id="priorityId") 
+            option(value="") None 
+            each priority in priorities 
+                if work && work.priorityId === priority.id 
+                    option(value=priority.id, selected=true)= priority.name
+                else 
+                    option(value=priority.id)= priority.name
+
     .mb-4
         label(for="dueDate") Due date 
         input(type="text", name="dueDate", id="dueDate", value=work ? work.dueDate : '' placeholder="2026-12-31")

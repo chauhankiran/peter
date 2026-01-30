@@ -1,6 +1,6 @@
 {
     "name": "peter",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "calm work tracking",
     "main": "app.js",
     "scripts": {

@@ -5,7 +5,6 @@ block content
         .col-1 
         .col-11 
             h1 Work details  
-            p.gray.italic * = required fields.
 
             .mt-4 
                 include ../includes/flash
@@ -15,7 +14,8 @@ block content
         .col-3
             .mb-4
                 strong Project
-                p= work.projectId 
+                p 
+                    a(href=`/projects/${work.projectId}`)= work.projectName 
             .mb-4
                 strong Title
                 p= work.title 
@@ -30,13 +30,13 @@ block content
                 p= work.assigneeName || "Unassigned"
             .mb-4
                 strong Status 
-                p= work.statusId
+                p= work.statusName || 'None'
             .mb-4
                 strong Type  
                 p= work.typeName || 'None'
             .mb-4
                 strong Priority  
-                p= work.priorityId
+                p= work.priorityName || 'None'
             .mb-4
                 strong Due date 
                 p= work.dueDate || 'N/A'
@@ -45,10 +45,7 @@ block content
     .row 
         .col-1 
         .col-3 
-            .row 
-                .col-6 
-                    button.btn.is-danger.delete-work Delete work 
-                .col-6.text-end 
-                    a(href=`/works/${work.id}/edit`).btn Edit work 
+            button.btn.is-danger.delete-work.mr-2 Delete work 
+            a(href=`/projects/${work.projectId}/works/${work.id}/edit`).btn Edit work 
         .col-8 
     include ./delete-work-modal 

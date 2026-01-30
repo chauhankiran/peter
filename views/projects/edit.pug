@@ -14,10 +14,7 @@ block content
                 include ./form 
 
                 .mb-4 
-                    .row 
-                        .col-6 
-                            a(href=`/projects/${project.id}`).btn.is-muted Cancel
-                        .col-6.text-end 
-                            button(type="submit") Update project 
+                    a(href=`/projects/${project.id}`).btn.is-muted.mr-2 Cancel
+                    button(type="submit") Update project 
 
         .col-8

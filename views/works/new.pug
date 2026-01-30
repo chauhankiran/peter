@@ -1,7 +1,7 @@
 extend ../layout 
 
 block content 
-    form(action="/works", method="post", class="row mt-4") 
+    form(action=`/projects/${projectId}/works`, method="post", class="row mt-4") 
         .col-1 
         .col-11 
             h1= title 
@@ -15,4 +15,5 @@ block content
         .col-1 
         .col-11 
             .mb-4 
+                a(href=`/projects/${projectId}`).btn.is-muted.mr-2 Cancel 
                 button(type="submit") Create work 
