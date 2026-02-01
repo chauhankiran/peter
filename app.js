@@ -157,6 +157,7 @@ app.get('/dashboard', isAuth, (req, res, next) => {
 
 app.use('/projects', require('./project'));
 app.use('/projects/:projectId/works', require('./work'));
+app.use('/projects/:projectId/works/:workId/comments', require('./comment'));
 
 // Logout
 app.get('/logout', isAuth, (req, res, next) => {

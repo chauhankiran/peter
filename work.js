@@ -87,6 +87,7 @@ router.post('/', async (req, res, next) => {
 
 router.get('/:workId', isWork, async (req, res, next) => {
     const workId = req.params.workId;
+    const projectId = req.params.projectId;
 
     try {
         const work = await sql`
@@ -123,9 +124,31 @@ router.get('/:workId', isWork, async (req, res, next) => {
                 w.id = ${workId}
         `.then(([x]) => x);
 
+        const comments = await sql`
+            SELECT
+                c."projectId",
+                c."workId",
+                c.content,
+                c."createdAt",
+                c."createdBy",
+                c."updatedAt",
+                c."updatedBy",
+                u.name AS "creatorName"
+            FROM
+                comments c
+            LEFT JOIN
+                users u ON c."createdBy" = u.id
+            WHERE
+                "workId" = ${workId} AND
+                "projectId" = ${projectId}
+            ORDER BY
+                c.id DESC
+        `;
+
         return res.render('works/show', {
             title: work.title,
             work,
+            comments,
         });
     } catch (err) {
         next(err);

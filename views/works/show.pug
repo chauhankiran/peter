@@ -9,7 +9,7 @@ block content
             .mt-4 
                 include ../includes/flash
 
-    form(action="/works", method="post", class="row mt-4")  
+    .row.mt-4
         .col-1 
         .col-3
             .mb-4
@@ -41,7 +41,32 @@ block content
                 strong Due date 
                 p= work.dueDate || 'N/A'
 
-        .col-6
+        .col-5
+            .mb-4 
+                strong Comments (#{comments.length})
+            
+            .mb-4 
+                form(action=`/projects/${work.projectId}/works/${work.id}/comments`, method="post") 
+                    .mb-4 
+                        textarea(name="content", rows="10", placeholder="Add a comment...")
+                    
+                    button(type="submit") Add comment 
+
+            .mb-4 
+                if comments.length > 0
+                    each comment in comments 
+                        p #{comment.creatorName} | #{comment.createdAt} 
+                            if comment.createdBy === userId 
+                                span  | edit 
+                                span  | delete 
+                        p.italic= comment.content
+
+                        hr
+
+                else 
+                    p.italic.gray No comments found.    
+        .col-1
+
     .row 
         .col-1 
         .col-3 
