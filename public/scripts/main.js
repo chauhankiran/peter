@@ -31,3 +31,55 @@ if (deleteWorkButton) {
         });
     });
 }
+
+// Edit comment.
+const editCommentButtons = document.querySelectorAll('.edit-comment');
+
+editCommentButtons.forEach(function (button) {
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        const commentItem = this.closest('.comment-item');
+        const modal = commentItem.querySelector('.edit-comment-modal');
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    });
+});
+
+const editCommentCloseButtons = document.querySelectorAll('.edit-comment-close');
+
+editCommentCloseButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+        const commentItem = this.closest('.comment-item');
+        const modal = commentItem.querySelector('.edit-comment-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+
+// Delete comment.
+const deleteCommentButtons = document.querySelectorAll('.delete-comment');
+
+deleteCommentButtons.forEach(function (button) {
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        const commentItem = this.closest('.comment-item');
+        const modal = commentItem.querySelector('.delete-comment-modal');
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    });
+});
+
+const deleteCommentCloseButtons = document.querySelectorAll('.delete-comment-close');
+
+deleteCommentCloseButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+        const commentItem = this.closest('.comment-item');
+        const modal = commentItem.querySelector('.delete-comment-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
+});

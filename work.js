@@ -126,6 +126,7 @@ router.get('/:workId', isWork, async (req, res, next) => {
 
         const comments = await sql`
             SELECT
+                c.id,
                 c."projectId",
                 c."workId",
                 c.content,

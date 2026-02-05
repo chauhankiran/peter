@@ -55,13 +55,39 @@ block content
             .mb-4 
                 if comments.length > 0
                     each comment in comments 
-                        p #{comment.creatorName} | #{comment.createdAt} 
-                            if comment.createdBy === userId 
-                                span  | edit 
-                                span  | delete 
-                        p.italic= comment.content
+                        .comment-item(data-comment-id=comment.id)
+                            p #{comment.creatorName} | #{comment.createdAt} 
+                                if comment.createdBy === userId 
+                                    a.edit-comment(href="#")  | edit 
+                                    a.delete-comment(href="#")  | delete 
+                            p.italic= comment.content
 
-                        hr
+                            if comment.createdBy === userId
+                                //- Inline edit modal for this comment
+                                .modal.edit-comment-modal
+                                    .modal-content
+                                        .mb-4
+                                            h3 Edit comment
+                                        form(action=`/projects/${work.projectId}/works/${work.id}/comments/${comment.id}?_method=put`, method="post")
+                                            .mb-4
+                                                textarea(name="content", rows="10")= comment.content
+                                            .text-end.pt-4
+                                                button.edit-comment-close.is-muted.mr-4(type="button") Cancel
+                                                button(type="submit") Update comment
+
+                                //- Inline delete modal for this comment
+                                .modal.delete-comment-modal
+                                    .modal-content
+                                        .mb-4
+                                            h3 Delete comment
+                                            p.italic.gray This action cannot be undone.
+                                        form(action=`/projects/${work.projectId}/works/${work.id}/comments/${comment.id}?_method=delete`, method="post")
+                                            p.mb-4 Are you sure you want to delete this comment?
+                                            .text-end.pt-4
+                                                button.delete-comment-close.is-muted.mr-4(type="button") Cancel
+                                                button.is-danger(type="submit") Yes
+
+                            hr
 
                 else 
                     p.italic.gray No comments found.    
